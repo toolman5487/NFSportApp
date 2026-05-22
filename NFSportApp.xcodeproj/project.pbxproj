@@ -28,6 +28,7 @@
 		152000042FC01000008C60D9 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000142FC01000008C60D9 /* TabBarView.swift */; };
 		152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000152FC01000008C60D9 /* TabBarContainerViewController.swift */; };
 		152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000162FC01000008C60D9 /* TabBarViewModel.swift */; };
+		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		152000142FC01000008C60D9 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		152000152FC01000008C60D9 /* TabBarContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarContainerViewController.swift; sourceTree = "<group>"; };
 		152000162FC01000008C60D9 /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
+		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -160,17 +162,18 @@
 		15182AF82FC03AE3008C60D9 /* Base */ = {
 			isa = PBXGroup;
 			children = (
-				15182AF92FC03AEC008C60D9 /* ViewController */,
+				15EF4F9A2FC0A60F0016E43C /* MainBaseViewController */,
+				15182AF92FC03AEC008C60D9 /* BaseViewController */,
 			);
 			path = Base;
 			sourceTree = "<group>";
 		};
-		15182AF92FC03AEC008C60D9 /* ViewController */ = {
+		15182AF92FC03AEC008C60D9 /* BaseViewController */ = {
 			isa = PBXGroup;
 			children = (
 				15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */,
 			);
-			path = ViewController;
+			path = BaseViewController;
 			sourceTree = "<group>";
 		};
 		15182AFC2FC03C50008C60D9 /* Networks */ = {
@@ -255,6 +258,14 @@
 				152000152FC01000008C60D9 /* TabBarContainerViewController.swift */,
 			);
 			path = ViewController;
+			sourceTree = "<group>";
+		};
+		15EF4F9A2FC0A60F0016E43C /* MainBaseViewController */ = {
+			isa = PBXGroup;
+			children = (
+				15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */,
+			);
+			path = MainBaseViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -355,6 +366,7 @@
 				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
+				15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */,
 				15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */,
 				15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */,
 			);

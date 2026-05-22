@@ -7,11 +7,10 @@
 
 import UIKit
 
-class MainHomeViewController: UIViewController {
+@MainActor
+final class MainHomeViewController: MainBaseViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.title = "首頁"
-        view.backgroundColor = .systemBackground
+    override func setupNavigation() {
+        title = "首頁"
     }
 }
