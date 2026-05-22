@@ -12,6 +12,16 @@
 		15182ABA2FBFFD2A008C60D9 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AB92FBFFD2A008C60D9 /* SDWebImage */; };
 		15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */; };
 		15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */; };
+		15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */; };
+		15182AF32FC02BFF008C60D9 /* SkeletonView in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AF22FC02BFF008C60D9 /* SkeletonView */; };
+		15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */; };
+		15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */; };
+		15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B052FC03D43008C60D9 /* HTTPMethod.swift */; };
+		15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B062FC03D43008C60D9 /* NetworkQueryItem.swift */; };
+		15182B022FC03D43008C60D9 /* NetworkRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B072FC03D43008C60D9 /* NetworkRequest.swift */; };
+		15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B082FC03D43008C60D9 /* NetworkError.swift */; };
+		15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B092FC03D43008C60D9 /* NetworkClient.swift */; };
+		15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B0A2FC04000008C60D9 /* AppLogger.swift */; };
 		152000012FC01000008C60D9 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000112FC01000008C60D9 /* AppTab.swift */; };
 		152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000122FC01000008C60D9 /* TabBarItemViewData.swift */; };
 		152000032FC01000008C60D9 /* TabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000132FC01000008C60D9 /* TabBarButton.swift */; };
@@ -24,6 +34,15 @@
 		15182AAD2FBFFCF5008C60D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
+		15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderViewController.swift; sourceTree = "<group>"; };
+		15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeViewController.swift; sourceTree = "<group>"; };
+		15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		15182B052FC03D43008C60D9 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		15182B062FC03D43008C60D9 /* NetworkQueryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkQueryItem.swift; sourceTree = "<group>"; };
+		15182B072FC03D43008C60D9 /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
+		15182B082FC03D43008C60D9 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		15182B092FC03D43008C60D9 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
+		15182B0A2FC04000008C60D9 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		15186B9D2FBF1393008C60D9 /* NFSportApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NFSportApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		152000112FC01000008C60D9 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		152000122FC01000008C60D9 /* TabBarItemViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItemViewData.swift; sourceTree = "<group>"; };
@@ -60,6 +79,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				15182ABA2FBFFD2A008C60D9 /* SDWebImage in Frameworks */,
+				15182AF32FC02BFF008C60D9 /* SkeletonView in Frameworks */,
 				15182AB72FBFFD14008C60D9 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,6 +90,9 @@
 		15182ABB2FBFFFA4008C60D9 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				15182B092FC03F4D008C60D9 /* Logger */,
+				15182AFC2FC03C50008C60D9 /* Networks */,
+				15182AF82FC03AE3008C60D9 /* Base */,
 				15182ABF2FC00BBC008C60D9 /* Extensions */,
 				15182ABC2FBFFFB0008C60D9 /* Components */,
 			);
@@ -96,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				15182AAD2FBFFCF5008C60D9 /* ViewController.swift */,
+				15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -117,9 +141,62 @@
 			path = UIColor;
 			sourceTree = "<group>";
 		};
+		15182AF42FC02CF5008C60D9 /* MainHome */ = {
+			isa = PBXGroup;
+			children = (
+				15182AF52FC02CFF008C60D9 /* ViewController */,
+			);
+			path = MainHome;
+			sourceTree = "<group>";
+		};
+		15182AF52FC02CFF008C60D9 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		15182AF82FC03AE3008C60D9 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				15182AF92FC03AEC008C60D9 /* ViewController */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		15182AF92FC03AEC008C60D9 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		15182AFC2FC03C50008C60D9 /* Networks */ = {
+			isa = PBXGroup;
+			children = (
+				15182B052FC03D43008C60D9 /* HTTPMethod.swift */,
+				15182B062FC03D43008C60D9 /* NetworkQueryItem.swift */,
+				15182B072FC03D43008C60D9 /* NetworkRequest.swift */,
+				15182B082FC03D43008C60D9 /* NetworkError.swift */,
+				15182B092FC03D43008C60D9 /* NetworkClient.swift */,
+			);
+			path = Networks;
+			sourceTree = "<group>";
+		};
+		15182B092FC03F4D008C60D9 /* Logger */ = {
+			isa = PBXGroup;
+			children = (
+				15182B0A2FC04000008C60D9 /* AppLogger.swift */,
+			);
+			path = Logger;
+			sourceTree = "<group>";
+		};
 		15186B942FBF1393008C60D9 = {
 			isa = PBXGroup;
 			children = (
+				15182AF42FC02CF5008C60D9 /* MainHome */,
 				15182ABB2FBFFFA4008C60D9 /* Features */,
 				152000202FC01000008C60D9 /* TabBar */,
 				15186B9F2FBF1393008C60D9 /* NFSportApp */,
@@ -202,6 +279,7 @@
 			packageProductDependencies = (
 				15182AB62FBFFD14008C60D9 /* SnapKit */,
 				15182AB92FBFFD2A008C60D9 /* SDWebImage */,
+				15182AF22FC02BFF008C60D9 /* SkeletonView */,
 			);
 			productName = NFSportApp;
 			productReference = 15186B9D2FBF1393008C60D9 /* NFSportApp.app */;
@@ -234,6 +312,7 @@
 			packageReferences = (
 				15182AB52FBFFD14008C60D9 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				15182AB82FBFFD2A008C60D9 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				15182AF12FC02BFF008C60D9 /* XCRemoteSwiftPackageReference "SkeletonView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 15186B9E2FBF1393008C60D9 /* Products */;
@@ -261,10 +340,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				152000012FC01000008C60D9 /* AppTab.swift in Sources */,
+				15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */,
 				152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */,
 				152000032FC01000008C60D9 /* TabBarButton.swift in Sources */,
 				152000042FC01000008C60D9 /* TabBarView.swift in Sources */,
+				15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */,
+				15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */,
 				15182AB42FBFFCF5008C60D9 /* ViewController.swift in Sources */,
+				15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */,
+				15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */,
+				15182B022FC03D43008C60D9 /* NetworkRequest.swift in Sources */,
+				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
+				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
+				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
 				15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */,
@@ -498,6 +586,14 @@
 				minimumVersion = 5.21.7;
 			};
 		};
+		15182AF12FC02BFF008C60D9 /* XCRemoteSwiftPackageReference "SkeletonView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Juanpe/SkeletonView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.31.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -510,6 +606,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 15182AB82FBFFD2A008C60D9 /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImage;
+		};
+		15182AF22FC02BFF008C60D9 /* SkeletonView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15182AF12FC02BFF008C60D9 /* XCRemoteSwiftPackageReference "SkeletonView" */;
+			productName = SkeletonView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

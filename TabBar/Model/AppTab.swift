@@ -10,9 +10,9 @@ import Foundation
 enum AppTab: Int, CaseIterable, Sendable {
 
     case home
-    case schedule
-    case news
-    case profile
+    case matches
+    case leagues
+    case favorites
 }
 
 // MARK: - Display
@@ -23,12 +23,12 @@ extension AppTab {
         switch self {
         case .home:
             return "Home"
-        case .schedule:
-            return "Schedule"
-        case .news:
-            return "News"
-        case .profile:
-            return "Profile"
+        case .matches:
+            return "Matches"
+        case .leagues:
+            return "Leagues"
+        case .favorites:
+            return "Favorites"
         }
     }
 
@@ -36,12 +36,12 @@ extension AppTab {
         switch self {
         case .home:
             return "house"
-        case .schedule:
-            return "sportscourt"
-        case .news:
-            return "newspaper"
-        case .profile:
-            return "person"
+        case .matches:
+            return "calendar"
+        case .leagues:
+            return "trophy"
+        case .favorites:
+            return "star"
         }
     }
 }

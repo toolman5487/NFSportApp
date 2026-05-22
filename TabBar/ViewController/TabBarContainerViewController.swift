@@ -139,8 +139,7 @@ final class TabBarContainerViewController: UIViewController {
     // MARK: - Navigation
 
     private func makeNavigationController(for tab: AppTab) -> UINavigationController {
-        let rootViewController = ViewController()
-        rootViewController.title = tab.title
+        let rootViewController = makeRootViewController(for: tab)
         rootViewController.navigationItem.largeTitleDisplayMode = .always
 
         let navigationController = UINavigationController(rootViewController: rootViewController)
@@ -158,5 +157,14 @@ final class TabBarContainerViewController: UIViewController {
         navigationController.navigationBar.compactAppearance = appearance
 
         return navigationController
+    }
+
+    private func makeRootViewController(for tab: AppTab) -> UIViewController {
+        switch tab {
+        case .home:
+            return MainHomeViewController()
+        case .matches, .leagues, .favorites:
+            return PlaceholderViewController(title: tab.title)
+        }
     }
 }

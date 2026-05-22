@@ -64,6 +64,11 @@ final class TabBarViewModel {
             state = .loaded(selectedTab: currentSelectedTab, badges: badges)
         } catch {
             state = .failed(selectedTab: currentSelectedTab, message: error.localizedDescription)
+            AppLogger.shared.error(
+                error,
+                context: LogErrorContext("TabBar loading failed"),
+                metadata: ["tab": currentSelectedTab.title]
+            )
         }
     }
 
