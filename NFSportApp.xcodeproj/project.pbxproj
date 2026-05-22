@@ -6,8 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		15182AB42FBFFCF5008C60D9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AAD2FBFFCF5008C60D9 /* ViewController.swift */; };
+		15182AB72FBFFD14008C60D9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AB62FBFFD14008C60D9 /* SnapKit */; };
+		15182ABA2FBFFD2A008C60D9 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AB92FBFFD2A008C60D9 /* SDWebImage */; };
+		15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */; };
+		15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */; };
+		152000012FC01000008C60D9 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000112FC01000008C60D9 /* AppTab.swift */; };
+		152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000122FC01000008C60D9 /* TabBarItemViewData.swift */; };
+		152000032FC01000008C60D9 /* TabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000132FC01000008C60D9 /* TabBarButton.swift */; };
+		152000042FC01000008C60D9 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000142FC01000008C60D9 /* TabBarView.swift */; };
+		152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000152FC01000008C60D9 /* TabBarContainerViewController.swift */; };
+		152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000162FC01000008C60D9 /* TabBarViewModel.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		15182AAD2FBFFCF5008C60D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
+		15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		15186B9D2FBF1393008C60D9 /* NFSportApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NFSportApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		152000112FC01000008C60D9 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		152000122FC01000008C60D9 /* TabBarItemViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItemViewData.swift; sourceTree = "<group>"; };
+		152000132FC01000008C60D9 /* TabBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButton.swift; sourceTree = "<group>"; };
+		152000142FC01000008C60D9 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
+		152000152FC01000008C60D9 /* TabBarContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarContainerViewController.swift; sourceTree = "<group>"; };
+		152000162FC01000008C60D9 /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,15 +59,69 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15182ABA2FBFFD2A008C60D9 /* SDWebImage in Frameworks */,
+				15182AB72FBFFD14008C60D9 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		15182ABB2FBFFFA4008C60D9 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				15182ABF2FC00BBC008C60D9 /* Extensions */,
+				15182ABC2FBFFFB0008C60D9 /* Components */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		15182ABC2FBFFFB0008C60D9 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				15182ABD2FBFFFD0008C60D9 /* Placeholder */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		15182ABD2FBFFFD0008C60D9 /* Placeholder */ = {
+			isa = PBXGroup;
+			children = (
+				15182ABE2FC00450008C60D9 /* ViewController */,
+			);
+			path = Placeholder;
+			sourceTree = "<group>";
+		};
+		15182ABE2FC00450008C60D9 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				15182AAD2FBFFCF5008C60D9 /* ViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		15182ABF2FC00BBC008C60D9 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				15182AC02FC00BC5008C60D9 /* UIColor */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		15182AC02FC00BC5008C60D9 /* UIColor */ = {
+			isa = PBXGroup;
+			children = (
+				15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */,
+				15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */,
+			);
+			path = UIColor;
+			sourceTree = "<group>";
+		};
 		15186B942FBF1393008C60D9 = {
 			isa = PBXGroup;
 			children = (
+				15182ABB2FBFFFA4008C60D9 /* Features */,
+				152000202FC01000008C60D9 /* TabBar */,
 				15186B9F2FBF1393008C60D9 /* NFSportApp */,
 				15186B9E2FBF1393008C60D9 /* Products */,
 			);
@@ -56,6 +133,51 @@
 				15186B9D2FBF1393008C60D9 /* NFSportApp.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		152000202FC01000008C60D9 /* TabBar */ = {
+			isa = PBXGroup;
+			children = (
+				152000212FC01000008C60D9 /* Model */,
+				152000222FC01000008C60D9 /* ViewModel */,
+				152000232FC01000008C60D9 /* View */,
+				152000242FC01000008C60D9 /* ViewController */,
+			);
+			path = TabBar;
+			sourceTree = "<group>";
+		};
+		152000212FC01000008C60D9 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				152000112FC01000008C60D9 /* AppTab.swift */,
+				152000122FC01000008C60D9 /* TabBarItemViewData.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		152000222FC01000008C60D9 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				152000162FC01000008C60D9 /* TabBarViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		152000232FC01000008C60D9 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				152000132FC01000008C60D9 /* TabBarButton.swift */,
+				152000142FC01000008C60D9 /* TabBarView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		152000242FC01000008C60D9 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				152000152FC01000008C60D9 /* TabBarContainerViewController.swift */,
+			);
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -78,6 +200,8 @@
 			);
 			name = NFSportApp;
 			packageProductDependencies = (
+				15182AB62FBFFD14008C60D9 /* SnapKit */,
+				15182AB92FBFFD2A008C60D9 /* SDWebImage */,
 			);
 			productName = NFSportApp;
 			productReference = 15186B9D2FBF1393008C60D9 /* NFSportApp.app */;
@@ -107,6 +231,10 @@
 			);
 			mainGroup = 15186B942FBF1393008C60D9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				15182AB52FBFFD14008C60D9 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				15182AB82FBFFD2A008C60D9 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 15186B9E2FBF1393008C60D9 /* Products */;
 			projectDirPath = "";
@@ -132,6 +260,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152000012FC01000008C60D9 /* AppTab.swift in Sources */,
+				152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */,
+				152000032FC01000008C60D9 /* TabBarButton.swift in Sources */,
+				152000042FC01000008C60D9 /* TabBarView.swift in Sources */,
+				15182AB42FBFFCF5008C60D9 /* ViewController.swift in Sources */,
+				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
+				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
+				15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */,
+				15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,7 +301,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -195,7 +332,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -343,6 +480,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		15182AB52FBFFD14008C60D9 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		15182AB82FBFFD2A008C60D9 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.21.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		15182AB62FBFFD14008C60D9 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15182AB52FBFFD14008C60D9 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		15182AB92FBFFD2A008C60D9 /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15182AB82FBFFD2A008C60D9 /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 15186B952FBF1393008C60D9 /* Project object */;
 }

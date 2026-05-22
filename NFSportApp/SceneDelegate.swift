@@ -17,7 +17,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
         window.overrideUserInterfaceStyle = .dark
-        window.rootViewController = UINavigationController(rootViewController: ViewController())
+        let viewModel = TabBarViewModel(badgeService: MockTabBarBadgeService())
+        let rootViewController = TabBarContainerViewController(viewModel: viewModel)
+        window.rootViewController = rootViewController
         window.makeKeyAndVisible()
         self.window = window
     }
@@ -34,4 +36,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
 }
-
