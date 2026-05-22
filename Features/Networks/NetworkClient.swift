@@ -84,25 +84,21 @@ actor NetworkClient: NetworkServicing {
 
     func send(_ request: NetworkRequest) async throws -> Data {
         let urlRequest = try makeURLRequest(from: request)
+        AppLogger.logNetworkRequest(
+            method: urlRequest.httpMethod ?? "GET",
+            url: urlRequest.url?.absoluteString ?? ""
+        )
 
         do {
             let (data, response) = try await session.data(for: urlRequest)
             try validate(response)
             return data
         } catch let error as NetworkError {
-            AppLogger.shared.error(
-                error,
-                context: LogErrorContext("Network request failed"),
-                metadata: request.logMetadata
-            )
+            AppLogger.logNetworkError(error, method: request.method.rawValue, path: request.path)
             throw error
         } catch {
             let networkError = NetworkError.requestFailed(error.localizedDescription)
-            AppLogger.shared.error(
-                networkError,
-                context: LogErrorContext("Network request failed"),
-                metadata: request.logMetadata
-            )
+            AppLogger.logNetworkError(networkError, method: request.method.rawValue, path: request.path)
             throw networkError
         }
     }
@@ -121,11 +117,7 @@ actor NetworkClient: NetworkServicing {
             return try JSONDecoder().decode(Response.self, from: data)
         } catch {
             let networkError = NetworkError.decodingFailed(error.localizedDescription)
-            AppLogger.shared.error(
-                networkError,
-                context: LogErrorContext("Network response decoding failed"),
-                metadata: request.logMetadata
-            )
+            AppLogger.logDecodingError(networkError, method: request.method.rawValue, path: request.path)
             throw networkError
         }
     }
@@ -322,15 +314,5 @@ private nonisolated enum HTTPStatusCategory {
         default:
             self = .unexpected
         }
-    }
-}
-
-private nonisolated extension NetworkRequest {
-
-    var logMetadata: [String: String] {
-        [
-            "method": method.rawValue,
-            "path": path
-        ]
     }
 }

@@ -7,81 +7,110 @@
 
 import OSLog
 
-// MARK: - LogErrorContext
+// MARK: - AppLogCategory
 
-nonisolated struct LogErrorContext: Sendable {
+nonisolated enum AppLogCategory: String, CaseIterable, Sendable {
 
-    let message: String
-    let file: String
-    let function: String
-    let line: Int
+    case app = "App"
+    case lifecycle = "Lifecycle"
+    case network = "Network"
+    case connectivity = "Connectivity"
+    case decoding = "Decoding"
+    case persistence = "Persistence"
+    case keychain = "Keychain"
+    case authentication = "Authentication"
+    case navigation = "Navigation"
+    case ui = "UI"
+    case cache = "Cache"
+    case performance = "Performance"
+    case backgroundTask = "BackgroundTask"
+    case notifications = "Notifications"
+    case deeplink = "Deeplink"
+    case sync = "Sync"
+    case media = "Media"
+    case analytics = "Analytics"
+    case security = "Security"
+    case thirdParty = "ThirdParty"
+    case domain = "Domain"
+    case search = "Search"
+    case configuration = "Configuration"
 
-    init(
-        _ message: String,
-        file: String = #fileID,
-        function: String = #function,
-        line: Int = #line
-    ) {
-        self.message = message
-        self.file = file
-        self.function = function
-        self.line = line
+    var logger: Logger {
+        Logger(subsystem: AppLogger.subsystem, category: rawValue)
     }
 }
 
 // MARK: - AppLogger
 
-nonisolated final class AppLogger: @unchecked Sendable {
+nonisolated enum AppLogger {
 
-    static let shared = AppLogger()
+    // MARK: - Configuration
 
-    private let logger = Logger(subsystem: "NFSportApp", category: "Error")
+    static let subsystem = Bundle.main.bundleIdentifier ?? "NFSportApp"
 
-    private init() {}
+    // MARK: - Core
 
-    func error(
-        _ error: Error,
-        context: LogErrorContext,
-        metadata: [String: String] = [:]
-    ) {
-        var details = metadata
-        details["errorType"] = String(describing: type(of: error))
-        details["errorMessage"] = error.localizedDescription
+    static let app = AppLogCategory.app.logger
+    static let lifecycle = AppLogCategory.lifecycle.logger
+    static let configuration = AppLogCategory.configuration.logger
 
-        self.error(
-            context.message,
-            metadata: details,
-            file: context.file,
-            function: context.function,
-            line: context.line
+    // MARK: - Infrastructure
+
+    static let network = AppLogCategory.network.logger
+    static let connectivity = AppLogCategory.connectivity.logger
+    static let persistence = AppLogCategory.persistence.logger
+    static let keychain = AppLogCategory.keychain.logger
+    static let cache = AppLogCategory.cache.logger
+    static let sync = AppLogCategory.sync.logger
+    static let backgroundTask = AppLogCategory.backgroundTask.logger
+
+    // MARK: - Feature
+
+    static let authentication = AppLogCategory.authentication.logger
+    static let navigation = AppLogCategory.navigation.logger
+    static let ui = AppLogCategory.ui.logger
+    static let domain = AppLogCategory.domain.logger
+    static let search = AppLogCategory.search.logger
+    static let media = AppLogCategory.media.logger
+    static let notifications = AppLogCategory.notifications.logger
+    static let deeplink = AppLogCategory.deeplink.logger
+
+    // MARK: - Observability
+
+    static let performance = AppLogCategory.performance.logger
+    static let analytics = AppLogCategory.analytics.logger
+    static let security = AppLogCategory.security.logger
+
+    // MARK: - Integration
+
+    static let decoding = AppLogCategory.decoding.logger
+    static let thirdParty = AppLogCategory.thirdParty.logger
+
+    // MARK: - Network Logging
+
+    static func logNetworkRequest(method: String, url: String) {
+        network.debug("\(method, privacy: .public) \(url, privacy: .public)")
+    }
+
+    static func logNetworkError(_ error: Error, method: String, path: String) {
+        network.error(
+            "Network request failed | method=\(method, privacy: .public), path=\(path, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
         )
     }
 
-    func error(
-        _ message: String,
-        metadata: [String: String] = [:],
-        file: String = #fileID,
-        function: String = #function,
-        line: Int = #line
-    ) {
-        let detail = formattedMetadata(metadata)
+    // MARK: - Decoding Logging
 
-        switch detail.isEmpty {
-        case true:
-            logger.error("[Error] \(message, privacy: .public) | source=\(file, privacy: .public):\(line) \(function, privacy: .public)")
-        case false:
-            logger.error("[Error] \(message, privacy: .public) | \(detail, privacy: .public) | source=\(file, privacy: .public):\(line) \(function, privacy: .public)")
-        }
+    static func logDecodingError(_ error: Error, method: String, path: String) {
+        decoding.error(
+            "Network response decoding failed | method=\(method, privacy: .public), path=\(path, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+        )
     }
 
-    private func formattedMetadata(_ metadata: [String: String]) -> String {
-        guard !metadata.isEmpty else {
-            return ""
-        }
+    // MARK: - UI Logging
 
-        return metadata
-            .sorted { $0.key < $1.key }
-            .map { "\($0.key)=\($0.value)" }
-            .joined(separator: ", ")
+    static func logUIError(_ error: Error, message: String, metadata: String) {
+        ui.error(
+            "\(message, privacy: .public) | \(metadata, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+        )
     }
 }
