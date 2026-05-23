@@ -14,6 +14,7 @@ final class TabBarContainerViewController: UIViewController {
     // MARK: - Dependencies
 
     private let viewModel: TabBarViewModel
+    private let sportScopedNetworkClient: NetworkServicing
 
     // MARK: - UI Components
 
@@ -60,8 +61,12 @@ final class TabBarContainerViewController: UIViewController {
 
     // MARK: - Initialization
 
-    init(viewModel: TabBarViewModel) {
+    init(
+        viewModel: TabBarViewModel,
+        sportScopedNetworkClient: NetworkServicing
+    ) {
         self.viewModel = viewModel
+        self.sportScopedNetworkClient = sportScopedNetworkClient
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -200,7 +205,12 @@ final class TabBarContainerViewController: UIViewController {
     private func makeRootViewController(for tab: AppTab) -> UIViewController {
         switch tab {
         case .home:
-            return MainHomeViewController(selectedSport: viewModel.selectedSport)
+            let homeService = MainHomeService(networkClient: sportScopedNetworkClient)
+            let homeViewModel = MainHomeViewModel(
+                selectedSport: viewModel.selectedSport,
+                homeService: homeService
+            )
+            return MainHomeViewController(viewModel: homeViewModel)
         case .matches, .leagues, .favorites:
             return PlaceholderViewController(title: tab.title)
         }

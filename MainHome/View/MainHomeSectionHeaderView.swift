@@ -1,0 +1,51 @@
+//
+//  MainHomeSectionHeaderView.swift
+//  NFSportApp
+//
+//  Created by Willy Hsu 2026/5/23.
+//
+
+import SnapKit
+import UIKit
+
+final class MainHomeSectionHeaderView: UICollectionReusableView {
+
+    static let reuseIdentifier = "MainHomeSectionHeaderView"
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .title3)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        return label
+    }()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.text = nil
+    }
+
+    func configure(title: String) {
+        titleLabel.text = title
+    }
+
+    private func setupView() {
+        addSubview(titleLabel)
+
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().inset(8)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().inset(8)
+        }
+    }
+}
+

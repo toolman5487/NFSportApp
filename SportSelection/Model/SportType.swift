@@ -16,6 +16,15 @@ nonisolated struct SportType: Codable, Equatable, Hashable, Sendable {
     let apiHost: String
 }
 
+// MARK: - API
+
+extension SportType {
+
+    nonisolated var apiBaseURL: URL? {
+        URL(string: "https://\(apiHost)")
+    }
+}
+
 // MARK: - Local Catalog
 
 extension SportType {

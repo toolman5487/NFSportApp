@@ -33,6 +33,13 @@
 		153000032FC10000008C60D9 /* SportCatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000132FC10000008C60D9 /* SportCatalogService.swift */; };
 		153000042FC10000008C60D9 /* SportSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000142FC10000008C60D9 /* SportSelectionViewModel.swift */; };
 		153000052FC10000008C60D9 /* SportSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000152FC10000008C60D9 /* SportSelectionViewController.swift */; };
+		154000012FC20000008C60D9 /* MainHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000112FC20000008C60D9 /* MainHomeDashboard.swift */; };
+		154000022FC20000008C60D9 /* MainHomeEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000122FC20000008C60D9 /* MainHomeEndpoint.swift */; };
+		154000032FC20000008C60D9 /* MainHomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000132FC20000008C60D9 /* MainHomeService.swift */; };
+		154000042FC20000008C60D9 /* MainHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000142FC20000008C60D9 /* MainHomeViewModel.swift */; };
+		154000052FC20000008C60D9 /* MainHomePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000152FC20000008C60D9 /* MainHomePresentation.swift */; };
+		154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000162FC20000008C60D9 /* MainHomeGameCell.swift */; };
+		154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +68,13 @@
 		153000132FC10000008C60D9 /* SportCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogService.swift; sourceTree = "<group>"; };
 		153000142FC10000008C60D9 /* SportSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewModel.swift; sourceTree = "<group>"; };
 		153000152FC10000008C60D9 /* SportSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewController.swift; sourceTree = "<group>"; };
+		154000112FC20000008C60D9 /* MainHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeDashboard.swift; sourceTree = "<group>"; };
+		154000122FC20000008C60D9 /* MainHomeEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeEndpoint.swift; sourceTree = "<group>"; };
+		154000132FC20000008C60D9 /* MainHomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeService.swift; sourceTree = "<group>"; };
+		154000142FC20000008C60D9 /* MainHomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeViewModel.swift; sourceTree = "<group>"; };
+		154000152FC20000008C60D9 /* MainHomePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomePresentation.swift; sourceTree = "<group>"; };
+		154000162FC20000008C60D9 /* MainHomeGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeGameCell.swift; sourceTree = "<group>"; };
+		154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeSectionHeaderView.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -156,6 +170,10 @@
 		15182AF42FC02CF5008C60D9 /* MainHome */ = {
 			isa = PBXGroup;
 			children = (
+				154000202FC20000008C60D9 /* Model */,
+				154000212FC20000008C60D9 /* Service */,
+				154000222FC20000008C60D9 /* ViewModel */,
+				154000232FC20000008C60D9 /* View */,
 				15182AF52FC02CFF008C60D9 /* ViewController */,
 			);
 			path = MainHome;
@@ -315,6 +333,41 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
+		154000202FC20000008C60D9 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				154000112FC20000008C60D9 /* MainHomeDashboard.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		154000212FC20000008C60D9 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				154000122FC20000008C60D9 /* MainHomeEndpoint.swift */,
+				154000132FC20000008C60D9 /* MainHomeService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		154000222FC20000008C60D9 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				154000142FC20000008C60D9 /* MainHomeViewModel.swift */,
+				154000152FC20000008C60D9 /* MainHomePresentation.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		154000232FC20000008C60D9 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				154000162FC20000008C60D9 /* MainHomeGameCell.swift */,
+				154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		15EF4F9A2FC0A60F0016E43C /* MainBaseViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -419,11 +472,18 @@
 				15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */,
 				15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */,
 				15182B022FC03D43008C60D9 /* NetworkRequest.swift in Sources */,
+				154000012FC20000008C60D9 /* MainHomeDashboard.swift in Sources */,
+				154000022FC20000008C60D9 /* MainHomeEndpoint.swift in Sources */,
 				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
 				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
 				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
 				153000022FC10000008C60D9 /* SportSelectionViewData.swift in Sources */,
 				153000032FC10000008C60D9 /* SportCatalogService.swift in Sources */,
+				154000032FC20000008C60D9 /* MainHomeService.swift in Sources */,
+				154000042FC20000008C60D9 /* MainHomeViewModel.swift in Sources */,
+				154000052FC20000008C60D9 /* MainHomePresentation.swift in Sources */,
+				154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */,
+				154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
 				15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */,

@@ -9,6 +9,14 @@ import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
+    // MARK: - Dependencies
+
+    private let sportSessionStore = SportSessionStore()
+    private lazy var sportScopedNetworkClient: NetworkServicing = SportScopedNetworkClient(
+        sportSessionStore: sportSessionStore,
+        defaultHeadersProvider: AppConfiguration.apiSportsDefaultHeaders
+    )
+
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -44,10 +52,21 @@ private extension SceneDelegate {
         let viewController = SportSelectionViewController(viewModel: viewModel)
 
         viewController.onSportSelected = { [weak self] sport in
-            self?.showTabBar(for: sport)
+            self?.selectSport(sport)
         }
 
         return makeNavigationController(rootViewController: viewController)
+    }
+
+    func selectSport(_ sport: SportType) {
+        Task { @MainActor [weak self] in
+            guard let self else {
+                return
+            }
+
+            await sportSessionStore.selectSport(sport)
+            showTabBar(for: sport)
+        }
     }
 
     func showTabBar(for sport: SportType) {
@@ -55,7 +74,10 @@ private extension SceneDelegate {
             selectedSport: sport,
             badgeService: MockTabBarBadgeService()
         )
-        let viewController = TabBarContainerViewController(viewModel: viewModel)
+        let viewController = TabBarContainerViewController(
+            viewModel: viewModel,
+            sportScopedNetworkClient: sportScopedNetworkClient
+        )
         viewController.onSportSelectionRequested = { [weak self] in
             self?.showSportSelection()
         }
@@ -64,7 +86,14 @@ private extension SceneDelegate {
     }
 
     func showSportSelection() {
-        window?.rootViewController = makeSportSelectionViewController()
+        Task { @MainActor [weak self] in
+            guard let self else {
+                return
+            }
+
+            await sportSessionStore.clearSelectedSport()
+            window?.rootViewController = makeSportSelectionViewController()
+        }
     }
 
     func makeNavigationController(rootViewController: UIViewController) -> UINavigationController {

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>APISportsAPIKey</key>
+	<string>2774724f0d3a0c3935cc7e4379071003</string>
 	<key>UIDesignRequiresCompatibility</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
