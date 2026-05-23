@@ -28,6 +28,11 @@
 		152000042FC01000008C60D9 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000142FC01000008C60D9 /* TabBarView.swift */; };
 		152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000152FC01000008C60D9 /* TabBarContainerViewController.swift */; };
 		152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000162FC01000008C60D9 /* TabBarViewModel.swift */; };
+		153000012FC10000008C60D9 /* SportType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000112FC10000008C60D9 /* SportType.swift */; };
+		153000022FC10000008C60D9 /* SportSelectionViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000122FC10000008C60D9 /* SportSelectionViewData.swift */; };
+		153000032FC10000008C60D9 /* SportCatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000132FC10000008C60D9 /* SportCatalogService.swift */; };
+		153000042FC10000008C60D9 /* SportSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000142FC10000008C60D9 /* SportSelectionViewModel.swift */; };
+		153000052FC10000008C60D9 /* SportSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000152FC10000008C60D9 /* SportSelectionViewController.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +56,11 @@
 		152000142FC01000008C60D9 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		152000152FC01000008C60D9 /* TabBarContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarContainerViewController.swift; sourceTree = "<group>"; };
 		152000162FC01000008C60D9 /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
+		153000112FC10000008C60D9 /* SportType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportType.swift; sourceTree = "<group>"; };
+		153000122FC10000008C60D9 /* SportSelectionViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewData.swift; sourceTree = "<group>"; };
+		153000132FC10000008C60D9 /* SportCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogService.swift; sourceTree = "<group>"; };
+		153000142FC10000008C60D9 /* SportSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewModel.swift; sourceTree = "<group>"; };
+		153000152FC10000008C60D9 /* SportSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewController.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -201,6 +211,7 @@
 			children = (
 				15182AF42FC02CF5008C60D9 /* MainHome */,
 				15182ABB2FBFFFA4008C60D9 /* Features */,
+				153000202FC10000008C60D9 /* SportSelection */,
 				152000202FC01000008C60D9 /* TabBar */,
 				15186B9F2FBF1393008C60D9 /* NFSportApp */,
 				15186B9E2FBF1393008C60D9 /* Products */,
@@ -256,6 +267,50 @@
 			isa = PBXGroup;
 			children = (
 				152000152FC01000008C60D9 /* TabBarContainerViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		153000202FC10000008C60D9 /* SportSelection */ = {
+			isa = PBXGroup;
+			children = (
+				153000212FC10000008C60D9 /* Model */,
+				153000222FC10000008C60D9 /* Service */,
+				153000232FC10000008C60D9 /* ViewModel */,
+				153000242FC10000008C60D9 /* ViewController */,
+			);
+			path = SportSelection;
+			sourceTree = "<group>";
+		};
+		153000212FC10000008C60D9 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				153000112FC10000008C60D9 /* SportType.swift */,
+				153000122FC10000008C60D9 /* SportSelectionViewData.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		153000222FC10000008C60D9 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				153000132FC10000008C60D9 /* SportCatalogService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		153000232FC10000008C60D9 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				153000142FC10000008C60D9 /* SportSelectionViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		153000242FC10000008C60D9 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				153000152FC10000008C60D9 /* SportSelectionViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -353,17 +408,22 @@
 				152000012FC01000008C60D9 /* AppTab.swift in Sources */,
 				15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */,
 				152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */,
+				153000052FC10000008C60D9 /* SportSelectionViewController.swift in Sources */,
 				152000032FC01000008C60D9 /* TabBarButton.swift in Sources */,
+				153000042FC10000008C60D9 /* SportSelectionViewModel.swift in Sources */,
 				152000042FC01000008C60D9 /* TabBarView.swift in Sources */,
 				15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */,
 				15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */,
 				15182AB42FBFFCF5008C60D9 /* ViewController.swift in Sources */,
+				153000012FC10000008C60D9 /* SportType.swift in Sources */,
 				15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */,
 				15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */,
 				15182B022FC03D43008C60D9 /* NetworkRequest.swift in Sources */,
 				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
 				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
 				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
+				153000022FC10000008C60D9 /* SportSelectionViewData.swift in Sources */,
+				153000032FC10000008C60D9 /* SportCatalogService.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
 				15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */,

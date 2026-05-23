@@ -10,7 +10,22 @@ import UIKit
 @MainActor
 final class MainHomeViewController: MainBaseViewController {
 
-    override func setupNavigation() {
-        title = "首頁"
+    // MARK: - Properties
+
+    private let selectedSport: SportType
+
+    // MARK: - Initialization
+
+    init(selectedSport: SportType) {
+        self.selectedSport = selectedSport
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func setupMainNavigation() {
+        title = selectedSport.title
     }
 }

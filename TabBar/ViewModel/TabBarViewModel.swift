@@ -96,7 +96,9 @@ final class TabBarViewModel {
     }
     
     var onStateChange: ((TabBarViewState) -> Void)?
-    
+
+    let selectedSport: SportType
+
     private let badgeService: TabBarBadgeServicing
     private var currentDisplayedTab: AppTab?
     private var pendingTabSelection: AppTab?
@@ -120,10 +122,14 @@ final class TabBarViewModel {
             }
         )
     }
-    
+
     // MARK: - Initialization
-    
-    init(badgeService: TabBarBadgeServicing) {
+
+    init(
+        selectedSport: SportType,
+        badgeService: TabBarBadgeServicing
+    ) {
+        self.selectedSport = selectedSport
         self.badgeService = badgeService
     }
     

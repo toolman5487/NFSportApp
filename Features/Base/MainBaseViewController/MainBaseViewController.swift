@@ -21,6 +21,18 @@ class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UI
 
     // MARK: - Properties
 
+    var onSportSelectionRequested: (() -> Void)?
+
+    private lazy var sportSelectionBarButtonItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(
+            image: UIImage(systemName: "arrow.uturn.backward"),
+            style: .plain,
+            target: self,
+            action: #selector(handleSportSelectionButtonTap)
+        )
+        return item
+    }()
+
     private(set) lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -37,6 +49,13 @@ class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UI
     }()
 
     // MARK: - Override Points
+
+    final override func setupNavigation() {
+        super.setupNavigation()
+
+        navigationItem.rightBarButtonItem = sportSelectionBarButtonItem
+        setupMainNavigation()
+    }
 
     final override func setupView() {
         super.setupView()
@@ -56,6 +75,8 @@ class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UI
 
         setupContentConstraints()
     }
+
+    func setupMainNavigation() {}
 
     func registerReusableViews() {}
 
@@ -102,6 +123,13 @@ class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UI
 
     func reloadCollectionViewLayout(animated: Bool = false) {
         collectionView.setCollectionViewLayout(makeCollectionViewLayout(), animated: animated)
+    }
+
+    // MARK: - Actions
+
+    @objc
+    private func handleSportSelectionButtonTap() {
+        onSportSelectionRequested?()
     }
 }
 

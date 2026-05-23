@@ -54,6 +54,10 @@ final class TabBarContainerViewController: UIViewController {
         })
     }()
 
+    // MARK: - Callbacks
+
+    var onSportSelectionRequested: (() -> Void)?
+
     // MARK: - Initialization
 
     init(viewModel: TabBarViewModel) {
@@ -170,6 +174,12 @@ final class TabBarContainerViewController: UIViewController {
         let rootViewController = makeRootViewController(for: tab)
         rootViewController.navigationItem.largeTitleDisplayMode = .always
 
+        if let mainBaseViewController = rootViewController as? MainBaseViewController {
+            mainBaseViewController.onSportSelectionRequested = { [weak self] in
+                self?.onSportSelectionRequested?()
+            }
+        }
+
         let navigationController = UINavigationController(rootViewController: rootViewController)
         navigationController.navigationBar.prefersLargeTitles = true
         navigationController.navigationBar.tintColor = .primaryLabel
@@ -190,7 +200,7 @@ final class TabBarContainerViewController: UIViewController {
     private func makeRootViewController(for tab: AppTab) -> UIViewController {
         switch tab {
         case .home:
-            return MainHomeViewController()
+            return MainHomeViewController(selectedSport: viewModel.selectedSport)
         case .matches, .leagues, .favorites:
             return PlaceholderViewController(title: tab.title)
         }
