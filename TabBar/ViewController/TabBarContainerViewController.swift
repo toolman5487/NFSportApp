@@ -8,11 +8,14 @@
 import SnapKit
 import UIKit
 
+@MainActor
 final class TabBarContainerViewController: UIViewController {
 
-    // MARK: - Properties
+    // MARK: - Dependencies
 
     private let viewModel: TabBarViewModel
+
+    // MARK: - UI Components
 
     private let contentContainerView: UIView = {
         let view = UIView()
@@ -26,13 +29,30 @@ final class TabBarContainerViewController: UIViewController {
         return view
     }()
 
+    private lazy var pageViewController: UIPageViewController = {
+        let pageViewController = UIPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal
+        )
+        pageViewController.dataSource = self
+        pageViewController.delegate = self
+        pageViewController.view.backgroundColor = .clear
+        return pageViewController
+    }()
+
+    // MARK: - Child View Controllers
+
     private lazy var childViewControllersByTab: [AppTab: UINavigationController] = {
         Dictionary(uniqueKeysWithValues: AppTab.allCases.map { tab in
             (tab, makeNavigationController(for: tab))
         })
     }()
 
-    private var currentChildViewController: UIViewController?
+    private lazy var tabByViewControllerIdentifier: [ObjectIdentifier: AppTab] = {
+        Dictionary(uniqueKeysWithValues: childViewControllersByTab.map { tab, viewController in
+            (ObjectIdentifier(viewController), tab)
+        })
+    }()
 
     // MARK: - Initialization
 
@@ -52,8 +72,6 @@ final class TabBarContainerViewController: UIViewController {
         setupView()
         bindViewModel()
 
-        viewModel.selectTab(.home)
-
         Task { [weak self] in
             guard let self else {
                 return
@@ -70,9 +88,10 @@ final class TabBarContainerViewController: UIViewController {
 
         view.addSubview(contentContainerView)
         view.addSubview(tabBarView)
+        setupPageViewController()
 
         contentContainerView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.top.equalToSuperview()
             make.leading.trailing.equalToSuperview()
             make.bottom.equalTo(tabBarView.snp.top)
         }
@@ -83,57 +102,66 @@ final class TabBarContainerViewController: UIViewController {
         }
 
         tabBarView.onTabSelected = { [weak self] tab in
-            self?.viewModel.selectTab(tab)
+            self?.viewModel.handleTabSelection(tab)
         }
     }
 
-    private func bindViewModel() {
-        viewModel.onStateChange = { [weak self] state in
-            self?.render(state)
+    private func setupPageViewController() {
+        addChild(pageViewController)
+        contentContainerView.addSubview(pageViewController.view)
+
+        pageViewController.view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
 
-        render(viewModel.state)
+        pageViewController.didMove(toParent: self)
+    }
+
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] _ in
+            self?.render()
+        }
+
+        render()
     }
 
     // MARK: - Rendering
 
-    private func render(_ state: TabBarViewState) {
-        tabBarView.render(items: viewModel.makeItemViewData())
-
-        switch state {
-        case .idle(let selectedTab):
-            displayContent(for: selectedTab)
-        case .loading(let selectedTab):
-            displayContent(for: selectedTab)
-        case .loaded(let selectedTab, _):
-            displayContent(for: selectedTab)
-        case .failed(let selectedTab, _):
-            displayContent(for: selectedTab)
-        }
+    private func render() {
+        let presentation = viewModel.presentation
+        tabBarView.render(items: presentation.items)
+        displayContent()
     }
 
-    private func displayContent(for tab: AppTab) {
-        guard let nextViewController = childViewControllersByTab[tab] else {
+    private func displayContent() {
+        guard let transition = viewModel.makePageTransition(),
+              let nextViewController = childViewControllersByTab[transition.targetTab] else {
             return
         }
 
-        guard currentChildViewController !== nextViewController else {
+        let navigationDirection = makeNavigationDirection(from: transition.direction)
+
+        guard transition.isAnimated else {
+            pageViewController.setViewControllers(
+                [nextViewController],
+                direction: navigationDirection,
+                animated: false
+            )
+            viewModel.handleProgrammaticTransitionCompletion(visibleTab: transition.targetTab)
             return
         }
 
-        currentChildViewController?.willMove(toParent: nil)
-        currentChildViewController?.view.removeFromSuperview()
-        currentChildViewController?.removeFromParent()
+        pageViewController.setViewControllers(
+            [nextViewController],
+            direction: navigationDirection,
+            animated: true
+        ) { [weak self] _ in
+            guard let self else {
+                return
+            }
 
-        addChild(nextViewController)
-        contentContainerView.addSubview(nextViewController.view)
-
-        nextViewController.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            self.viewModel.handleProgrammaticTransitionCompletion(visibleTab: self.visibleTab)
         }
-
-        nextViewController.didMove(toParent: self)
-        currentChildViewController = nextViewController
     }
 
     // MARK: - Navigation
@@ -166,5 +194,89 @@ final class TabBarContainerViewController: UIViewController {
         case .matches, .leagues, .favorites:
             return PlaceholderViewController(title: tab.title)
         }
+    }
+
+    private func makeNavigationDirection(
+        from direction: TabBarPageTransitionDirection
+    ) -> UIPageViewController.NavigationDirection {
+        switch direction {
+        case .forward:
+            return .forward
+        case .reverse:
+            return .reverse
+        }
+    }
+
+    private func tab(for viewController: UIViewController) -> AppTab? {
+        tabByViewControllerIdentifier[ObjectIdentifier(viewController)]
+    }
+
+    private func makeViewController(for tab: AppTab?) -> UIViewController? {
+        guard let tab else {
+            return nil
+        }
+
+        return childViewControllersByTab[tab]
+    }
+
+    private var visibleTab: AppTab? {
+        guard let visibleViewController = pageViewController.viewControllers?.first else {
+            return nil
+        }
+
+        return tab(for: visibleViewController)
+    }
+}
+
+// MARK: - UIPageViewControllerDataSource
+
+extension TabBarContainerViewController: UIPageViewControllerDataSource {
+
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        viewControllerBefore currentViewController: UIViewController
+    ) -> UIViewController? {
+        guard let currentTab = tab(for: currentViewController) else {
+            return nil
+        }
+
+        let previousTab = AppTab(rawValue: currentTab.rawValue - 1)
+        return makeViewController(for: previousTab)
+    }
+
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        viewControllerAfter currentViewController: UIViewController
+    ) -> UIViewController? {
+        guard let currentTab = tab(for: currentViewController) else {
+            return nil
+        }
+
+        let nextTab = AppTab(rawValue: currentTab.rawValue + 1)
+        return makeViewController(for: nextTab)
+    }
+}
+
+// MARK: - UIPageViewControllerDelegate
+
+extension TabBarContainerViewController: UIPageViewControllerDelegate {
+
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        willTransitionTo pendingViewControllers: [UIViewController]
+    ) {
+        viewModel.handleGestureTransitionWillStart()
+    }
+
+    func pageViewController(
+        _ pageViewController: UIPageViewController,
+        didFinishAnimating finished: Bool,
+        previousViewControllers: [UIViewController],
+        transitionCompleted completed: Bool
+    ) {
+        viewModel.handleGestureTransitionCompletion(
+            visibleTab: visibleTab,
+            didComplete: finished && completed
+        )
     }
 }
