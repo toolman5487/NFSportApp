@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		15182AB42FBFFCF5008C60D9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AAD2FBFFCF5008C60D9 /* ViewController.swift */; };
 		15182AB72FBFFD14008C60D9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AB62FBFFD14008C60D9 /* SnapKit */; };
 		15182ABA2FBFFD2A008C60D9 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AB92FBFFD2A008C60D9 /* SDWebImage */; };
 		15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */; };
@@ -44,7 +43,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		15182AAD2FBFFCF5008C60D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderViewController.swift; sourceTree = "<group>"; };
@@ -144,7 +142,6 @@
 		15182ABE2FC00450008C60D9 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				15182AAD2FBFFCF5008C60D9 /* ViewController.swift */,
 				15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */,
 			);
 			path = ViewController;
@@ -467,7 +464,6 @@
 				152000042FC01000008C60D9 /* TabBarView.swift in Sources */,
 				15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */,
 				15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */,
-				15182AB42FBFFCF5008C60D9 /* ViewController.swift in Sources */,
 				153000012FC10000008C60D9 /* SportType.swift in Sources */,
 				15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */,
 				15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */,

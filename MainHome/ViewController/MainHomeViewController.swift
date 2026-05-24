@@ -55,6 +55,7 @@ final class MainHomeViewController: MainBaseViewController {
 
     override func setupMainNavigation() {
         title = viewModel.selectedSport.title
+        navigationItem.leftBarButtonItem = nil
     }
 
     override func registerReusableViews() {
@@ -132,6 +133,7 @@ final class MainHomeViewController: MainBaseViewController {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
         )
+        header.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [header]
         return section
     }

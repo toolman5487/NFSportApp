@@ -17,6 +17,7 @@ nonisolated struct MainHomeDashboard: Equatable, Sendable {
 nonisolated struct MainHomeGame: Equatable, Identifiable, Sendable {
 
     let id: Int
+    let leagueName: String
     let homeTeamName: String
     let awayTeamName: String
     let scheduledStartText: String?

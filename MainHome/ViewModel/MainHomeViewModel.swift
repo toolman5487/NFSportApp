@@ -75,16 +75,11 @@ final class MainHomeViewModel {
     // MARK: - Private Methods
 
     private func makePresentation(from dashboard: MainHomeDashboard) -> MainHomePresentation {
-        let sections = [
-            MainHomeSectionViewData(
-                title: "Live Games",
-                items: dashboard.liveGames.map(makeGameViewData)
-            ),
-            MainHomeSectionViewData(
-                title: "Today",
-                items: dashboard.todayGames.map(makeGameViewData)
-            )
-        ].filter { !$0.items.isEmpty }
+        let games = mergeGames(
+            liveGames: dashboard.liveGames,
+            todayGames: dashboard.todayGames
+        )
+        let sections = makeLeagueSections(from: games)
 
         return MainHomePresentation(
             title: dashboard.sport.title,
@@ -128,6 +123,47 @@ final class MainHomeViewModel {
 
         default:
             return .neutral
+        }
+    }
+
+    private func mergeGames(
+        liveGames: [MainHomeGame],
+        todayGames: [MainHomeGame]
+    ) -> [MainHomeGame] {
+        var seenGameIDs = Set<Int>()
+        var mergedGames: [MainHomeGame] = []
+
+        for game in liveGames + todayGames where seenGameIDs.insert(game.id).inserted {
+            mergedGames.append(game)
+        }
+
+        return mergedGames
+    }
+
+    private func makeLeagueSections(from games: [MainHomeGame]) -> [MainHomeSectionViewData] {
+        var orderedLeagueNames: [String] = []
+        var gamesByLeagueName: [String: [MainHomeGame]] = [:]
+
+        for game in games {
+            let leagueName = game.leagueName
+
+            if gamesByLeagueName[leagueName] == nil {
+                orderedLeagueNames.append(leagueName)
+            }
+
+            gamesByLeagueName[leagueName, default: []].append(game)
+        }
+
+        return orderedLeagueNames.compactMap { leagueName in
+            guard let leagueGames = gamesByLeagueName[leagueName],
+                  !leagueGames.isEmpty else {
+                return nil
+            }
+
+            return MainHomeSectionViewData(
+                title: leagueName,
+                items: leagueGames.map(makeGameViewData)
+            )
         }
     }
 }

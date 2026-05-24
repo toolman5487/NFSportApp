@@ -78,6 +78,7 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
     let id: Int?
     let date: APISportsGameDateResponse?
     let time: String?
+    let league: APISportsLeagueResponse?
     let status: APISportsGameStatusResponse?
     let teams: APISportsGameTeamsResponse?
     let scores: APISportsGameScoresResponse?
@@ -91,6 +92,7 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
 
         return MainHomeGame(
             id: id,
+            leagueName: league?.displayName ?? "Other League",
             homeTeamName: homeName,
             awayTeamName: awayName,
             scheduledStartText: time ?? date?.displayText,
@@ -98,6 +100,29 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
             homeScore: scores?.home?.displayValue,
             awayScore: scores?.away?.displayValue
         )
+    }
+}
+
+private nonisolated struct APISportsLeagueResponse: Decodable, Sendable {
+
+    let displayName: String?
+
+    init(from decoder: Decoder) throws {
+        let singleValueContainer = try decoder.singleValueContainer()
+
+        if let value = try? singleValueContainer.decode(String.self) {
+            displayName = value
+            return
+        }
+
+        let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
+        displayName = try keyedContainer.decodeIfPresent(String.self, forKey: .name)
+            ?? keyedContainer.decodeIfPresent(String.self, forKey: .type)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name
+        case type
     }
 }
 

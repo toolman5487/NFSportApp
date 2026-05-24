@@ -31,30 +31,30 @@ extension SportType {
 
     nonisolated static let localCatalog: [SportType] = [
         SportType(
-            id: "nfl",
-            title: "NFL",
-            subtitle: "NFL teams, games, standings, injuries",
+            id: "football",
+            title: "Football",
+            subtitle: "Games, schedules, and standings",
             systemImageName: "football",
             apiHost: "v1.american-football.api-sports.io"
         ),
         SportType(
-            id: "nba",
-            title: "NBA",
-            subtitle: "NBA teams, games, standings",
+            id: "basketball",
+            title: "Basketball",
+            subtitle: "Games, schedules, and standings",
             systemImageName: "basketball",
             apiHost: "v2.nba.api-sports.io"
         ),
         SportType(
             id: "baseball",
-            title: "MLB",
-            subtitle: "MLB teams, games, standings",
+            title: "Baseball",
+            subtitle: "Games, schedules, and standings",
             systemImageName: "baseball",
             apiHost: "v1.baseball.api-sports.io"
         ),
         SportType(
             id: "hockey",
-            title: "NHL",
-            subtitle: "NHL teams, games, standings",
+            title: "Hockey",
+            subtitle: "Games, schedules, and standings",
             systemImageName: "hockey.puck",
             apiHost: "v1.hockey.api-sports.io"
         )

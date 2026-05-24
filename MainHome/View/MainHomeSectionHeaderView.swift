@@ -12,9 +12,15 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
 
     static let reuseIdentifier = "MainHomeSectionHeaderView"
 
+    private let backgroundContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .backgroundColor
+        return view
+    }()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .title3)
+        label.font = .preferredFont(forTextStyle: .headline)
         label.textColor = .primaryLabel
         label.adjustsFontForContentSizeCategory = true
         return label
@@ -39,7 +45,13 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
     }
 
     private func setupView() {
-        addSubview(titleLabel)
+        backgroundColor = .clear
+        addSubview(backgroundContainerView)
+        backgroundContainerView.addSubview(titleLabel)
+
+        backgroundContainerView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
 
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(8)
@@ -48,4 +60,3 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
         }
     }
 }
-

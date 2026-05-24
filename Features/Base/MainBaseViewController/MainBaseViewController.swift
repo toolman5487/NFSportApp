@@ -121,10 +121,6 @@ class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UI
         return section
     }
 
-    func reloadCollectionViewLayout(animated: Bool = false) {
-        collectionView.setCollectionViewLayout(makeCollectionViewLayout(), animated: animated)
-    }
-
     // MARK: - Actions
 
     @objc
