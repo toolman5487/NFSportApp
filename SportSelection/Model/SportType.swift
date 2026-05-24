@@ -42,7 +42,7 @@ extension SportType {
             title: "Basketball",
             subtitle: "Games, schedules, and standings",
             systemImageName: "basketball",
-            apiHost: "v2.nba.api-sports.io"
+            apiHost: "v1.basketball.api-sports.io"
         ),
         SportType(
             id: "baseball",
@@ -57,6 +57,27 @@ extension SportType {
             subtitle: "Games, schedules, and standings",
             systemImageName: "hockey.puck",
             apiHost: "v1.hockey.api-sports.io"
+        ),
+        SportType(
+            id: "volleyball",
+            title: "Volleyball",
+            subtitle: "Games, schedules, and standings",
+            systemImageName: "figure.volleyball",
+            apiHost: "v1.volleyball.api-sports.io"
+        ),
+        SportType(
+            id: "handball",
+            title: "Handball",
+            subtitle: "Games, schedules, and standings",
+            systemImageName: "figure.handball",
+            apiHost: "v1.handball.api-sports.io"
+        ),
+        SportType(
+            id: "rugby",
+            title: "Rugby",
+            subtitle: "Games, schedules, and standings",
+            systemImageName: "figure.rugby",
+            apiHost: "v1.rugby.api-sports.io"
         )
     ]
 }
