@@ -7,12 +7,16 @@
 
 import Foundation
 
+// MARK: - Dashboard
+
 nonisolated struct MainHomeDashboard: Equatable, Sendable {
 
     let sport: SportType
     let liveGames: [MainHomeGame]
     let todayGames: [MainHomeGame]
 }
+
+// MARK: - Game
 
 nonisolated struct MainHomeGame: Equatable, Identifiable, Sendable {
 

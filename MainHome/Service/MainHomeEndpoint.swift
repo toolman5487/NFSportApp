@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MainHomeEndpoint
+
 nonisolated enum MainHomeEndpoint: Sendable, Equatable {
 
     case games(date: String)
@@ -14,10 +16,13 @@ nonisolated enum MainHomeEndpoint: Sendable, Equatable {
     case gameDetail(id: Int)
     case standings(leagueID: Int, season: Int)
 
+    // MARK: - Properties
+
     var path: String {
         switch self {
         case .games, .liveGames, .gameDetail:
             return "games"
+
         case .standings:
             return "standings"
         }
@@ -48,4 +53,3 @@ nonisolated enum MainHomeEndpoint: Sendable, Equatable {
         }
     }
 }
-

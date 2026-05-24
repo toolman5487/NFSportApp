@@ -14,7 +14,7 @@ nonisolated enum MainHomeViewState: Equatable, Sendable {
     case idle
     case loading
     case loaded(MainHomePresentation)
-    case empty(message: String)
+    case empty(presentation: MainHomePresentation, message: String)
     case failed(message: String)
 }
 
@@ -33,9 +33,14 @@ final class MainHomeViewModel {
 
     var onStateChange: ((MainHomeViewState) -> Void)?
 
-    let selectedSport: SportType
+    var title: String {
+        selectedSport.title
+    }
 
     private let homeService: MainHomeServicing
+    private let selectedSport: SportType
+    private var dashboard: MainHomeDashboard?
+    private var selectedFilterOption: MainHomeFilterOption = .all
 
     // MARK: - Initialization
 
@@ -57,11 +62,8 @@ final class MainHomeViewModel {
                 for: selectedSport,
                 date: Date()
             )
-            let presentation = makePresentation(from: dashboard)
-
-            state = presentation.sections.isEmpty
-                ? .empty(message: "No games available.")
-                : .loaded(presentation)
+            self.dashboard = dashboard
+            renderDashboard(dashboard)
         } catch {
             state = .failed(message: error.localizedDescription)
             AppLogger.logUIError(
@@ -72,20 +74,73 @@ final class MainHomeViewModel {
         }
     }
 
-    // MARK: - Private Methods
+    func selectFilterOption(_ option: MainHomeFilterOption) {
+        guard selectedFilterOption != option else {
+            return
+        }
+
+        selectedFilterOption = option
+        guard let dashboard else {
+            return
+        }
+
+        renderDashboard(dashboard)
+    }
+
+    // MARK: - Rendering
+
+    private func renderDashboard(_ dashboard: MainHomeDashboard) {
+        let presentation = makePresentation(from: dashboard)
+
+        switch presentation.hasLeagueSections {
+        case true:
+            state = .loaded(presentation)
+
+        case false:
+            state = .empty(presentation: presentation, message: makeEmptyMessage())
+        }
+    }
+
+    // MARK: - Presentation Mapping
 
     private func makePresentation(from dashboard: MainHomeDashboard) -> MainHomePresentation {
-        let games = mergeGames(
+        let mergedGames = mergeGames(
             liveGames: dashboard.liveGames,
             todayGames: dashboard.todayGames
         )
-        let sections = makeLeagueSections(from: games)
+        let games = filterGames(mergedGames)
+        let leagueSections = makeLeagueSections(
+            from: games,
+            fallbackSystemImageName: dashboard.sport.systemImageName
+        )
+        let contentSections: [MainHomeContentSectionViewData] = [
+            .filter(makeFilterViewData())
+        ] + leagueSections.map { section in
+            .league(section)
+        }
 
         return MainHomePresentation(
             title: dashboard.sport.title,
-            sections: sections
+            sections: contentSections
         )
     }
+
+    // MARK: - Filter Mapping
+
+    private func makeFilterViewData() -> MainHomeFilterViewData {
+        return MainHomeFilterViewData(
+            options: MainHomeFilterOption.allCases.map { option in
+                MainHomeFilterOptionViewData(
+                    option: option,
+                    title: option.title,
+                    systemImageName: option.systemImageName,
+                    isSelected: option == selectedFilterOption
+                )
+            }
+        )
+    }
+
+    // MARK: - Game Mapping
 
     private func makeGameViewData(from game: MainHomeGame) -> MainHomeGameViewData {
         MainHomeGameViewData(
@@ -126,6 +181,42 @@ final class MainHomeViewModel {
         }
     }
 
+    // MARK: - Filtering
+
+    private func filterGames(_ games: [MainHomeGame]) -> [MainHomeGame] {
+        games.filter { game in
+            matchesSelectedFilterOption(makeStatusStyle(from: game.statusDescription))
+        }
+    }
+
+    private func matchesSelectedFilterOption(_ statusStyle: MainHomeGameStatusStyle) -> Bool {
+        switch selectedFilterOption {
+        case .all, .ascending, .descending:
+            return true
+
+        case .live:
+            return statusStyle == .live
+
+        case .upcoming:
+            return statusStyle == .upcoming
+
+        case .finished:
+            return statusStyle == .final
+        }
+    }
+
+    private func makeEmptyMessage() -> String {
+        switch selectedFilterOption {
+        case .all, .ascending, .descending:
+            return "No games available."
+
+        case .live, .upcoming, .finished:
+            return "No \(selectedFilterOption.title.lowercased()) games available."
+        }
+    }
+
+    // MARK: - Merging
+
     private func mergeGames(
         liveGames: [MainHomeGame],
         todayGames: [MainHomeGame]
@@ -140,7 +231,12 @@ final class MainHomeViewModel {
         return mergedGames
     }
 
-    private func makeLeagueSections(from games: [MainHomeGame]) -> [MainHomeSectionViewData] {
+    // MARK: - League Grouping
+
+    private func makeLeagueSections(
+        from games: [MainHomeGame],
+        fallbackSystemImageName: String
+    ) -> [MainHomeSectionViewData] {
         var orderedLeagueNames: [String] = []
         var gamesByLeagueName: [String: [MainHomeGame]] = [:]
         var leagueLogoURLsByName: [String: URL] = [:]
@@ -158,17 +254,41 @@ final class MainHomeViewModel {
             gamesByLeagueName[leagueName, default: []].append(game)
         }
 
-        return orderedLeagueNames.compactMap { leagueName in
+        let leagueSections: [MainHomeSectionViewData] = orderedLeagueNames.compactMap { leagueName in
             guard let leagueGames = gamesByLeagueName[leagueName],
                   !leagueGames.isEmpty else {
-                return nil
+                return nil as MainHomeSectionViewData?
             }
 
             return MainHomeSectionViewData(
                 title: leagueName,
                 logoURL: leagueLogoURLsByName[leagueName],
+                fallbackSystemImageName: fallbackSystemImageName,
                 items: leagueGames.map(makeGameViewData)
             )
+        }
+
+        return sortLeagueSections(leagueSections)
+    }
+
+    // MARK: - Sorting
+
+    private func sortLeagueSections(
+        _ sections: [MainHomeSectionViewData]
+    ) -> [MainHomeSectionViewData] {
+        switch selectedFilterOption {
+        case .ascending:
+            return sections.sorted { lhs, rhs in
+                lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            }
+
+        case .descending:
+            return sections.sorted { lhs, rhs in
+                lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedDescending
+            }
+
+        case .all, .live, .upcoming, .finished:
+            return sections
         }
     }
 }

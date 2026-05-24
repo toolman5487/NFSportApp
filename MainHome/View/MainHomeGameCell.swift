@@ -8,6 +8,8 @@
 import SnapKit
 import UIKit
 
+// MARK: - MainHomeGameCell
+
 final class MainHomeGameCell: UICollectionViewCell {
 
     static let reuseIdentifier = "MainHomeGameCell"
@@ -141,6 +143,8 @@ final class MainHomeGameCell: UICollectionViewCell {
         }
     }
 
+    // MARK: - Status Style
+
     private func applyStatusStyle(_ style: MainHomeGameStatusStyle) {
         switch style {
         case .live:
@@ -166,6 +170,8 @@ final class MainHomeGameCell: UICollectionViewCell {
 
 private final class TeamScoreRowView: UIView {
 
+    // MARK: - Layout Metrics
+
     private enum LayoutMetric {
         static let roleWidth: CGFloat = 44
         static let teamLeadingSpacing: CGFloat = 8
@@ -173,7 +179,11 @@ private final class TeamScoreRowView: UIView {
         static let scoreWidth: CGFloat = 48
     }
 
+    // MARK: - Properties
+
     private let roleText: String
+
+    // MARK: - UI Components
 
     private let roleLabel: UILabel = {
         let label = UILabel()
@@ -203,6 +213,8 @@ private final class TeamScoreRowView: UIView {
         return label
     }()
 
+    // MARK: - Initialization
+
     init(roleText: String) {
         self.roleText = roleText
         super.init(frame: .zero)
@@ -213,15 +225,21 @@ private final class TeamScoreRowView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Reuse
+
     func prepareForReuse() {
         teamNameLabel.text = nil
         scoreLabel.text = nil
     }
 
+    // MARK: - Configuration
+
     func configure(teamName: String, scoreText: String) {
         teamNameLabel.text = teamName
         scoreLabel.text = scoreText
     }
+
+    // MARK: - Setup
 
     private func setupView() {
         roleLabel.text = roleText

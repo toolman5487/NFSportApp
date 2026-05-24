@@ -9,6 +9,8 @@ import SDWebImage
 import SnapKit
 import UIKit
 
+// MARK: - MainHomeViewController
+
 @MainActor
 final class MainHomeViewController: MainBaseViewController {
 
@@ -19,6 +21,7 @@ final class MainHomeViewController: MainBaseViewController {
         static let sectionTopInset: CGFloat = 8
         static let sectionBottomInset: CGFloat = 16
         static let itemSpacing: CGFloat = 8
+        static let estimatedFilterHeight: CGFloat = 60
         static let estimatedItemHeight: CGFloat = 136
         static let estimatedHeaderHeight: CGFloat = 56
     }
@@ -27,12 +30,14 @@ final class MainHomeViewController: MainBaseViewController {
 
     private let viewModel: MainHomeViewModel
     private let navigationTitleView = MainHomeNavigationTitleView()
-    private var sections: [MainHomeSectionViewData] = []
+    private var screenTitle: String
+    private var sections: [MainHomeContentSectionViewData] = []
 
     // MARK: - Initialization
 
     init(viewModel: MainHomeViewModel) {
         self.viewModel = viewModel
+        self.screenTitle = viewModel.title
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -57,12 +62,16 @@ final class MainHomeViewController: MainBaseViewController {
     // MARK: - Setup
 
     override func setupMainNavigation() {
-        title = viewModel.selectedSport.title
+        title = screenTitle
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.leftBarButtonItem = nil
     }
 
     override func registerReusableViews() {
+        collectionView.register(
+            MainHomeFilterCell.self,
+            forCellWithReuseIdentifier: MainHomeFilterCell.reuseIdentifier
+        )
         collectionView.register(
             MainHomeGameCell.self,
             forCellWithReuseIdentifier: MainHomeGameCell.reuseIdentifier
@@ -96,17 +105,15 @@ final class MainHomeViewController: MainBaseViewController {
 
         case .loaded(let presentation):
             renderLoadingState(.idle)
-            sections = presentation.sections
-            collectionView.reloadData()
-            updateNavigationTitle()
+            applyPresentation(presentation)
 
-        case .empty(let message):
-            sections = []
-            collectionView.reloadData()
-            updateNavigationTitle()
+        case .empty(let presentation, let message):
+            applyPresentation(presentation)
             renderLoadingState(.empty(message: message))
 
         case .failed(let message):
+            screenTitle = viewModel.title
+            title = screenTitle
             sections = []
             collectionView.reloadData()
             updateNavigationTitle()
@@ -114,17 +121,30 @@ final class MainHomeViewController: MainBaseViewController {
         }
     }
 
+    // MARK: - Presentation
+
+    private func applyPresentation(_ presentation: MainHomePresentation) {
+        screenTitle = presentation.title
+        title = presentation.title
+        sections = presentation.sections
+        collectionView.reloadData()
+        updateNavigationTitle()
+    }
+
+    // MARK: - Navigation Title
+
     private func updateNavigationTitle() {
         guard isNavigationBarCollapsed,
               let currentSection = currentVisibleSection() else {
             navigationItem.titleView = nil
-            navigationItem.title = viewModel.selectedSport.title
+            navigationItem.title = screenTitle
             return
         }
 
         navigationTitleView.configure(
             title: currentSection.title,
-            logoURL: currentSection.logoURL
+            logoURL: currentSection.logoURL,
+            fallbackSystemImageName: currentSection.fallbackSystemImageName
         )
         navigationItem.title = nil
         navigationItem.titleView = navigationTitleView
@@ -138,6 +158,8 @@ final class MainHomeViewController: MainBaseViewController {
         return navigationBar.bounds.height <= 44.5
     }
 
+    // MARK: - Section Access
+
     private func currentVisibleSection() -> MainHomeSectionViewData? {
         let topVisibleIndexPath = collectionView.indexPathsForVisibleItems.min { lhs, rhs in
             if lhs.section == rhs.section {
@@ -148,11 +170,19 @@ final class MainHomeViewController: MainBaseViewController {
         }
 
         guard let sectionIndex = topVisibleIndexPath?.section,
-              sections.indices.contains(sectionIndex) else {
+              case .some(.league(let sectionViewData)) = sectionViewData(at: sectionIndex) else {
             return nil
         }
 
-        return sections[sectionIndex]
+        return sectionViewData
+    }
+
+    private func sectionViewData(at index: Int) -> MainHomeContentSectionViewData? {
+        guard sections.indices.contains(index) else {
+            return nil
+        }
+
+        return sections[index]
     }
 
     // MARK: - Layout
@@ -161,6 +191,16 @@ final class MainHomeViewController: MainBaseViewController {
         for sectionIndex: Int,
         environment: NSCollectionLayoutEnvironment
     ) -> NSCollectionLayoutSection {
+        switch sectionViewData(at: sectionIndex) {
+        case .some(.filter):
+            return makeFilterSectionLayout()
+
+        case .some(.league), .none:
+            return makeLeagueSectionLayout()
+        }
+    }
+
+    private func makeLeagueSectionLayout() -> NSCollectionLayoutSection {
         let section = makeListSectionLayout(
             itemHeight: .estimated(LayoutMetric.estimatedItemHeight),
             contentInsets: NSDirectionalEdgeInsets(
@@ -184,6 +224,19 @@ final class MainHomeViewController: MainBaseViewController {
         return section
     }
 
+    private func makeFilterSectionLayout() -> NSCollectionLayoutSection {
+        makeListSectionLayout(
+            itemHeight: .estimated(LayoutMetric.estimatedFilterHeight),
+            contentInsets: NSDirectionalEdgeInsets(
+                top: LayoutMetric.sectionTopInset,
+                leading: LayoutMetric.horizontalInset,
+                bottom: 0,
+                trailing: LayoutMetric.horizontalInset
+            ),
+            interGroupSpacing: 0
+        )
+    }
+
     // MARK: - UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -194,23 +247,55 @@ final class MainHomeViewController: MainBaseViewController {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        sections[section].items.count
+        switch sectionViewData(at: section) {
+        case .some(.filter):
+            return 1
+
+        case .some(.league(let sectionViewData)):
+            return sectionViewData.items.count
+
+        case .none:
+            return 0
+        }
     }
 
     override func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: MainHomeGameCell.reuseIdentifier,
-            for: indexPath
-        ) as? MainHomeGameCell else {
+        switch sectionViewData(at: indexPath.section) {
+        case .some(.filter(let filterViewData)):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MainHomeFilterCell.reuseIdentifier,
+                for: indexPath
+            ) as? MainHomeFilterCell else {
+                return UICollectionViewCell()
+            }
+
+            cell.configure(with: filterViewData)
+            cell.onFilterSelected = { [weak self] action in
+                self?.viewModel.selectFilterOption(action)
+            }
+            return cell
+
+        case .some(.league(let sectionViewData)):
+            guard sectionViewData.items.indices.contains(indexPath.item),
+                  let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: MainHomeGameCell.reuseIdentifier,
+                    for: indexPath
+                  ) as? MainHomeGameCell else {
+                return UICollectionViewCell()
+            }
+
+            cell.configure(with: sectionViewData.items[indexPath.item])
+            return cell
+
+        case .none:
             return UICollectionViewCell()
         }
-
-        cell.configure(with: sections[indexPath.section].items[indexPath.item])
-        return cell
     }
+
+    // MARK: - Supplementary Views
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -218,6 +303,7 @@ final class MainHomeViewController: MainBaseViewController {
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
+              case .some(.league(let sectionViewData)) = sectionViewData(at: indexPath.section),
               let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: MainHomeSectionHeaderView.reuseIdentifier,
@@ -227,28 +313,38 @@ final class MainHomeViewController: MainBaseViewController {
         }
 
         headerView.configure(
-            title: sections[indexPath.section].title,
-            logoURL: sections[indexPath.section].logoURL
+            title: sectionViewData.title,
+            logoURL: sectionViewData.logoURL,
+            fallbackSystemImageName: sectionViewData.fallbackSystemImageName
         )
         return headerView
     }
+
+    // MARK: - UIScrollViewDelegate
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateNavigationTitle()
     }
 }
 
+// MARK: - MainHomeNavigationTitleView
+
 private final class MainHomeNavigationTitleView: UIView {
+
+    // MARK: - Layout Metrics
 
     private enum LayoutMetric {
         static let logoSize: CGFloat = 20
         static let spacing: CGFloat = 8
     }
 
+    // MARK: - UI Components
+
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
+        imageView.tintColor = .primaryLabel
         imageView.isHidden = true
         return imageView
     }()
@@ -271,6 +367,8 @@ private final class MainHomeNavigationTitleView: UIView {
         return stackView
     }()
 
+    // MARK: - Initialization
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -280,20 +378,38 @@ private final class MainHomeNavigationTitleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(title: String, logoURL: URL?) {
+    // MARK: - Configuration
+
+    func configure(
+        title: String,
+        logoURL: URL?,
+        fallbackSystemImageName: String
+    ) {
         titleLabel.text = title
+        let fallbackImage = makeFallbackImage(systemImageName: fallbackSystemImageName)
 
         switch logoURL {
         case .some(let logoURL):
             logoImageView.isHidden = false
-            logoImageView.sd_setImage(with: logoURL)
+            logoImageView.sd_setImage(with: logoURL, placeholderImage: fallbackImage)
 
         case .none:
             logoImageView.sd_cancelCurrentImageLoad()
-            logoImageView.image = nil
-            logoImageView.isHidden = true
+            logoImageView.image = fallbackImage
+            logoImageView.isHidden = false
         }
     }
+
+    // MARK: - Private Methods
+
+    private func makeFallbackImage(systemImageName: String) -> UIImage? {
+        let image = UIImage(systemName: systemImageName)
+            ?? UIImage(systemName: "sportscourt")
+            ?? UIImage(systemName: "trophy")
+        return image?.withRenderingMode(.alwaysTemplate)
+    }
+
+    // MARK: - Setup
 
     private func setupView() {
         addSubview(stackView)

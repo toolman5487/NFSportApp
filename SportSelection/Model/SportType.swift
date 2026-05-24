@@ -76,7 +76,7 @@ extension SportType {
             id: "rugby",
             title: "Rugby",
             subtitle: "Games, schedules, and standings",
-            systemImageName: "figure.rugby",
+            systemImageName: "rugbyball.fill",
             apiHost: "v1.rugby.api-sports.io"
         )
     ]

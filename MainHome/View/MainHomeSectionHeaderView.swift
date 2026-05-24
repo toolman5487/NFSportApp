@@ -9,9 +9,13 @@ import SDWebImage
 import SnapKit
 import UIKit
 
+// MARK: - MainHomeSectionHeaderView
+
 final class MainHomeSectionHeaderView: UICollectionReusableView {
 
     static let reuseIdentifier = "MainHomeSectionHeaderView"
+
+    // MARK: - Layout Metrics
 
     private enum LayoutMetric {
         static let horizontalInset: CGFloat = 16
@@ -19,6 +23,8 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
         static let logoSize: CGFloat = 28
         static let contentSpacing: CGFloat = 8
     }
+
+    // MARK: - UI Components
 
     private let backgroundContainerView: UIView = {
         let view = UIView()
@@ -39,6 +45,7 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
+        imageView.tintColor = .primaryLabel
         imageView.isHidden = true
         return imageView
     }()
@@ -51,6 +58,8 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
         return stackView
     }()
 
+    // MARK: - Initialization
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -60,28 +69,49 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Reuse
+
     override func prepareForReuse() {
         super.prepareForReuse()
         logoImageView.sd_cancelCurrentImageLoad()
         logoImageView.image = nil
         logoImageView.isHidden = true
+        logoImageView.tintColor = .primaryLabel
         titleLabel.text = nil
     }
 
-    func configure(title: String, logoURL: URL?) {
+    // MARK: - Configuration
+
+    func configure(
+        title: String,
+        logoURL: URL?,
+        fallbackSystemImageName: String
+    ) {
         titleLabel.text = title
+        let fallbackImage = makeFallbackImage(systemImageName: fallbackSystemImageName)
 
         switch logoURL {
         case .some(let logoURL):
             logoImageView.isHidden = false
-            logoImageView.sd_setImage(with: logoURL)
+            logoImageView.sd_setImage(with: logoURL, placeholderImage: fallbackImage)
 
         case .none:
             logoImageView.sd_cancelCurrentImageLoad()
-            logoImageView.image = nil
-            logoImageView.isHidden = true
+            logoImageView.image = fallbackImage
+            logoImageView.isHidden = false
         }
     }
+
+    // MARK: - Private Methods
+
+    private func makeFallbackImage(systemImageName: String) -> UIImage? {
+        let image = UIImage(systemName: systemImageName)
+            ?? UIImage(systemName: "sportscourt")
+            ?? UIImage(systemName: "trophy")
+        return image?.withRenderingMode(.alwaysTemplate)
+    }
+
+    // MARK: - Setup
 
     private func setupView() {
         backgroundColor = .clear

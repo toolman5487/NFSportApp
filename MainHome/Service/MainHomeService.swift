@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MainHomeServicing
+
 nonisolated protocol MainHomeServicing: Sendable {
 
     func fetchDashboard(
@@ -14,6 +16,8 @@ nonisolated protocol MainHomeServicing: Sendable {
         date: Date
     ) async throws -> MainHomeDashboard
 }
+
+// MARK: - MainHomeService
 
 nonisolated struct MainHomeService: MainHomeServicing {
 
@@ -66,12 +70,14 @@ nonisolated struct MainHomeService: MainHomeServicing {
     }
 }
 
-// MARK: - API-Sports DTO
+// MARK: - API-Sports Response
 
 private nonisolated struct APISportsResponse<Response: Decodable & Sendable>: Decodable, Sendable {
 
     let response: Response
 }
+
+// MARK: - API-Sports Game
 
 private nonisolated struct APISportsGameResponse: Decodable, Sendable {
 
@@ -104,6 +110,8 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
     }
 }
 
+// MARK: - API-Sports League
+
 private nonisolated struct APISportsLeagueResponse: Decodable, Sendable {
 
     let displayName: String?
@@ -134,6 +142,8 @@ private nonisolated struct APISportsLeagueResponse: Decodable, Sendable {
         case logo
     }
 }
+
+// MARK: - API-Sports Date
 
 private nonisolated struct APISportsGameDateResponse: Decodable, Sendable {
 
@@ -166,11 +176,15 @@ private nonisolated struct APISportsGameDateObjectResponse: Decodable, Sendable 
     let start: String?
 }
 
+// MARK: - API-Sports Status
+
 private nonisolated struct APISportsGameStatusResponse: Decodable, Sendable {
 
     let long: String?
     let short: APISportsFlexibleValueResponse?
 }
+
+// MARK: - API-Sports Teams
 
 private nonisolated struct APISportsGameTeamsResponse: Decodable, Sendable {
 
@@ -203,6 +217,8 @@ private nonisolated struct APISportsTeamResponse: Decodable, Sendable {
     let logo: String?
 }
 
+// MARK: - API-Sports Scores
+
 private nonisolated struct APISportsGameScoresResponse: Decodable, Sendable {
 
     let home: APISportsScoreValueResponse?
@@ -220,7 +236,6 @@ private nonisolated struct APISportsGameScoresResponse: Decodable, Sendable {
         away = try container.decodeIfPresent(APISportsScoreValueResponse.self, forKey: .away)
             ?? container.decodeIfPresent(APISportsScoreValueResponse.self, forKey: .visitors)
     }
-
 }
 
 private nonisolated struct APISportsScoreValueResponse: Decodable, Sendable {
@@ -253,6 +268,8 @@ private nonisolated struct APISportsScoreValueResponse: Decodable, Sendable {
         displayValue = nil
     }
 }
+
+// MARK: - API-Sports Flexible Value
 
 private nonisolated struct APISportsFlexibleValueResponse: Decodable, Sendable {
 

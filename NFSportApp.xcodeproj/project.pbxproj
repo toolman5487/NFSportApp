@@ -39,6 +39,7 @@
 		154000052FC20000008C60D9 /* MainHomePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000152FC20000008C60D9 /* MainHomePresentation.swift */; };
 		154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000162FC20000008C60D9 /* MainHomeGameCell.swift */; };
 		154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */; };
+		154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000182FC20000008C60D9 /* MainHomeFilterCell.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +74,7 @@
 		154000152FC20000008C60D9 /* MainHomePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomePresentation.swift; sourceTree = "<group>"; };
 		154000162FC20000008C60D9 /* MainHomeGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeGameCell.swift; sourceTree = "<group>"; };
 		154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeSectionHeaderView.swift; sourceTree = "<group>"; };
+		154000182FC20000008C60D9 /* MainHomeFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeFilterCell.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -359,6 +361,7 @@
 		154000232FC20000008C60D9 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				154000182FC20000008C60D9 /* MainHomeFilterCell.swift */,
 				154000162FC20000008C60D9 /* MainHomeGameCell.swift */,
 				154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */,
 			);
@@ -478,6 +481,7 @@
 				154000032FC20000008C60D9 /* MainHomeService.swift in Sources */,
 				154000042FC20000008C60D9 /* MainHomeViewModel.swift in Sources */,
 				154000052FC20000008C60D9 /* MainHomePresentation.swift in Sources */,
+				154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */,
 				154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */,
 				154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
