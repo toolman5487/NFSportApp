@@ -143,12 +143,16 @@ final class MainHomeViewModel {
     private func makeLeagueSections(from games: [MainHomeGame]) -> [MainHomeSectionViewData] {
         var orderedLeagueNames: [String] = []
         var gamesByLeagueName: [String: [MainHomeGame]] = [:]
+        var leagueLogoURLsByName: [String: URL] = [:]
 
         for game in games {
             let leagueName = game.leagueName
 
             if gamesByLeagueName[leagueName] == nil {
                 orderedLeagueNames.append(leagueName)
+                if let leagueLogoURL = game.leagueLogoURL {
+                    leagueLogoURLsByName[leagueName] = leagueLogoURL
+                }
             }
 
             gamesByLeagueName[leagueName, default: []].append(game)
@@ -162,6 +166,7 @@ final class MainHomeViewModel {
 
             return MainHomeSectionViewData(
                 title: leagueName,
+                logoURL: leagueLogoURLsByName[leagueName],
                 items: leagueGames.map(makeGameViewData)
             )
         }

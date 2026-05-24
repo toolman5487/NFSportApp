@@ -89,13 +89,6 @@ final class MainHomeGameCell: UICollectionViewCell {
         awayRowView.configure(teamName: viewData.awayTeamName, scoreText: viewData.awayScoreText)
         homeRowView.configure(teamName: viewData.homeTeamName, scoreText: viewData.homeScoreText)
         applyStatusStyle(viewData.statusStyle)
-
-        accessibilityLabel = [
-            viewData.statusText,
-            viewData.scheduledStartText,
-            "\(viewData.awayTeamName) \(viewData.awayScoreText)",
-            "\(viewData.homeTeamName) \(viewData.homeScoreText)"
-        ].joined(separator: ", ")
     }
 
     // MARK: - Setup

@@ -5,6 +5,7 @@
 //  Created by Willy Hsu 2026/5/23.
 //
 
+import SDWebImage
 import SnapKit
 import UIKit
 
@@ -15,9 +16,8 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
     private enum LayoutMetric {
         static let horizontalInset: CGFloat = 16
         static let verticalInset: CGFloat = 8
-        static let lineSpacing: CGFloat = 12
-        static let lineHeight: CGFloat = 1
-        static let minimumLineWidth: CGFloat = 24
+        static let logoSize: CGFloat = 28
+        static let contentSpacing: CGFloat = 8
     }
 
     private let backgroundContainerView: UIView = {
@@ -28,23 +28,27 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
+        label.font = .preferredFont(forTextStyle: .title1)
         label.textColor = .primaryLabel
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
-    private let leadingLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
+        return imageView
     }()
 
-    private let trailingLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
+    private lazy var contentStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [logoImageView, titleLabel])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = LayoutMetric.contentSpacing
+        return stackView
     }()
 
     override init(frame: CGRect) {
@@ -58,47 +62,46 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        logoImageView.sd_cancelCurrentImageLoad()
+        logoImageView.image = nil
+        logoImageView.isHidden = true
         titleLabel.text = nil
     }
 
-    func configure(title: String) {
+    func configure(title: String, logoURL: URL?) {
         titleLabel.text = title
+
+        switch logoURL {
+        case .some(let logoURL):
+            logoImageView.isHidden = false
+            logoImageView.sd_setImage(with: logoURL)
+
+        case .none:
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = nil
+            logoImageView.isHidden = true
+        }
     }
 
     private func setupView() {
         backgroundColor = .clear
         addSubview(backgroundContainerView)
-        backgroundContainerView.addSubview(leadingLineView)
-        backgroundContainerView.addSubview(titleLabel)
-        backgroundContainerView.addSubview(trailingLineView)
+        backgroundContainerView.addSubview(contentStackView)
 
         backgroundContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
 
-        titleLabel.setContentHuggingPriority(.required, for: .horizontal)
-        titleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        logoImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(LayoutMetric.logoSize)
+        }
 
-        titleLabel.snp.makeConstraints { make in
+        contentStackView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(LayoutMetric.verticalInset)
             make.centerX.equalToSuperview()
+            make.leading.greaterThanOrEqualToSuperview().inset(LayoutMetric.horizontalInset)
+            make.trailing.lessThanOrEqualToSuperview().inset(LayoutMetric.horizontalInset)
             make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
-        }
-
-        leadingLineView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(LayoutMetric.horizontalInset)
-            make.trailing.equalTo(titleLabel.snp.leading).offset(-LayoutMetric.lineSpacing)
-            make.centerY.equalTo(titleLabel.snp.centerY)
-            make.height.equalTo(LayoutMetric.lineHeight)
-            make.width.greaterThanOrEqualTo(LayoutMetric.minimumLineWidth)
-        }
-
-        trailingLineView.snp.makeConstraints { make in
-            make.leading.equalTo(titleLabel.snp.trailing).offset(LayoutMetric.lineSpacing)
-            make.trailing.equalToSuperview().inset(LayoutMetric.horizontalInset)
-            make.centerY.equalTo(titleLabel.snp.centerY)
-            make.height.equalTo(LayoutMetric.lineHeight)
-            make.width.greaterThanOrEqualTo(LayoutMetric.minimumLineWidth)
         }
     }
 }

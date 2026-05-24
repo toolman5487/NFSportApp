@@ -16,6 +16,7 @@ nonisolated struct MainHomePresentation: Equatable, Sendable {
 nonisolated struct MainHomeSectionViewData: Equatable, Sendable {
 
     let title: String
+    let logoURL: URL?
     let items: [MainHomeGameViewData]
 }
 

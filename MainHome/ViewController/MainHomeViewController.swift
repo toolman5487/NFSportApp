@@ -5,6 +5,8 @@
 //  Created by Willy Hsu on 2026/5/22.
 //
 
+import SDWebImage
+import SnapKit
 import UIKit
 
 @MainActor
@@ -18,12 +20,13 @@ final class MainHomeViewController: MainBaseViewController {
         static let sectionBottomInset: CGFloat = 16
         static let itemSpacing: CGFloat = 8
         static let estimatedItemHeight: CGFloat = 136
-        static let estimatedHeaderHeight: CGFloat = 40
+        static let estimatedHeaderHeight: CGFloat = 56
     }
 
     // MARK: - Properties
 
     private let viewModel: MainHomeViewModel
+    private let navigationTitleView = MainHomeNavigationTitleView()
     private var sections: [MainHomeSectionViewData] = []
 
     // MARK: - Initialization
@@ -113,12 +116,18 @@ final class MainHomeViewController: MainBaseViewController {
 
     private func updateNavigationTitle() {
         guard isNavigationBarCollapsed,
-              let currentSectionTitle = currentPinnedSectionTitle() else {
+              let currentSection = currentVisibleSection() else {
+            navigationItem.titleView = nil
             navigationItem.title = viewModel.selectedSport.title
             return
         }
 
-        navigationItem.title = currentSectionTitle
+        navigationTitleView.configure(
+            title: currentSection.title,
+            logoURL: currentSection.logoURL
+        )
+        navigationItem.title = nil
+        navigationItem.titleView = navigationTitleView
     }
 
     private var isNavigationBarCollapsed: Bool {
@@ -129,7 +138,7 @@ final class MainHomeViewController: MainBaseViewController {
         return navigationBar.bounds.height <= 44.5
     }
 
-    private func currentPinnedSectionTitle() -> String? {
+    private func currentVisibleSection() -> MainHomeSectionViewData? {
         let topVisibleIndexPath = collectionView.indexPathsForVisibleItems.min { lhs, rhs in
             if lhs.section == rhs.section {
                 return lhs.item < rhs.item
@@ -143,7 +152,7 @@ final class MainHomeViewController: MainBaseViewController {
             return nil
         }
 
-        return sections[sectionIndex].title
+        return sections[sectionIndex]
     }
 
     // MARK: - Layout
@@ -217,11 +226,84 @@ final class MainHomeViewController: MainBaseViewController {
             return UICollectionReusableView()
         }
 
-        headerView.configure(title: sections[indexPath.section].title)
+        headerView.configure(
+            title: sections[indexPath.section].title,
+            logoURL: sections[indexPath.section].logoURL
+        )
         return headerView
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateNavigationTitle()
+    }
+}
+
+private final class MainHomeNavigationTitleView: UIView {
+
+    private enum LayoutMetric {
+        static let logoSize: CGFloat = 20
+        static let spacing: CGFloat = 8
+    }
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
+        return imageView
+    }()
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.lineBreakMode = .byTruncatingTail
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return label
+    }()
+
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [logoImageView, titleLabel])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = LayoutMetric.spacing
+        return stackView
+    }()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(title: String, logoURL: URL?) {
+        titleLabel.text = title
+
+        switch logoURL {
+        case .some(let logoURL):
+            logoImageView.isHidden = false
+            logoImageView.sd_setImage(with: logoURL)
+
+        case .none:
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = nil
+            logoImageView.isHidden = true
+        }
+    }
+
+    private func setupView() {
+        addSubview(stackView)
+
+        logoImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(LayoutMetric.logoSize)
+        }
+
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 }
