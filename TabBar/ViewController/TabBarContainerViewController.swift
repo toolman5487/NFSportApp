@@ -190,8 +190,9 @@ final class TabBarContainerViewController: UIViewController {
         navigationController.navigationBar.tintColor = .primaryLabel
 
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundColor = .clear
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBackground
+        appearance.shadowColor = .clear
         appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
         appearance.titleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
 

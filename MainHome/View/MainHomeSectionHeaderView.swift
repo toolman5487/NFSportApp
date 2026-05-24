@@ -22,6 +22,7 @@ final class MainHomeSectionHeaderView: UICollectionReusableView {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .headline)
         label.textColor = .primaryLabel
+        label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
         return label
     }()

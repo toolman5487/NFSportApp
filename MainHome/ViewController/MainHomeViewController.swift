@@ -55,6 +55,7 @@ final class MainHomeViewController: MainBaseViewController {
 
     override func setupMainNavigation() {
         title = viewModel.selectedSport.title
+        navigationItem.largeTitleDisplayMode = .always
         navigationItem.leftBarButtonItem = nil
     }
 
@@ -92,20 +93,57 @@ final class MainHomeViewController: MainBaseViewController {
 
         case .loaded(let presentation):
             renderLoadingState(.idle)
-            title = presentation.title
             sections = presentation.sections
             collectionView.reloadData()
+            updateNavigationTitle()
 
         case .empty(let message):
             sections = []
             collectionView.reloadData()
+            updateNavigationTitle()
             renderLoadingState(.empty(message: message))
 
         case .failed(let message):
             sections = []
             collectionView.reloadData()
+            updateNavigationTitle()
             renderLoadingState(.failed(message: message))
         }
+    }
+
+    private func updateNavigationTitle() {
+        guard isNavigationBarCollapsed,
+              let currentSectionTitle = currentPinnedSectionTitle() else {
+            navigationItem.title = viewModel.selectedSport.title
+            return
+        }
+
+        navigationItem.title = currentSectionTitle
+    }
+
+    private var isNavigationBarCollapsed: Bool {
+        guard let navigationBar = navigationController?.navigationBar else {
+            return false
+        }
+
+        return navigationBar.bounds.height <= 44.5
+    }
+
+    private func currentPinnedSectionTitle() -> String? {
+        let topVisibleIndexPath = collectionView.indexPathsForVisibleItems.min { lhs, rhs in
+            if lhs.section == rhs.section {
+                return lhs.item < rhs.item
+            }
+
+            return lhs.section < rhs.section
+        }
+
+        guard let sectionIndex = topVisibleIndexPath?.section,
+              sections.indices.contains(sectionIndex) else {
+            return nil
+        }
+
+        return sections[sectionIndex].title
     }
 
     // MARK: - Layout
@@ -133,7 +171,6 @@ final class MainHomeViewController: MainBaseViewController {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
         )
-        header.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [header]
         return section
     }
@@ -182,5 +219,9 @@ final class MainHomeViewController: MainBaseViewController {
 
         headerView.configure(title: sections[indexPath.section].title)
         return headerView
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateNavigationTitle()
     }
 }
