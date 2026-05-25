@@ -24,7 +24,9 @@ nonisolated struct MainSoccerLiveMatchViewData: Equatable, Sendable {
     let minuteText: String
     let leagueName: String
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
     let scoreText: String
 }
 
@@ -45,41 +47,20 @@ nonisolated struct MainSoccerFixtureViewData: Equatable, Sendable {
     let timeText: String
     let leagueName: String
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
+    let homeScoreText: String
+    let awayScoreText: String
+    let statusText: String
+    let statusStyle: MainSoccerFixtureStatusStyle
 }
 
-// MARK: - Top Leagues
-
-nonisolated struct MainSoccerTopLeaguesViewData: Equatable, Sendable {
-    let title: String
-    let leagues: [MainSoccerTopLeagueViewData]
-}
-
-nonisolated struct MainSoccerTopLeagueViewData: Equatable, Sendable {
-    let name: String
-    let region: String
-    let logoURL: URL?
-    let systemImageName: String
-}
-
-// MARK: - Standings
-
-nonisolated struct MainSoccerStandingsViewData: Equatable, Sendable {
-
-    nonisolated enum State: Equatable, Sendable {
-        case empty(message: String)
-        case loaded([MainSoccerStandingRowViewData])
-    }
-
-    let title: String
-    let state: State
-}
-
-nonisolated struct MainSoccerStandingRowViewData: Equatable, Sendable {
-    let rankText: String
-    let teamName: String
-    let recordText: String
-    let pointsText: String
+nonisolated enum MainSoccerFixtureStatusStyle: Equatable, Sendable {
+    case live
+    case final
+    case upcoming
+    case neutral
 }
 
 // MARK: - Empty State

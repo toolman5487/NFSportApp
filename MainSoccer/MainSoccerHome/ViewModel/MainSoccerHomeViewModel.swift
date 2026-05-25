@@ -22,14 +22,6 @@ nonisolated enum MainSoccerHomeViewState: Equatable, Sendable {
 @MainActor
 final class MainSoccerHomeViewModel {
 
-    // MARK: - Constants
-
-    private enum DisplayLimit {
-        static let liveFixtures = 3
-        static let todayFixtures = 6
-        static let standings = 5
-    }
-
     // MARK: - Properties
 
     private(set) var state: MainSoccerHomeViewState = .idle {
@@ -85,18 +77,13 @@ final class MainSoccerHomeViewModel {
             title: dashboard.sport.title,
             sections: [
                 makeLiveMatchesSection(from: dashboard.liveFixtures),
-                makeTodaySection(from: dashboard.todayFixtures),
-                makeTopLeaguesSection(from: dashboard.topLeagues),
-                makeStandingsSection(
-                    title: dashboard.standingsTitle,
-                    standings: dashboard.standings
-                )
+                makeTodaySection(from: dashboard.todayFixtures)
             ]
         )
     }
 
     private func makeLiveMatchesSection(from fixtures: [MainSoccerFixture]) -> MainSoccerHomeSection {
-        let liveFixtures = fixtures.prefix(DisplayLimit.liveFixtures).map(makeLiveMatchViewData)
+        let liveFixtures = fixtures.map(makeLiveMatchViewData)
         let state: MainSoccerLiveMatchesViewData.State
 
         switch liveFixtures.isEmpty {
@@ -116,7 +103,7 @@ final class MainSoccerHomeViewModel {
     }
 
     private func makeTodaySection(from fixtures: [MainSoccerFixture]) -> MainSoccerHomeSection {
-        let todayFixtures = fixtures.prefix(DisplayLimit.todayFixtures).map(makeFixtureViewData)
+        let todayFixtures = fixtures.map(makeFixtureViewData)
         let state: MainSoccerTodayFixturesViewData.State
 
         switch todayFixtures.isEmpty {
@@ -135,38 +122,6 @@ final class MainSoccerHomeViewModel {
         )
     }
 
-    private func makeTopLeaguesSection(from leagues: [MainSoccerLeague]) -> MainSoccerHomeSection {
-        .topLeagues(
-            MainSoccerTopLeaguesViewData(
-                title: "Top Leagues",
-                leagues: leagues.map(makeTopLeagueViewData)
-            )
-        )
-    }
-
-    private func makeStandingsSection(
-        title: String?,
-        standings: [MainSoccerStandingRow]
-    ) -> MainSoccerHomeSection {
-        let rows = standings.prefix(DisplayLimit.standings).map(makeStandingRowViewData)
-        let state: MainSoccerStandingsViewData.State
-
-        switch rows.isEmpty {
-        case true:
-            state = .empty(message: "No standings available")
-
-        case false:
-            state = .loaded(Array(rows))
-        }
-
-        return .standings(
-            MainSoccerStandingsViewData(
-                title: title ?? "Standings",
-                state: state
-            )
-        )
-    }
-
     // MARK: - Item Mapping
 
     private func makeLiveMatchViewData(from fixture: MainSoccerFixture) -> MainSoccerLiveMatchViewData {
@@ -174,7 +129,9 @@ final class MainSoccerHomeViewModel {
             minuteText: makeMinuteText(from: fixture),
             leagueName: fixture.leagueName,
             homeTeamName: fixture.homeTeamName,
+            homeTeamLogoURL: fixture.homeTeamLogoURL,
             awayTeamName: fixture.awayTeamName,
+            awayTeamLogoURL: fixture.awayTeamLogoURL,
             scoreText: makeScoreText(from: fixture)
         )
     }
@@ -184,25 +141,13 @@ final class MainSoccerHomeViewModel {
             timeText: makeFixtureTimeText(from: fixture),
             leagueName: fixture.leagueName,
             homeTeamName: fixture.homeTeamName,
-            awayTeamName: fixture.awayTeamName
-        )
-    }
-
-    private func makeTopLeagueViewData(from league: MainSoccerLeague) -> MainSoccerTopLeagueViewData {
-        MainSoccerTopLeagueViewData(
-            name: league.name,
-            region: league.countryName ?? "International",
-            logoURL: league.logoURL,
-            systemImageName: "trophy.fill"
-        )
-    }
-
-    private func makeStandingRowViewData(from standing: MainSoccerStandingRow) -> MainSoccerStandingRowViewData {
-        MainSoccerStandingRowViewData(
-            rankText: "\(standing.rank)",
-            teamName: standing.teamName,
-            recordText: makeRecordText(from: standing),
-            pointsText: "\(standing.points)"
+            homeTeamLogoURL: fixture.homeTeamLogoURL,
+            awayTeamName: fixture.awayTeamName,
+            awayTeamLogoURL: fixture.awayTeamLogoURL,
+            homeScoreText: fixture.homeScore?.description ?? "-",
+            awayScoreText: fixture.awayScore?.description ?? "-",
+            statusText: makeFixtureStatusText(from: fixture),
+            statusStyle: makeStatusStyle(from: fixture)
         )
     }
 
@@ -236,22 +181,20 @@ final class MainSoccerHomeViewModel {
         return formatter.string(from: scheduledStartDate)
     }
 
-    private func makeRecordText(from standing: MainSoccerStandingRow) -> String {
-        let recordText: String
+    private func makeFixtureStatusText(from fixture: MainSoccerFixture) -> String {
+        switch makeStatusStyle(from: fixture) {
+        case .live:
+            return makeMinuteText(from: fixture)
 
-        switch (standing.wins, standing.draws, standing.losses) {
-        case (.some(let wins), .some(let draws), .some(let losses)):
-            recordText = "\(wins)-\(draws)-\(losses)"
+        case .upcoming:
+            return "Upcoming"
 
-        default:
-            recordText = "\(standing.played ?? 0) played"
+        case .final:
+            return "Final"
+
+        case .neutral:
+            return fixture.statusShort ?? fixture.statusLong ?? "Info"
         }
-
-        guard let goalsDifference = standing.goalsDifference else {
-            return recordText
-        }
-
-        return "\(recordText) | GD \(goalsDifference)"
     }
 
     private func makeStatusStyle(from fixture: MainSoccerFixture) -> MainSoccerFixtureStatusStyle {
@@ -267,19 +210,10 @@ final class MainSoccerHomeViewModel {
             return .upcoming
 
         case "FT", "AET", "PEN", "PST", "CANC", "ABD", "AWD", "WO":
-            return .finished
+            return .final
 
         default:
             return .neutral
         }
     }
-}
-
-// MARK: - Fixture Status Style
-
-private enum MainSoccerFixtureStatusStyle {
-    case live
-    case upcoming
-    case finished
-    case neutral
 }

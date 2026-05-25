@@ -19,10 +19,10 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
     private enum LayoutMetric {
         static let badgeHorizontalInset: CGFloat = 8
         static let badgeVerticalInset: CGFloat = 4
+        static let teamLogoSize: CGFloat = 40
         static let contentSpacing: CGFloat = 12
+        static let teamSpacing: CGFloat = 12
         static let scoreSpacing: CGFloat = 8
-        static let scoreTopPadding: CGFloat = 12
-        static let stackSpacing: CGFloat = 12
         static let contentInset: CGFloat = MainSoccerHomeCardCell.LayoutMetric.contentInset
     }
 
@@ -39,13 +39,16 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
 
     private let matchupLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .title3)
+        label.font = .preferredFont(forTextStyle: .headline)
         label.textColor = .primaryLabel
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 2
         return label
     }()
+
+    private let homeTeamLogoImageView = UIImageView()
+    private let awayTeamLogoImageView = UIImageView()
 
     private let scoreLabel: UILabel = {
         let label = UILabel()
@@ -90,8 +93,22 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
         return stackView
     }()
 
+    private lazy var teamsRowStackView: UIStackView = {
+        let stackView = UIStackView(
+            arrangedSubviews: [
+                homeTeamLogoImageView,
+                scoreStackView,
+                awayTeamLogoImageView
+            ]
+        )
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = LayoutMetric.teamSpacing
+        return stackView
+    }()
+
     private lazy var contentStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [headerStackView, scoreStackView])
+        let stackView = UIStackView(arrangedSubviews: [headerStackView, teamsRowStackView])
         stackView.axis = .vertical
         stackView.spacing = LayoutMetric.contentSpacing
         return stackView
@@ -114,6 +131,8 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
         badgeLabel.text = nil
         matchupLabel.text = nil
         scoreLabel.text = nil
+        homeTeamLogoImageView.resetSoccerTeamLogo()
+        awayTeamLogoImageView.resetSoccerTeamLogo()
     }
 
     // MARK: - Configuration
@@ -123,6 +142,8 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
         badgeLabel.text = viewData.minuteText
         matchupLabel.text = "\(viewData.homeTeamName) vs \(viewData.awayTeamName)"
         scoreLabel.text = viewData.scoreText
+        homeTeamLogoImageView.setSoccerTeamLogo(with: viewData.homeTeamLogoURL)
+        awayTeamLogoImageView.setSoccerTeamLogo(with: viewData.awayTeamLogoURL)
     }
 
     // MARK: - Setup
@@ -133,10 +154,17 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
 
         leagueLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         badgeContainerView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        scoreStackView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         badgeLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(LayoutMetric.badgeVerticalInset)
             make.leading.trailing.equalToSuperview().inset(LayoutMetric.badgeHorizontalInset)
+        }
+
+        [homeTeamLogoImageView, awayTeamLogoImageView].forEach { imageView in
+            imageView.snp.makeConstraints { make in
+                make.size.equalTo(LayoutMetric.teamLogoSize)
+            }
         }
 
         contentStackView.snp.makeConstraints { make in

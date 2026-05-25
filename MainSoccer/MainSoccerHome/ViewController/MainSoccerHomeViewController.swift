@@ -22,20 +22,21 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         static let headerHeight: CGFloat = 36
         static let liveHeroHeight: CGFloat = 176
         static let liveHeroWidthFraction: CGFloat = 0.88
-        static let rowHeight: CGFloat = 72
-        static let leagueHeight: CGFloat = 80
-        static let fallbackHeight: CGFloat = rowHeight
+        static let fixtureRowHeight: CGFloat = 136
+        static let fallbackHeight: CGFloat = fixtureRowHeight
     }
 
     // MARK: - Properties
 
     private let viewModel: MainSoccerHomeViewModel
+    private var screenTitle: String
     private var sections: [MainSoccerHomeSection] = []
 
     // MARK: - Initialization
 
     init(viewModel: MainSoccerHomeViewModel) {
         self.viewModel = viewModel
+        self.screenTitle = viewModel.title
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -60,7 +61,7 @@ final class MainSoccerHomeViewController: MainBaseViewController {
     // MARK: - Setup
 
     override func setupMainNavigation() {
-        title = viewModel.title
+        title = screenTitle
         navigationItem.largeTitleDisplayMode = .always
         navigationItem.leftBarButtonItem = nil
     }
@@ -77,14 +78,6 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         collectionView.register(
             MainSoccerFixtureCell.self,
             forCellWithReuseIdentifier: MainSoccerFixtureCell.reuseIdentifier
-        )
-        collectionView.register(
-            MainSoccerLeagueCell.self,
-            forCellWithReuseIdentifier: MainSoccerLeagueCell.reuseIdentifier
-        )
-        collectionView.register(
-            MainSoccerStandingCell.self,
-            forCellWithReuseIdentifier: MainSoccerStandingCell.reuseIdentifier
         )
         collectionView.register(
             MainSoccerHomeSectionHeaderView.self,
@@ -118,19 +111,58 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             applyPresentation(presentation)
 
         case .failed(let message):
+            screenTitle = viewModel.title
+            title = screenTitle
             sections = []
             collectionView.reloadData()
+            updateNavigationTitle()
             renderLoadingState(.failed(message: message))
         }
     }
 
     private func applyPresentation(_ presentation: MainSoccerHomePresentation) {
+        screenTitle = presentation.title
         title = presentation.title
         sections = presentation.sections
         collectionView.reloadData()
+        updateNavigationTitle()
     }
 
     // MARK: - Section Access
+
+    private func updateNavigationTitle() {
+        guard isNavigationBarCollapsed,
+              let currentSectionTitle = currentVisibleSectionTitle() else {
+            navigationItem.title = screenTitle
+            return
+        }
+
+        navigationItem.title = currentSectionTitle
+    }
+
+    private var isNavigationBarCollapsed: Bool {
+        guard let navigationBar = navigationController?.navigationBar else {
+            return false
+        }
+
+        return navigationBar.bounds.height <= 44.5
+    }
+
+    private func currentVisibleSectionTitle() -> String? {
+        let topVisibleIndexPath = collectionView.indexPathsForVisibleItems.min { lhs, rhs in
+            if lhs.section == rhs.section {
+                return lhs.item < rhs.item
+            }
+
+            return lhs.section < rhs.section
+        }
+
+        guard let sectionIndex = topVisibleIndexPath?.section else {
+            return nil
+        }
+
+        return section(at: sectionIndex)?.title
+    }
 
     private func section(at index: Int) -> MainSoccerHomeSection? {
         guard sections.indices.contains(index) else {
@@ -159,12 +191,9 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         case .some(.liveMatches):
             return makeLiveMatchesSectionLayout()
 
-        case .some(.topLeagues):
-            return makeTopLeaguesSectionLayout()
-
-        case .some(.today), .some(.standings):
+        case .some(.today):
             return makeListSectionLayout(
-                estimatedHeight: LayoutMetric.rowHeight,
+                estimatedHeight: LayoutMetric.fixtureRowHeight,
                 includesHeader: true
             )
 
@@ -223,35 +252,6 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             section.boundarySupplementaryItems = [makeSectionHeaderItem()]
         }
 
-        return section
-    }
-
-    private func makeTopLeaguesSectionLayout() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(0.5),
-            heightDimension: .estimated(LayoutMetric.leagueHeight)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(LayoutMetric.leagueHeight)
-        )
-        let group = NSCollectionLayoutGroup.horizontal(
-            layoutSize: groupSize,
-            repeatingSubitem: item,
-            count: 2
-        )
-        group.interItemSpacing = .fixed(LayoutMetric.itemSpacing)
-
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: LayoutMetric.sectionTopInset,
-            leading: LayoutMetric.horizontalInset,
-            bottom: LayoutMetric.sectionBottomInset,
-            trailing: LayoutMetric.horizontalInset
-        )
-        section.interGroupSpacing = LayoutMetric.itemSpacing
-        section.boundarySupplementaryItems = [makeSectionHeaderItem()]
         return section
     }
 
@@ -315,22 +315,6 @@ final class MainSoccerHomeViewController: MainBaseViewController {
                 indexPath: indexPath
             ) { $0.configure(with: viewData) }
 
-        case .some(.league(let viewData)):
-            return configuredCell(
-                MainSoccerLeagueCell.self,
-                reuseIdentifier: MainSoccerLeagueCell.reuseIdentifier,
-                collectionView: collectionView,
-                indexPath: indexPath
-            ) { $0.configure(with: viewData) }
-
-        case .some(.standing(let viewData)):
-            return configuredCell(
-                MainSoccerStandingCell.self,
-                reuseIdentifier: MainSoccerStandingCell.reuseIdentifier,
-                collectionView: collectionView,
-                indexPath: indexPath
-            ) { $0.configure(with: viewData) }
-
         case .none:
             return UICollectionViewCell()
         }
@@ -378,5 +362,9 @@ extension MainSoccerHomeViewController {
 
         headerView.configure(title: title)
         return headerView
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateNavigationTitle()
     }
 }

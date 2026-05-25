@@ -18,28 +18,47 @@ final class MainSoccerFixtureCell: MainSoccerHomeCardCell {
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
-        static let timeWidth: CGFloat = 52
-        static let spacing: CGFloat = 12
+        static let compactSpacing: CGFloat = 8
+        static let rowSpacing: CGFloat = 12
+        static let scoreWidth: CGFloat = 48
+        static let statusHorizontalInset: CGFloat = 8
+        static let statusVerticalInset: CGFloat = 4
     }
 
     // MARK: - UI Components
 
-    private let timeLabel: UILabel = {
+    private let statusContainerView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 6
+        view.layer.masksToBounds = true
+        return view
+    }()
+
+    private let statusLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .caption1)
-        label.textColor = .secondaryLabelColor
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 1
         return label
     }()
 
-    private let matchupLabel: UILabel = {
+    private let scheduledStartLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .primaryLabel
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
+        label.textAlignment = .right
         label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         return label
+    }()
+
+    private let awayRowView = MainSoccerTeamScoreRowView(roleText: "AWAY")
+    private let homeRowView = MainSoccerTeamScoreRowView(roleText: "HOME")
+
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator.withAlphaComponent(0.32)
+        return view
     }()
 
     private let leagueLabel: UILabel = {
@@ -51,13 +70,6 @@ final class MainSoccerFixtureCell: MainSoccerHomeCardCell {
         return label
     }()
 
-    private lazy var textStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [matchupLabel, leagueLabel])
-        stackView.axis = .vertical
-        stackView.spacing = 4
-        return stackView
-    }()
-
     // MARK: - Initialization
 
     override init(frame: CGRect) {
@@ -71,204 +83,149 @@ final class MainSoccerFixtureCell: MainSoccerHomeCardCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        timeLabel.text = nil
-        matchupLabel.text = nil
+        statusLabel.text = nil
+        scheduledStartLabel.text = nil
         leagueLabel.text = nil
+        awayRowView.prepareForReuse()
+        homeRowView.prepareForReuse()
     }
 
     // MARK: - Configuration
 
     func configure(with viewData: MainSoccerFixtureViewData) {
-        timeLabel.text = viewData.timeText
-        matchupLabel.text = "\(viewData.homeTeamName) vs \(viewData.awayTeamName)"
+        statusLabel.text = viewData.statusText.uppercased()
+        scheduledStartLabel.text = viewData.timeText
         leagueLabel.text = viewData.leagueName
+        awayRowView.configure(
+            teamName: viewData.awayTeamName,
+            logoURL: viewData.awayTeamLogoURL,
+            scoreText: viewData.awayScoreText
+        )
+        homeRowView.configure(
+            teamName: viewData.homeTeamName,
+            logoURL: viewData.homeTeamLogoURL,
+            scoreText: viewData.homeScoreText
+        )
+        applyStatusStyle(viewData.statusStyle)
     }
 
     // MARK: - Setup
 
     private func setupView() {
-        contentView.addSubview(timeLabel)
-        contentView.addSubview(textStackView)
+        contentView.addSubview(statusContainerView)
+        statusContainerView.addSubview(statusLabel)
+        contentView.addSubview(scheduledStartLabel)
+        contentView.addSubview(leagueLabel)
+        contentView.addSubview(awayRowView)
+        contentView.addSubview(separatorView)
+        contentView.addSubview(homeRowView)
 
-        timeLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.centerY.equalToSuperview()
-            make.width.equalTo(LayoutMetric.timeWidth)
+        statusContainerView.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
+            make.trailing.lessThanOrEqualTo(scheduledStartLabel.snp.leading).offset(-LayoutMetric.compactSpacing)
         }
 
-        textStackView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.leading.equalTo(timeLabel.snp.trailing).offset(LayoutMetric.spacing)
+        statusLabel.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview().inset(LayoutMetric.statusVerticalInset)
+            make.leading.trailing.equalToSuperview().inset(LayoutMetric.statusHorizontalInset)
+        }
+
+        scheduledStartLabel.snp.makeConstraints { make in
+            make.top.trailing.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
+            make.leading.greaterThanOrEqualTo(contentView.snp.centerX)
+        }
+
+        leagueLabel.snp.makeConstraints { make in
+            make.top.equalTo(statusContainerView.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.leading.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
             make.trailing.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
+        }
+
+        awayRowView.snp.makeConstraints { make in
+            make.top.equalTo(leagueLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
+            make.leading.trailing.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
+        }
+
+        separatorView.snp.makeConstraints { make in
+            make.top.equalTo(awayRowView.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.leading.trailing.equalTo(awayRowView)
+            make.height.equalTo(1)
+        }
+
+        homeRowView.snp.makeConstraints { make in
+            make.top.equalTo(separatorView.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.leading.trailing.equalTo(awayRowView)
+            make.bottom.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
+        }
+    }
+
+    private func applyStatusStyle(_ style: MainSoccerFixtureStatusStyle) {
+        switch style {
+        case .live:
+            statusContainerView.backgroundColor = .systemRed.withAlphaComponent(0.18)
+            statusLabel.textColor = .systemRed
+
+        case .final:
+            statusContainerView.backgroundColor = .secondaryLabelColor.withAlphaComponent(0.16)
+            statusLabel.textColor = .secondaryLabelColor
+
+        case .upcoming:
+            statusContainerView.backgroundColor = .systemBlue.withAlphaComponent(0.18)
+            statusLabel.textColor = .systemBlue
+
+        case .neutral:
+            statusContainerView.backgroundColor = .tertiarySystemFill
+            statusLabel.textColor = .secondaryLabelColor
         }
     }
 }
 
-// MARK: - MainSoccerLeagueCell
+// MARK: - MainSoccerTeamScoreRowView
 
-final class MainSoccerLeagueCell: MainSoccerHomeCardCell {
-
-    static let reuseIdentifier = "MainSoccerLeagueCell"
-
-    // MARK: - Layout Metrics
+private final class MainSoccerTeamScoreRowView: UIView {
 
     private enum LayoutMetric {
-        static let iconSize: CGFloat = 36
-        static let iconImageSize: CGFloat = 20
-        static let spacing: CGFloat = 12
+        static let roleWidth: CGFloat = 44
+        static let teamLeadingSpacing: CGFloat = 8
+        static let logoSize: CGFloat = 24
+        static let logoSpacing: CGFloat = 8
+        static let scoreLeadingSpacing: CGFloat = 12
+        static let scoreWidth: CGFloat = 48
     }
 
-    // MARK: - UI Components
+    private let roleText: String
+    private var logoWidthConstraint: Constraint?
+    private var teamLeadingConstraint: Constraint?
 
-    private let iconContainerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .tertiarySystemFill
-        view.layer.cornerRadius = 8
-        view.layer.masksToBounds = true
-        return view
+    private let roleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption2)
+        label.textColor = .tertiaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
     }()
 
-    private let iconImageView: UIImageView = {
+    private let teamNameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 2
+        return label
+    }()
+
+    private let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.tintColor = .primaryLabel
         imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
         return imageView
     }()
 
-    private let nameLabel: UILabel = {
+    private let scoreLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .primaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let regionLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
-        label.textColor = .secondaryLabelColor
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private lazy var textStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [nameLabel, regionLabel])
-        stackView.axis = .vertical
-        stackView.spacing = 4
-        return stackView
-    }()
-
-    // MARK: - Initialization
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        iconImageView.sd_cancelCurrentImageLoad()
-        iconImageView.image = nil
-        nameLabel.text = nil
-        regionLabel.text = nil
-    }
-
-    // MARK: - Configuration
-
-    func configure(with viewData: MainSoccerTopLeagueViewData) {
-        let fallbackImage = UIImage(systemName: viewData.systemImageName)
-
-        switch viewData.logoURL {
-        case .some(let logoURL):
-            iconImageView.sd_setImage(with: logoURL, placeholderImage: fallbackImage)
-
-        case .none:
-            iconImageView.sd_cancelCurrentImageLoad()
-            iconImageView.image = fallbackImage
-        }
-
-        nameLabel.text = viewData.name
-        regionLabel.text = viewData.region
-    }
-
-    // MARK: - Setup
-
-    private func setupView() {
-        contentView.addSubview(iconContainerView)
-        iconContainerView.addSubview(iconImageView)
-        contentView.addSubview(textStackView)
-
-        iconContainerView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.centerY.equalToSuperview()
-            make.size.equalTo(LayoutMetric.iconSize)
-        }
-
-        iconImageView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.size.equalTo(LayoutMetric.iconImageSize)
-        }
-
-        textStackView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.leading.equalTo(iconContainerView.snp.trailing).offset(LayoutMetric.spacing)
-            make.trailing.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-        }
-    }
-}
-
-// MARK: - MainSoccerStandingCell
-
-final class MainSoccerStandingCell: MainSoccerHomeCardCell {
-
-    static let reuseIdentifier = "MainSoccerStandingCell"
-
-    // MARK: - Layout Metrics
-
-    private enum LayoutMetric {
-        static let rankWidth: CGFloat = 32
-        static let pointsWidth: CGFloat = 44
-        static let spacing: CGFloat = 12
-    }
-
-    // MARK: - UI Components
-
-    private let rankLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
-        label.textColor = .secondaryLabelColor
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let teamLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .primaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let recordLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
-        label.textColor = .secondaryLabelColor
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let pointsLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
+        label.font = .preferredFont(forTextStyle: .title3)
         label.textColor = .primaryLabel
         label.textAlignment = .right
         label.adjustsFontForContentSizeCategory = true
@@ -276,17 +233,9 @@ final class MainSoccerStandingCell: MainSoccerHomeCardCell {
         return label
     }()
 
-    private lazy var textStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [teamLabel, recordLabel])
-        stackView.axis = .vertical
-        stackView.spacing = 4
-        return stackView
-    }()
-
-    // MARK: - Initialization
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(roleText: String) {
+        self.roleText = roleText
+        super.init(frame: .zero)
         setupView()
     }
 
@@ -294,46 +243,98 @@ final class MainSoccerStandingCell: MainSoccerHomeCardCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        rankLabel.text = nil
-        teamLabel.text = nil
-        recordLabel.text = nil
-        pointsLabel.text = nil
+    func prepareForReuse() {
+        logoImageView.sd_cancelCurrentImageLoad()
+        logoImageView.image = nil
+        logoImageView.isHidden = true
+        teamNameLabel.text = nil
+        scoreLabel.text = nil
     }
 
-    // MARK: - Configuration
+    func configure(
+        teamName: String,
+        logoURL: URL?,
+        scoreText: String
+    ) {
+        teamNameLabel.text = teamName
+        scoreLabel.text = scoreText
 
-    func configure(with viewData: MainSoccerStandingRowViewData) {
-        rankLabel.text = viewData.rankText
-        teamLabel.text = viewData.teamName
-        recordLabel.text = viewData.recordText
-        pointsLabel.text = viewData.pointsText
+        switch logoURL {
+        case .some(let logoURL):
+            logoImageView.isHidden = false
+            logoWidthConstraint?.update(offset: LayoutMetric.logoSize)
+            teamLeadingConstraint?.update(offset: LayoutMetric.logoSpacing)
+            logoImageView.sd_setImage(with: logoURL)
+
+        case .none:
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = nil
+            logoImageView.isHidden = true
+            logoWidthConstraint?.update(offset: 0)
+            teamLeadingConstraint?.update(offset: 0)
+        }
     }
-
-    // MARK: - Setup
 
     private func setupView() {
-        contentView.addSubview(rankLabel)
-        contentView.addSubview(textStackView)
-        contentView.addSubview(pointsLabel)
+        roleLabel.text = roleText
 
-        rankLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
+        addSubview(roleLabel)
+        addSubview(logoImageView)
+        addSubview(teamNameLabel)
+        addSubview(scoreLabel)
+
+        roleLabel.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview()
+            make.width.equalTo(LayoutMetric.roleWidth)
+        }
+
+        logoImageView.snp.makeConstraints { make in
+            make.leading.equalTo(roleLabel.snp.trailing).offset(LayoutMetric.teamLeadingSpacing)
             make.centerY.equalToSuperview()
-            make.width.equalTo(LayoutMetric.rankWidth)
+            logoWidthConstraint = make.width.equalTo(LayoutMetric.logoSize).constraint
+            make.height.equalTo(LayoutMetric.logoSize)
         }
 
-        pointsLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.centerY.equalToSuperview()
-            make.width.equalTo(LayoutMetric.pointsWidth)
+        teamNameLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            teamLeadingConstraint = make.leading.equalTo(logoImageView.snp.trailing)
+                .offset(LayoutMetric.logoSpacing)
+                .constraint
+            make.trailing.lessThanOrEqualTo(scoreLabel.snp.leading).offset(-LayoutMetric.scoreLeadingSpacing)
+            make.bottom.equalToSuperview()
         }
 
-        textStackView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.leading.equalTo(rankLabel.snp.trailing).offset(LayoutMetric.spacing)
-            make.trailing.equalTo(pointsLabel.snp.leading).offset(-LayoutMetric.spacing)
+        scoreLabel.snp.makeConstraints { make in
+            make.top.trailing.bottom.equalToSuperview()
+            make.width.equalTo(LayoutMetric.scoreWidth)
         }
+    }
+}
+
+// MARK: - UIImageView
+
+extension UIImageView {
+
+    func setSoccerTeamLogo(
+        with logoURL: URL?,
+        placeholderSystemName: String = "shield.fill"
+    ) {
+        let placeholderImage = UIImage(systemName: placeholderSystemName)
+        tintColor = .secondaryLabelColor
+        contentMode = .scaleAspectFit
+
+        switch logoURL {
+        case .some(let logoURL):
+            sd_setImage(with: logoURL, placeholderImage: placeholderImage)
+
+        case .none:
+            sd_cancelCurrentImageLoad()
+            image = placeholderImage
+        }
+    }
+
+    func resetSoccerTeamLogo() {
+        sd_cancelCurrentImageLoad()
+        image = nil
     }
 }

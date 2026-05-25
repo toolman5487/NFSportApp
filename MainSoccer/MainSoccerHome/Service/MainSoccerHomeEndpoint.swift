@@ -13,19 +13,11 @@ nonisolated enum MainSoccerHomeEndpoint: Equatable, Sendable {
 
     case liveFixtures(timezone: String)
     case fixtures(date: String, timezone: String)
-    case currentLeagues
-    case standings(leagueID: Int, season: Int)
 
     var path: String {
         switch self {
         case .liveFixtures, .fixtures:
             return "fixtures"
-
-        case .currentLeagues:
-            return "leagues"
-
-        case .standings:
-            return "standings"
         }
     }
 
@@ -41,17 +33,6 @@ nonisolated enum MainSoccerHomeEndpoint: Equatable, Sendable {
             return [
                 NetworkQueryItem(name: "date", value: date),
                 NetworkQueryItem(name: "timezone", value: timezone)
-            ]
-
-        case .currentLeagues:
-            return [
-                NetworkQueryItem(name: "current", value: "true")
-            ]
-
-        case .standings(let leagueID, let season):
-            return [
-                NetworkQueryItem(name: "league", value: "\(leagueID)"),
-                NetworkQueryItem(name: "season", value: "\(season)")
             ]
         }
     }

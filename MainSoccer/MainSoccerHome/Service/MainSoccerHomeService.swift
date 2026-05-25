@@ -21,11 +21,6 @@ nonisolated protocol MainSoccerHomeServicing: Sendable {
 
 nonisolated struct MainSoccerHomeService: MainSoccerHomeServicing {
 
-    // MARK: - Constants
-
-    private static let topLeagueIDs = [39, 140, 135, 78, 61, 2]
-    private static let maximumTopLeagueCount = 4
-
     // MARK: - Dependencies
 
     private let networkClient: NetworkServicing
@@ -51,21 +46,15 @@ nonisolated struct MainSoccerHomeService: MainSoccerHomeServicing {
                 timezone: timezone
             )
         )
-        async let topLeagues = fetchTopLeagues()
 
         let resolvedLiveFixtures = try await liveFixtures
         let resolvedTodayFixtures = try await todayFixtures
-        let resolvedTopLeagues = try await topLeagues
-        let standingsPayload = await fetchFirstAvailableStandings(from: resolvedTopLeagues)
 
         return MainSoccerHomeDashboard(
             sport: sport,
             date: date,
             liveFixtures: resolvedLiveFixtures,
-            todayFixtures: resolvedTodayFixtures,
-            topLeagues: resolvedTopLeagues,
-            standingsTitle: standingsPayload?.title,
-            standings: standingsPayload?.rows ?? []
+            todayFixtures: resolvedTodayFixtures
         )
     }
 
@@ -80,68 +69,6 @@ nonisolated struct MainSoccerHomeService: MainSoccerHomeServicing {
         )
 
         return response.response.compactMap(\.domainFixture)
-    }
-
-    // MARK: - Leagues
-
-    private func fetchTopLeagues() async throws -> [MainSoccerLeague] {
-        let endpoint = MainSoccerHomeEndpoint.currentLeagues
-        let response = try await networkClient.get(
-            endpoint.path,
-            queryItems: endpoint.queryItems,
-            headers: [:],
-            as: APISoccerResponse<[APISoccerLeagueResponse]>.self
-        )
-        var leaguesByID: [Int: MainSoccerLeague] = [:]
-        for response in response.response {
-            guard let league = response.domainLeague,
-                  leaguesByID[league.id] == nil else {
-                continue
-            }
-
-            leaguesByID[league.id] = league
-        }
-
-        return Self.topLeagueIDs
-            .compactMap { leaguesByID[$0] }
-            .prefix(Self.maximumTopLeagueCount)
-            .map { $0 }
-    }
-
-    // MARK: - Standings
-
-    private func fetchFirstAvailableStandings(
-        from leagues: [MainSoccerLeague]
-    ) async -> (title: String, rows: [MainSoccerStandingRow])? {
-        for league in leagues where league.supportsStandings {
-            guard let season = league.currentSeason,
-                  let rows = try? await fetchStandings(leagueID: league.id, season: season),
-                  !rows.isEmpty else {
-                continue
-            }
-
-            return (league.name, rows)
-        }
-
-        return nil
-    }
-
-    private func fetchStandings(
-        leagueID: Int,
-        season: Int
-    ) async throws -> [MainSoccerStandingRow] {
-        let endpoint = MainSoccerHomeEndpoint.standings(
-            leagueID: leagueID,
-            season: season
-        )
-        let response = try await networkClient.get(
-            endpoint.path,
-            queryItems: endpoint.queryItems,
-            headers: [:],
-            as: APISoccerResponse<[APISoccerStandingsResponse]>.self
-        )
-
-        return response.response.first?.rows ?? []
     }
 
     // MARK: - Date
@@ -265,133 +192,4 @@ private nonisolated struct APISoccerGoalsResponse: Decodable, Sendable {
 
     let home: Int?
     let away: Int?
-}
-
-// MARK: - Leagues Response
-
-private nonisolated struct APISoccerLeagueResponse: Decodable, Sendable {
-
-    let league: APISoccerLeagueDetailResponse?
-    let country: APISoccerCountryResponse?
-    let seasons: [APISoccerSeasonResponse]
-
-    var domainLeague: MainSoccerLeague? {
-        guard let id = league?.id,
-              let name = league?.name else {
-            return nil
-        }
-
-        let currentSeason = seasons.first(where: \.isCurrent) ?? seasons.first
-        return MainSoccerLeague(
-            id: id,
-            name: name,
-            countryName: country?.name,
-            logoURL: league?.logoURL,
-            currentSeason: currentSeason?.year,
-            supportsStandings: currentSeason?.coverage.standings ?? false
-        )
-    }
-}
-
-private nonisolated struct APISoccerLeagueDetailResponse: Decodable, Sendable {
-
-    let id: Int?
-    let name: String?
-    let logo: String?
-
-    var logoURL: URL? {
-        guard let logo else {
-            return nil
-        }
-
-        return URL(string: logo)
-    }
-}
-
-private nonisolated struct APISoccerCountryResponse: Decodable, Sendable {
-
-    let name: String?
-}
-
-private nonisolated struct APISoccerSeasonResponse: Decodable, Sendable {
-
-    let year: Int?
-    let current: Bool?
-    let coverage: APISoccerCoverageResponse
-
-    var isCurrent: Bool {
-        current == true
-    }
-}
-
-private nonisolated struct APISoccerCoverageResponse: Decodable, Sendable {
-
-    let standings: Bool
-}
-
-// MARK: - Standings Response
-
-private nonisolated struct APISoccerStandingsResponse: Decodable, Sendable {
-
-    let league: APISoccerStandingsLeagueResponse?
-
-    var rows: [MainSoccerStandingRow] {
-        league?.standings.first?.compactMap(\.row) ?? []
-    }
-}
-
-private nonisolated struct APISoccerStandingsLeagueResponse: Decodable, Sendable {
-
-    let standings: [[APISoccerStandingRowResponse]]
-}
-
-private nonisolated struct APISoccerStandingRowResponse: Decodable, Sendable {
-
-    let rank: Int?
-    let team: APISoccerStandingTeamResponse?
-    let points: Int?
-    let goalsDiff: Int?
-    let all: APISoccerStandingStatsResponse?
-
-    var row: MainSoccerStandingRow? {
-        guard let rank,
-              let teamName = team?.name,
-              let points else {
-            return nil
-        }
-
-        return MainSoccerStandingRow(
-            rank: rank,
-            teamName: teamName,
-            teamLogoURL: team?.logoURL,
-            points: points,
-            played: all?.played,
-            wins: all?.win,
-            draws: all?.draw,
-            losses: all?.lose,
-            goalsDifference: goalsDiff
-        )
-    }
-}
-
-private nonisolated struct APISoccerStandingTeamResponse: Decodable, Sendable {
-
-    let name: String?
-    let logo: String?
-
-    var logoURL: URL? {
-        guard let logo else {
-            return nil
-        }
-
-        return URL(string: logo)
-    }
-}
-
-private nonisolated struct APISoccerStandingStatsResponse: Decodable, Sendable {
-
-    let played: Int?
-    let win: Int?
-    let draw: Int?
-    let lose: Int?
 }
