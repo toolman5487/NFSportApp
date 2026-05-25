@@ -5,6 +5,7 @@
 //  Created by Codex on 2026/5/24.
 //
 
+import SkeletonView
 import SnapKit
 import UIKit
 
@@ -285,5 +286,106 @@ private final class MainHomeFilterOptionCell: UICollectionViewCell {
             titleLabel.textColor = .primaryLabel
             accessibilityTraits.remove(.selected)
         }
+    }
+}
+
+// MARK: - MainHomeFilterSkeletonCell
+
+final class MainHomeFilterSkeletonCell: UICollectionViewCell {
+
+    static let reuseIdentifier = "MainHomeFilterSkeletonCell"
+
+    // MARK: - Layout Metrics
+
+    private enum LayoutMetric {
+        static let optionHeight: CGFloat = 44
+        static let optionSpacing: CGFloat = 8
+        static let verticalInset: CGFloat = 8
+    }
+
+    // MARK: - UI Components
+
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: makeSkeletonOptionViews())
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.distribution = .fillEqually
+        stackView.spacing = LayoutMetric.optionSpacing
+        stackView.isSkeletonable = true
+        return stackView
+    }()
+
+    // MARK: - Initialization
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Lifecycle
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        switch window {
+        case .some:
+            contentView.layoutIfNeeded()
+            contentView.showAnimatedGradientSkeleton()
+
+        case .none:
+            contentView.hideSkeleton()
+        }
+    }
+
+    // MARK: - Reuse
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        contentView.hideSkeleton()
+    }
+
+    // MARK: - Setup
+
+    private func setupView() {
+        contentView.backgroundColor = .clear
+        contentView.isSkeletonable = true
+        contentView.addSubview(stackView)
+
+        stackView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(LayoutMetric.optionHeight)
+        }
+    }
+
+    // MARK: - Factory
+
+    private func makeSkeletonOptionViews() -> [UIView] {
+        (0..<4).map { _ in
+            let view = MainHomeSkeletonFactory.makeSkeletonView(cornerRadius: 22)
+            view.snp.makeConstraints { make in
+                make.height.equalTo(LayoutMetric.optionHeight)
+            }
+            return view
+        }
+    }
+}
+
+// MARK: - MainHomeSkeletonFactory
+
+enum MainHomeSkeletonFactory {
+
+    static func makeSkeletonView(cornerRadius: Float = 8) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .tertiarySystemFill
+        view.isSkeletonable = true
+        view.skeletonCornerRadius = cornerRadius
+        view.layer.cornerRadius = CGFloat(cornerRadius)
+        view.layer.masksToBounds = true
+        return view
     }
 }

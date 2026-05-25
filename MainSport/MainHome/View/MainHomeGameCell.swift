@@ -319,3 +319,35 @@ private final class TeamScoreRowView: UIView {
         }
     }
 }
+
+// MARK: - MainHomeLoadingBackgroundCell
+
+final class MainHomeLoadingBackgroundCell: UICollectionViewCell {
+
+    static let reuseIdentifier = "MainHomeLoadingBackgroundCell"
+
+    // MARK: - Layout Metrics
+
+    private enum LayoutMetric {
+        static let cornerRadius: CGFloat = 8
+    }
+
+    // MARK: - Initialization
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Setup
+
+    private func setupView() {
+        contentView.backgroundColor = .secondaryBackgroundColor
+        contentView.layer.cornerRadius = LayoutMetric.cornerRadius
+        contentView.layer.masksToBounds = true
+    }
+}
