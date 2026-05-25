@@ -5,6 +5,8 @@
 //  Created by Willy Hsu on 2026/5/25.
 //
 
+import SDWebImage
+import SnapKit
 import UIKit
 
 // MARK: - MainSoccerHomeViewController
@@ -19,18 +21,17 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         static let sectionTopInset: CGFloat = 8
         static let sectionBottomInset: CGFloat = 16
         static let itemSpacing: CGFloat = 8
-        static let headerHeight: CGFloat = 36
-        static let liveHeroHeight: CGFloat = 176
-        static let liveHeroWidthFraction: CGFloat = 0.88
-        static let fixtureRowHeight: CGFloat = 136
-        static let fallbackHeight: CGFloat = fixtureRowHeight
+        static let estimatedFilterHeight: CGFloat = 60
+        static let estimatedItemHeight: CGFloat = 136
+        static let estimatedHeaderHeight: CGFloat = 56
     }
 
     // MARK: - Properties
 
     private let viewModel: MainSoccerHomeViewModel
+    private let navigationTitleView = MainSoccerHomeNavigationTitleView()
     private var screenTitle: String
-    private var sections: [MainSoccerHomeSection] = []
+    private var sections: [MainHomeContentSectionViewData] = []
 
     // MARK: - Initialization
 
@@ -68,21 +69,17 @@ final class MainSoccerHomeViewController: MainBaseViewController {
 
     override func registerReusableViews() {
         collectionView.register(
-            MainSoccerLiveHeroCell.self,
-            forCellWithReuseIdentifier: MainSoccerLiveHeroCell.reuseIdentifier
+            MainHomeFilterCell.self,
+            forCellWithReuseIdentifier: MainHomeFilterCell.reuseIdentifier
         )
         collectionView.register(
-            MainSoccerEmptyStateCell.self,
-            forCellWithReuseIdentifier: MainSoccerEmptyStateCell.reuseIdentifier
+            MainHomeGameCell.self,
+            forCellWithReuseIdentifier: MainHomeGameCell.reuseIdentifier
         )
         collectionView.register(
-            MainSoccerFixtureCell.self,
-            forCellWithReuseIdentifier: MainSoccerFixtureCell.reuseIdentifier
-        )
-        collectionView.register(
-            MainSoccerHomeSectionHeaderView.self,
+            MainHomeSectionHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: MainSoccerHomeSectionHeaderView.reuseIdentifier
+            withReuseIdentifier: MainHomeSectionHeaderView.reuseIdentifier
         )
     }
 
@@ -110,6 +107,10 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             renderLoadingState(.idle)
             applyPresentation(presentation)
 
+        case .empty(let presentation, let message):
+            applyPresentation(presentation)
+            renderLoadingState(.empty(message: message))
+
         case .failed(let message):
             screenTitle = viewModel.title
             title = screenTitle
@@ -120,6 +121,8 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         }
     }
 
+    // MARK: - Presentation
+
     private func applyPresentation(_ presentation: MainSoccerHomePresentation) {
         screenTitle = presentation.title
         title = presentation.title
@@ -128,16 +131,23 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         updateNavigationTitle()
     }
 
-    // MARK: - Section Access
+    // MARK: - Navigation Title
 
     private func updateNavigationTitle() {
         guard isNavigationBarCollapsed,
-              let currentSectionTitle = currentVisibleSectionTitle() else {
+              let currentSection = currentVisibleSection() else {
+            navigationItem.titleView = nil
             navigationItem.title = screenTitle
             return
         }
 
-        navigationItem.title = currentSectionTitle
+        navigationTitleView.configure(
+            title: currentSection.title,
+            logoURL: currentSection.logoURL,
+            fallbackSystemImageName: currentSection.fallbackSystemImageName
+        )
+        navigationItem.title = nil
+        navigationItem.titleView = navigationTitleView
     }
 
     private var isNavigationBarCollapsed: Bool {
@@ -148,7 +158,9 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         return navigationBar.bounds.height <= 44.5
     }
 
-    private func currentVisibleSectionTitle() -> String? {
+    // MARK: - Section Access
+
+    private func currentVisibleSection() -> MainHomeSectionViewData? {
         let topVisibleIndexPath = collectionView.indexPathsForVisibleItems.min { lhs, rhs in
             if lhs.section == rhs.section {
                 return lhs.item < rhs.item
@@ -157,28 +169,20 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             return lhs.section < rhs.section
         }
 
-        guard let sectionIndex = topVisibleIndexPath?.section else {
+        guard let sectionIndex = topVisibleIndexPath?.section,
+              case .some(.league(let sectionViewData)) = sectionViewData(at: sectionIndex) else {
             return nil
         }
 
-        return section(at: sectionIndex)?.title
+        return sectionViewData
     }
 
-    private func section(at index: Int) -> MainSoccerHomeSection? {
+    private func sectionViewData(at index: Int) -> MainHomeContentSectionViewData? {
         guard sections.indices.contains(index) else {
             return nil
         }
 
         return sections[index]
-    }
-
-    private func item(at indexPath: IndexPath) -> MainSoccerHomeItem? {
-        guard let section = section(at: indexPath.section),
-              section.items.indices.contains(indexPath.item) else {
-            return nil
-        }
-
-        return section.items[indexPath.item]
     }
 
     // MARK: - Layout
@@ -187,83 +191,49 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         for sectionIndex: Int,
         environment: NSCollectionLayoutEnvironment
     ) -> NSCollectionLayoutSection {
-        switch section(at: sectionIndex) {
-        case .some(.liveMatches):
-            return makeLiveMatchesSectionLayout()
+        switch sectionViewData(at: sectionIndex) {
+        case .some(.filter):
+            return makeFilterSectionLayout()
 
-        case .some(.today):
-            return makeListSectionLayout(
-                estimatedHeight: LayoutMetric.fixtureRowHeight,
-                includesHeader: true
-            )
-
-        case .none:
-            return makeListSectionLayout(
-                estimatedHeight: LayoutMetric.fallbackHeight,
-                includesHeader: false
-            )
+        case .some(.league), .none:
+            return makeLeagueSectionLayout()
         }
     }
 
-    private func makeLiveMatchesSectionLayout() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(LayoutMetric.liveHeroHeight)
+    private func makeLeagueSectionLayout() -> NSCollectionLayoutSection {
+        let section = makeListSectionLayout(
+            itemHeight: .estimated(LayoutMetric.estimatedItemHeight),
+            contentInsets: NSDirectionalEdgeInsets(
+                top: LayoutMetric.sectionTopInset,
+                leading: LayoutMetric.horizontalInset,
+                bottom: LayoutMetric.sectionBottomInset,
+                trailing: LayoutMetric.horizontalInset
+            ),
+            interGroupSpacing: LayoutMetric.itemSpacing
         )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(LayoutMetric.liveHeroWidthFraction),
-            heightDimension: .estimated(LayoutMetric.liveHeroHeight)
-        )
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: LayoutMetric.sectionTopInset,
-            leading: LayoutMetric.horizontalInset,
-            bottom: LayoutMetric.sectionBottomInset,
-            trailing: LayoutMetric.horizontalInset
-        )
-        section.interGroupSpacing = LayoutMetric.itemSpacing
-        section.orthogonalScrollingBehavior = .groupPagingCentered
-        section.boundarySupplementaryItems = [makeSectionHeaderItem()]
-        return section
-    }
-
-    private func makeListSectionLayout(
-        estimatedHeight: CGFloat,
-        includesHeader: Bool
-    ) -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(estimatedHeight)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: itemSize, subitems: [item])
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: LayoutMetric.sectionTopInset,
-            leading: LayoutMetric.horizontalInset,
-            bottom: LayoutMetric.sectionBottomInset,
-            trailing: LayoutMetric.horizontalInset
-        )
-        section.interGroupSpacing = LayoutMetric.itemSpacing
-
-        if includesHeader {
-            section.boundarySupplementaryItems = [makeSectionHeaderItem()]
-        }
-
-        return section
-    }
-
-    private func makeSectionHeaderItem() -> NSCollectionLayoutBoundarySupplementaryItem {
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(LayoutMetric.headerHeight)
+            heightDimension: .estimated(LayoutMetric.estimatedHeaderHeight)
         )
-        return NSCollectionLayoutBoundarySupplementaryItem(
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
+        )
+        section.boundarySupplementaryItems = [header]
+        return section
+    }
+
+    private func makeFilterSectionLayout() -> NSCollectionLayoutSection {
+        makeListSectionLayout(
+            itemHeight: .estimated(LayoutMetric.estimatedFilterHeight),
+            contentInsets: NSDirectionalEdgeInsets(
+                top: LayoutMetric.sectionTopInset,
+                leading: LayoutMetric.horizontalInset,
+                bottom: 0,
+                trailing: LayoutMetric.horizontalInset
+            ),
+            interGroupSpacing: 0
         )
     }
 
@@ -277,9 +247,12 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        switch self.section(at: section) {
-        case .some(let section):
-            return section.items.count
+        switch sectionViewData(at: section) {
+        case .some(.filter):
+            return 1
+
+        case .some(.league(let sectionViewData)):
+            return sectionViewData.items.count
 
         case .none:
             return 0
@@ -290,60 +263,39 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        switch item(at: indexPath) {
-        case .some(.liveHero(let viewData)):
-            return configuredCell(
-                MainSoccerLiveHeroCell.self,
-                reuseIdentifier: MainSoccerLiveHeroCell.reuseIdentifier,
-                collectionView: collectionView,
-                indexPath: indexPath
-            ) { $0.configure(with: viewData) }
+        switch sectionViewData(at: indexPath.section) {
+        case .some(.filter(let filterViewData)):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MainHomeFilterCell.reuseIdentifier,
+                for: indexPath
+            ) as? MainHomeFilterCell else {
+                return UICollectionViewCell()
+            }
 
-        case .some(.empty(let viewData)):
-            return configuredCell(
-                MainSoccerEmptyStateCell.self,
-                reuseIdentifier: MainSoccerEmptyStateCell.reuseIdentifier,
-                collectionView: collectionView,
-                indexPath: indexPath
-            ) { $0.configure(with: viewData) }
+            cell.configure(with: filterViewData)
+            cell.onFilterSelected = { [weak self] action in
+                self?.viewModel.selectFilterOption(action)
+            }
+            return cell
 
-        case .some(.fixture(let viewData)):
-            return configuredCell(
-                MainSoccerFixtureCell.self,
-                reuseIdentifier: MainSoccerFixtureCell.reuseIdentifier,
-                collectionView: collectionView,
-                indexPath: indexPath
-            ) { $0.configure(with: viewData) }
+        case .some(.league(let sectionViewData)):
+            guard sectionViewData.items.indices.contains(indexPath.item),
+                  let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: MainHomeGameCell.reuseIdentifier,
+                    for: indexPath
+                  ) as? MainHomeGameCell else {
+                return UICollectionViewCell()
+            }
+
+            cell.configure(with: sectionViewData.items[indexPath.item])
+            return cell
 
         case .none:
             return UICollectionViewCell()
         }
     }
 
-    // MARK: - Cell Dequeue
-
-    private func configuredCell<Cell: UICollectionViewCell>(
-        _ cellType: Cell.Type,
-        reuseIdentifier: String,
-        collectionView: UICollectionView,
-        indexPath: IndexPath,
-        configure: (Cell) -> Void
-    ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: reuseIdentifier,
-            for: indexPath
-        ) as? Cell else {
-            return UICollectionViewCell()
-        }
-
-        configure(cell)
-        return cell
-    }
-}
-
-// MARK: - Supplementary Views
-
-extension MainSoccerHomeViewController {
+    // MARK: - Supplementary Views
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -351,20 +303,123 @@ extension MainSoccerHomeViewController {
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader,
-              let title = section(at: indexPath.section)?.title,
+              case .some(.league(let sectionViewData)) = sectionViewData(at: indexPath.section),
               let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: MainSoccerHomeSectionHeaderView.reuseIdentifier,
+                withReuseIdentifier: MainHomeSectionHeaderView.reuseIdentifier,
                 for: indexPath
-              ) as? MainSoccerHomeSectionHeaderView else {
+              ) as? MainHomeSectionHeaderView else {
             return UICollectionReusableView()
         }
 
-        headerView.configure(title: title)
+        headerView.configure(
+            title: sectionViewData.title,
+            logoURL: sectionViewData.logoURL,
+            fallbackSystemImageName: sectionViewData.fallbackSystemImageName
+        )
         return headerView
     }
 
+    // MARK: - UIScrollViewDelegate
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateNavigationTitle()
+    }
+}
+
+// MARK: - MainSoccerHomeNavigationTitleView
+
+private final class MainSoccerHomeNavigationTitleView: UIView {
+
+    // MARK: - Layout Metrics
+
+    private enum LayoutMetric {
+        static let logoSize: CGFloat = 20
+        static let spacing: CGFloat = 8
+    }
+
+    // MARK: - UI Components
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.tintColor = .primaryLabel
+        imageView.isHidden = true
+        return imageView
+    }()
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.lineBreakMode = .byTruncatingTail
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return label
+    }()
+
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [logoImageView, titleLabel])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = LayoutMetric.spacing
+        return stackView
+    }()
+
+    // MARK: - Initialization
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Configuration
+
+    func configure(
+        title: String,
+        logoURL: URL?,
+        fallbackSystemImageName: String
+    ) {
+        titleLabel.text = title
+        let fallbackImage = makeFallbackImage(systemImageName: fallbackSystemImageName)
+
+        switch logoURL {
+        case .some(let logoURL):
+            logoImageView.isHidden = false
+            logoImageView.sd_setImage(with: logoURL, placeholderImage: fallbackImage)
+
+        case .none:
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = fallbackImage
+            logoImageView.isHidden = false
+        }
+    }
+
+    // MARK: - Private Methods
+
+    private func makeFallbackImage(systemImageName: String) -> UIImage? {
+        let image = UIImage(systemName: systemImageName)
+            ?? UIImage(systemName: "soccerball")
+            ?? UIImage(systemName: "sportscourt")
+        return image?.withRenderingMode(.alwaysTemplate)
+    }
+
+    // MARK: - Setup
+
+    private func setupView() {
+        addSubview(stackView)
+
+        logoImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(LayoutMetric.logoSize)
+        }
+
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 }

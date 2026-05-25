@@ -140,7 +140,17 @@ struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory
             homeViewController.onSportSelectionRequested = onSportSelectionRequested
             return homeViewController
 
-        case .matches, .favorites:
+        case .matches:
+            let matchesService = MainSoccerMatchesService(networkClient: sportScopedNetworkClient)
+            let matchesViewModel = MainMatchesViewModel(
+                selectedSport: selectedSport,
+                scheduleService: matchesService
+            )
+            let matchesViewController = MainMatchesViewController(viewModel: matchesViewModel)
+            matchesViewController.onSportSelectionRequested = onSportSelectionRequested
+            return matchesViewController
+
+        case .favorites:
             return PlaceholderViewController(title: tab.title)
         }
     }

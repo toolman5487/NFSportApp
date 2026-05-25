@@ -14,6 +14,7 @@ nonisolated enum MainSoccerHomeViewState: Equatable, Sendable {
     case idle
     case loading
     case loaded(MainSoccerHomePresentation)
+    case empty(presentation: MainSoccerHomePresentation, message: String)
     case failed(message: String)
 }
 
@@ -38,6 +39,8 @@ final class MainSoccerHomeViewModel {
 
     private let selectedSport: SportType
     private let homeService: MainSoccerHomeServicing
+    private var dashboard: MainSoccerHomeDashboard?
+    private var selectedFilterOption: MainHomeFilterOption = .all
 
     // MARK: - Initialization
 
@@ -59,7 +62,8 @@ final class MainSoccerHomeViewModel {
                 for: selectedSport,
                 date: Date()
             )
-            state = .loaded(makePresentation(from: dashboard))
+            self.dashboard = dashboard
+            renderDashboard(dashboard)
         } catch {
             state = .failed(message: error.localizedDescription)
             AppLogger.logUIError(
@@ -70,106 +74,90 @@ final class MainSoccerHomeViewModel {
         }
     }
 
+    func selectFilterOption(_ option: MainHomeFilterOption) {
+        guard selectedFilterOption != option else {
+            return
+        }
+
+        selectedFilterOption = option
+        guard let dashboard else {
+            return
+        }
+
+        renderDashboard(dashboard)
+    }
+
+    // MARK: - Rendering
+
+    private func renderDashboard(_ dashboard: MainSoccerHomeDashboard) {
+        let presentation = makePresentation(from: dashboard)
+
+        switch presentation.hasLeagueSections {
+        case true:
+            state = .loaded(presentation)
+
+        case false:
+            state = .empty(presentation: presentation, message: makeEmptyMessage())
+        }
+    }
+
     // MARK: - Presentation Mapping
 
     private func makePresentation(from dashboard: MainSoccerHomeDashboard) -> MainSoccerHomePresentation {
-        MainSoccerHomePresentation(
+        let mergedFixtures = mergeFixtures(
+            liveFixtures: dashboard.liveFixtures,
+            todayFixtures: dashboard.todayFixtures
+        )
+        let fixtures = filterFixtures(mergedFixtures)
+        let leagueSections = makeLeagueSections(
+            from: fixtures,
+            fallbackSystemImageName: dashboard.sport.systemImageName
+        )
+        let sections: [MainHomeContentSectionViewData] = [
+            .filter(makeFilterViewData())
+        ] + leagueSections.map { section in
+            .league(section)
+        }
+
+        return MainSoccerHomePresentation(
             title: dashboard.sport.title,
-            sections: [
-                makeLiveMatchesSection(from: dashboard.liveFixtures),
-                makeTodaySection(from: dashboard.todayFixtures)
-            ]
+            sections: sections
         )
     }
 
-    private func makeLiveMatchesSection(from fixtures: [MainSoccerFixture]) -> MainSoccerHomeSection {
-        let liveFixtures = fixtures.map(makeLiveMatchViewData)
-        let state: MainSoccerLiveMatchesViewData.State
+    // MARK: - Filter Mapping
 
-        switch liveFixtures.isEmpty {
-        case true:
-            state = .empty(message: "No live matches")
-
-        case false:
-            state = .loaded(Array(liveFixtures))
-        }
-
-        return .liveMatches(
-            MainSoccerLiveMatchesViewData(
-                title: "Live Matches",
-                state: state
-            )
+    private func makeFilterViewData() -> MainHomeFilterViewData {
+        MainHomeFilterViewData(
+            options: MainHomeFilterOption.allCases.map { option in
+                MainHomeFilterOptionViewData(
+                    option: option,
+                    title: option.title,
+                    systemImageName: option.systemImageName,
+                    isSelected: option == selectedFilterOption
+                )
+            }
         )
     }
 
-    private func makeTodaySection(from fixtures: [MainSoccerFixture]) -> MainSoccerHomeSection {
-        let todayFixtures = fixtures.map(makeFixtureViewData)
-        let state: MainSoccerTodayFixturesViewData.State
+    // MARK: - Fixture Mapping
 
-        switch todayFixtures.isEmpty {
-        case true:
-            state = .empty(message: "No fixtures today")
-
-        case false:
-            state = .loaded(Array(todayFixtures))
-        }
-
-        return .today(
-            MainSoccerTodayFixturesViewData(
-                title: "Today",
-                state: state
-            )
-        )
-    }
-
-    // MARK: - Item Mapping
-
-    private func makeLiveMatchViewData(from fixture: MainSoccerFixture) -> MainSoccerLiveMatchViewData {
-        MainSoccerLiveMatchViewData(
-            minuteText: makeMinuteText(from: fixture),
-            leagueName: fixture.leagueName,
-            homeTeamName: fixture.homeTeamName,
-            homeTeamLogoURL: fixture.homeTeamLogoURL,
+    private func makeGameViewData(from fixture: MainSoccerFixture) -> MainHomeGameViewData {
+        MainHomeGameViewData(
+            id: fixture.id,
             awayTeamName: fixture.awayTeamName,
             awayTeamLogoURL: fixture.awayTeamLogoURL,
-            scoreText: makeScoreText(from: fixture)
-        )
-    }
-
-    private func makeFixtureViewData(from fixture: MainSoccerFixture) -> MainSoccerFixtureViewData {
-        MainSoccerFixtureViewData(
-            timeText: makeFixtureTimeText(from: fixture),
-            leagueName: fixture.leagueName,
             homeTeamName: fixture.homeTeamName,
             homeTeamLogoURL: fixture.homeTeamLogoURL,
-            awayTeamName: fixture.awayTeamName,
-            awayTeamLogoURL: fixture.awayTeamLogoURL,
-            homeScoreText: fixture.homeScore?.description ?? "-",
             awayScoreText: fixture.awayScore?.description ?? "-",
+            homeScoreText: fixture.homeScore?.description ?? "-",
+            scheduledStartText: makeFixtureTimeText(from: fixture),
             statusText: makeFixtureStatusText(from: fixture),
             statusStyle: makeStatusStyle(from: fixture)
         )
     }
 
-    // MARK: - Text Formatting
-
-    private func makeMinuteText(from fixture: MainSoccerFixture) -> String {
-        if let elapsedMinute = fixture.elapsedMinute {
-            return "\(elapsedMinute)'"
-        }
-
-        return fixture.statusShort ?? fixture.statusLong ?? "Live"
-    }
-
-    private func makeScoreText(from fixture: MainSoccerFixture) -> String {
-        "\(fixture.homeScore?.description ?? "-") - \(fixture.awayScore?.description ?? "-")"
-    }
-
     private func makeFixtureTimeText(from fixture: MainSoccerFixture) -> String {
-        guard makeStatusStyle(from: fixture) == .upcoming else {
-            return fixture.statusShort ?? fixture.statusLong ?? "Live"
-        }
-
         guard let scheduledStartDate = fixture.scheduledStartDate else {
             return fixture.scheduledStartText ?? "TBD"
         }
@@ -197,13 +185,21 @@ final class MainSoccerHomeViewModel {
         }
     }
 
-    private func makeStatusStyle(from fixture: MainSoccerFixture) -> MainSoccerFixtureStatusStyle {
+    private func makeMinuteText(from fixture: MainSoccerFixture) -> String {
+        if let elapsedMinute = fixture.elapsedMinute {
+            return "\(elapsedMinute)'"
+        }
+
+        return fixture.statusShort ?? fixture.statusLong ?? "Live"
+    }
+
+    private func makeStatusStyle(from fixture: MainSoccerFixture) -> MainHomeGameStatusStyle {
         guard let statusShort = fixture.statusShort else {
             return .neutral
         }
 
         switch statusShort {
-        case "1H", "HT", "2H", "ET", "BT", "P", "SUSP", "INT":
+        case "1H", "HT", "2H", "ET", "BT", "P", "SUSP", "INT", "LIVE":
             return .live
 
         case "NS", "TBD":
@@ -214,6 +210,119 @@ final class MainSoccerHomeViewModel {
 
         default:
             return .neutral
+        }
+    }
+
+    // MARK: - Filtering
+
+    private func filterFixtures(_ fixtures: [MainSoccerFixture]) -> [MainSoccerFixture] {
+        fixtures.filter { fixture in
+            matchesSelectedFilterOption(makeStatusStyle(from: fixture))
+        }
+    }
+
+    private func matchesSelectedFilterOption(_ statusStyle: MainHomeGameStatusStyle) -> Bool {
+        switch selectedFilterOption {
+        case .all, .ascending, .descending:
+            return true
+
+        case .live:
+            return statusStyle == .live
+
+        case .upcoming:
+            return statusStyle == .upcoming
+
+        case .finished:
+            return statusStyle == .final
+        }
+    }
+
+    private func makeEmptyMessage() -> String {
+        switch selectedFilterOption {
+        case .all, .ascending, .descending:
+            return "No matches available."
+
+        case .live, .upcoming, .finished:
+            return "No \(selectedFilterOption.title.lowercased()) matches available."
+        }
+    }
+
+    // MARK: - Merging
+
+    private func mergeFixtures(
+        liveFixtures: [MainSoccerFixture],
+        todayFixtures: [MainSoccerFixture]
+    ) -> [MainSoccerFixture] {
+        var seenFixtureIDs = Set<Int>()
+        var mergedFixtures: [MainSoccerFixture] = []
+
+        for fixture in liveFixtures + todayFixtures where seenFixtureIDs.insert(fixture.id).inserted {
+            mergedFixtures.append(fixture)
+        }
+
+        return mergedFixtures
+    }
+
+    // MARK: - League Grouping
+
+    private func makeLeagueSections(
+        from fixtures: [MainSoccerFixture],
+        fallbackSystemImageName: String
+    ) -> [MainHomeSectionViewData] {
+        var orderedLeagueNames: [String] = []
+        var fixturesByLeagueName: [String: [MainSoccerFixture]] = [:]
+        var leagueLogoURLsByName: [String: URL] = [:]
+
+        for fixture in fixtures {
+            let leagueName = fixture.leagueName
+
+            if fixturesByLeagueName[leagueName] == nil {
+                orderedLeagueNames.append(leagueName)
+            }
+
+            if leagueLogoURLsByName[leagueName] == nil,
+               let leagueLogoURL = fixture.leagueLogoURL {
+                leagueLogoURLsByName[leagueName] = leagueLogoURL
+            }
+
+            fixturesByLeagueName[leagueName, default: []].append(fixture)
+        }
+
+        let leagueSections: [MainHomeSectionViewData] = orderedLeagueNames.compactMap { leagueName in
+            guard let leagueFixtures = fixturesByLeagueName[leagueName],
+                  !leagueFixtures.isEmpty else {
+                return nil as MainHomeSectionViewData?
+            }
+
+            return MainHomeSectionViewData(
+                title: leagueName,
+                logoURL: leagueLogoURLsByName[leagueName],
+                fallbackSystemImageName: fallbackSystemImageName,
+                items: leagueFixtures.map(makeGameViewData)
+            )
+        }
+
+        return sortLeagueSections(leagueSections)
+    }
+
+    // MARK: - Sorting
+
+    private func sortLeagueSections(
+        _ sections: [MainHomeSectionViewData]
+    ) -> [MainHomeSectionViewData] {
+        switch selectedFilterOption {
+        case .ascending:
+            return sections.sorted { lhs, rhs in
+                lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            }
+
+        case .descending:
+            return sections.sorted { lhs, rhs in
+                lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedDescending
+            }
+
+        case .all, .live, .upcoming, .finished:
+            return sections
         }
     }
 }

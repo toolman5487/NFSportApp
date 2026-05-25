@@ -7,10 +7,6 @@
 
 import Foundation
 
-// MARK: - MainSoccerHomePresentation
-
-nonisolated struct MainSoccerHomePresentation: Equatable, Sendable {
-
-    let title: String
-    let sections: [MainSoccerHomeSection]
-}
+// Soccer uses its own API service, but shares the standard sports-home
+// presentation contract so the homepage renders like MainHome.
+typealias MainSoccerHomePresentation = MainHomePresentation
