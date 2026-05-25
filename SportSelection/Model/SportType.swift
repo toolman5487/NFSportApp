@@ -38,6 +38,13 @@ extension SportType {
             apiHost: "v1.american-football.api-sports.io"
         ),
         SportType(
+            id: "soccer",
+            title: "Soccer",
+            subtitle: "Fixtures, scores, and leagues",
+            systemImageName: "soccerball",
+            apiHost: "v3.football.api-sports.io"
+        ),
+        SportType(
             id: "basketball",
             title: "Basketball",
             subtitle: "Games, schedules, and standings",

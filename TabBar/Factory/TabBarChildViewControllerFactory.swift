@@ -22,6 +22,21 @@ protocol TabBarChildViewControllerFactory {
 @MainActor
 struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory {
 
+    private enum SportRootFlow {
+        case standard
+        case soccer
+
+        init(sportID: String) {
+            switch sportID {
+            case "soccer":
+                self = .soccer
+
+            default:
+                self = .standard
+            }
+        }
+    }
+
     private let selectedSport: SportType
     private let sportScopedNetworkClient: NetworkServicing
 
@@ -65,6 +80,25 @@ struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory
         for tab: AppTab,
         onSportSelectionRequested: (() -> Void)?
     ) -> UIViewController {
+        switch SportRootFlow(sportID: selectedSport.id) {
+        case .standard:
+            return makeStandardRootViewController(
+                for: tab,
+                onSportSelectionRequested: onSportSelectionRequested
+            )
+
+        case .soccer:
+            return makeSoccerRootViewController(
+                for: tab,
+                onSportSelectionRequested: onSportSelectionRequested
+            )
+        }
+    }
+
+    private func makeStandardRootViewController(
+        for tab: AppTab,
+        onSportSelectionRequested: (() -> Void)?
+    ) -> UIViewController {
         switch tab {
         case .home:
             let homeService = MainHomeService(networkClient: sportScopedNetworkClient)
@@ -87,6 +121,26 @@ struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory
             return matchesViewController
 
         case .favorites:
+            return PlaceholderViewController(title: tab.title)
+        }
+    }
+
+    private func makeSoccerRootViewController(
+        for tab: AppTab,
+        onSportSelectionRequested: (() -> Void)?
+    ) -> UIViewController {
+        switch tab {
+        case .home:
+            let homeService = MainSoccerHomeService(networkClient: sportScopedNetworkClient)
+            let homeViewModel = MainSoccerHomeViewModel(
+                selectedSport: selectedSport,
+                homeService: homeService
+            )
+            let homeViewController = MainSoccerHomeViewController(viewModel: homeViewModel)
+            homeViewController.onSportSelectionRequested = onSportSelectionRequested
+            return homeViewController
+
+        case .matches, .favorites:
             return PlaceholderViewController(title: tab.title)
         }
     }
