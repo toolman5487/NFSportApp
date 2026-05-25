@@ -101,7 +101,9 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
             leagueName: league?.displayName ?? "Other League",
             leagueLogoURL: league?.logoURL,
             homeTeamName: homeName,
+            homeTeamLogoURL: teams?.home.logoURL,
             awayTeamName: awayName,
+            awayTeamLogoURL: teams?.away.logoURL,
             scheduledStartText: time ?? date?.displayText,
             statusDescription: status?.long ?? status?.short?.displayValue,
             homeScore: scores?.home?.displayValue,
@@ -215,6 +217,14 @@ private nonisolated struct APISportsTeamResponse: Decodable, Sendable {
     let id: Int?
     let name: String?
     let logo: String?
+
+    var logoURL: URL? {
+        guard let logo else {
+            return nil
+        }
+
+        return URL(string: logo)
+    }
 }
 
 // MARK: - API-Sports Scores

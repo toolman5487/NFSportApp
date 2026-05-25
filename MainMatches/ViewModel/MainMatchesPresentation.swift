@@ -74,6 +74,7 @@ nonisolated struct MainMatchesFilterOptionViewData: Equatable, Identifiable, Sen
     let option: MainMatchesFilterOption
     let title: String
     let systemImageName: String?
+    let logoURL: URL?
     let isSelected: Bool
 }
 
@@ -81,8 +82,6 @@ nonisolated struct MainMatchesFilterOptionViewData: Equatable, Identifiable, Sen
 
 nonisolated struct MainMatchesScheduleGroupViewData: Equatable, Sendable {
 
-    let title: String
-    let subtitle: String
     let items: [MainMatchesGameViewData]
 }
 
@@ -96,7 +95,9 @@ nonisolated struct MainMatchesGameViewData: Equatable, Identifiable, Sendable {
     let statusText: String
     let statusStyle: MainMatchesGameStatusStyle
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayScoreText: String
     let homeScoreText: String
 }
@@ -115,40 +116,40 @@ nonisolated enum MainMatchesGameStatusStyle: Equatable, Sendable {
 
 nonisolated enum MainMatchesFilterOption: CaseIterable, Equatable, Hashable, Sendable {
 
-    case all
-    case live
-    case upcoming
-    case finished
+    case allLeagues
+    case league(name: String, logoURL: URL?)
 
     var title: String {
         switch self {
-        case .all:
+        case .allLeagues:
             return "All"
 
-        case .live:
-            return "Live"
-
-        case .upcoming:
-            return "Upcoming"
-
-        case .finished:
-            return "Finished"
+        case .league(let name, _):
+            return name
         }
     }
 
     var systemImageName: String? {
         switch self {
-        case .all:
-            return "calendar"
+        case .allLeagues:
+            return "list.bullet"
 
-        case .live:
-            return "play.circle"
-
-        case .upcoming:
-            return "clock"
-
-        case .finished:
-            return "checkmark.circle"
+        case .league(_, let logoURL):
+            return logoURL == nil ? "trophy" : nil
         }
+    }
+
+    var logoURL: URL? {
+        switch self {
+        case .allLeagues:
+            return nil
+
+        case .league(_, let logoURL):
+            return logoURL
+        }
+    }
+
+    static var allCases: [MainMatchesFilterOption] {
+        [.allLeagues]
     }
 }

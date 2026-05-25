@@ -22,11 +22,14 @@ nonisolated struct MainMatchesGame: Equatable, Identifiable, Sendable {
 
     let id: Int
     let leagueName: String
+    let leagueLogoURL: URL?
     let scheduledStartDate: Date?
     let scheduledStartText: String
     let statusDescription: String?
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
     let homeScore: String?
     let awayScore: String?
 }

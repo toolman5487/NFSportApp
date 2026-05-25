@@ -49,7 +49,6 @@
 		15C9C8662FC3F797000820EE /* MainMatchesDatePickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8762FC3F797000820EE /* MainMatchesDatePickerCell.swift */; };
 		15C9C8672FC3F797000820EE /* MainMatchesFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8772FC3F797000820EE /* MainMatchesFilterCell.swift */; };
 		15C9C8682FC3F797000820EE /* MainMatchesGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */; };
-		15C9C8692FC3F797000820EE /* MainMatchesSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8792FC3F797000820EE /* MainMatchesSectionHeaderView.swift */; };
 		15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
 /* End PBXBuildFile section */
@@ -95,7 +94,6 @@
 		15C9C8762FC3F797000820EE /* MainMatchesDatePickerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesDatePickerCell.swift; sourceTree = "<group>"; };
 		15C9C8772FC3F797000820EE /* MainMatchesFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesFilterCell.swift; sourceTree = "<group>"; };
 		15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesGameCell.swift; sourceTree = "<group>"; };
-		15C9C8792FC3F797000820EE /* MainMatchesSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesSectionHeaderView.swift; sourceTree = "<group>"; };
 		15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesViewController.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -444,7 +442,6 @@
 				15C9C8762FC3F797000820EE /* MainMatchesDatePickerCell.swift */,
 				15C9C8772FC3F797000820EE /* MainMatchesFilterCell.swift */,
 				15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */,
-				15C9C8792FC3F797000820EE /* MainMatchesSectionHeaderView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -582,7 +579,6 @@
 				15C9C8662FC3F797000820EE /* MainMatchesDatePickerCell.swift in Sources */,
 				15C9C8622FC3F797000820EE /* MainMatchesEndpoint.swift in Sources */,
 				15C9C8612FC3F797000820EE /* MainMatchesSchedule.swift in Sources */,
-				15C9C8692FC3F797000820EE /* MainMatchesSectionHeaderView.swift in Sources */,
 				15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,

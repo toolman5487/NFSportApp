@@ -24,7 +24,9 @@ nonisolated struct MainHomeGame: Equatable, Identifiable, Sendable {
     let leagueName: String
     let leagueLogoURL: URL?
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
     let scheduledStartText: String?
     let statusDescription: String?
     let homeScore: String?

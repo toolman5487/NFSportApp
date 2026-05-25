@@ -44,7 +44,6 @@ final class MainMatchesDatePickerCell: UICollectionViewCell {
         button.backgroundColor = .secondaryBackgroundColor
         button.layer.cornerRadius = LayoutMetric.pageButtonCornerRadius
         button.layer.masksToBounds = true
-        button.accessibilityLabel = "Previous week"
         return button
     }()
 
@@ -65,7 +64,6 @@ final class MainMatchesDatePickerCell: UICollectionViewCell {
         button.backgroundColor = .secondaryBackgroundColor
         button.layer.cornerRadius = LayoutMetric.pageButtonCornerRadius
         button.layer.masksToBounds = true
-        button.accessibilityLabel = "Next week"
         return button
     }()
 
@@ -306,7 +304,7 @@ private final class MainMatchesDateItemCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with viewData: MainMatchesDateItemViewData) {
-        weekdayLabel.text = viewData.isToday ? "Today" : viewData.weekdayText
+        weekdayLabel.text = viewData.weekdayText
         dayLabel.text = viewData.dayText
         monthLabel.text = viewData.monthText
         applySelectionState(viewData.isSelected)

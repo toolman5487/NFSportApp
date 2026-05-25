@@ -146,7 +146,9 @@ final class MainHomeViewModel {
         MainHomeGameViewData(
             id: game.id,
             awayTeamName: game.awayTeamName,
+            awayTeamLogoURL: game.awayTeamLogoURL,
             homeTeamName: game.homeTeamName,
+            homeTeamLogoURL: game.homeTeamLogoURL,
             awayScoreText: game.awayScore ?? "-",
             homeScoreText: game.homeScore ?? "-",
             scheduledStartText: game.scheduledStartText ?? "TBD",

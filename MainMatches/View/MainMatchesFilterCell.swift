@@ -5,6 +5,7 @@
 //  Created by Willy Hsu on 2026/5/25.
 //
 
+import SDWebImage
 import SnapKit
 import UIKit
 
@@ -18,10 +19,10 @@ final class MainMatchesFilterCell: UICollectionViewCell {
 
     private enum LayoutMetric {
         static let optionHeight: CGFloat = 44
-        static let optionMinWidth: CGFloat = 76
+        static let optionMinWidth: CGFloat = 44
         static let optionHorizontalInset: CGFloat = 12
-        static let iconSize: CGFloat = 14
-        static let iconSpacing: CGFloat = 6
+        static let iconSize: CGFloat = 24
+        static let iconSpacing: CGFloat = 8
         static let optionSpacing: CGFloat = 8
         static let verticalInset: CGFloat = 8
     }
@@ -143,7 +144,7 @@ extension MainMatchesFilterCell: UICollectionViewDelegateFlowLayout {
         let option = options[indexPath.item]
         let font = UIFont.preferredFont(forTextStyle: .subheadline)
         let titleWidth = (option.title as NSString).size(withAttributes: [.font: font]).width
-        let iconWidth = option.systemImageName == nil
+        let iconWidth = option.systemImageName == nil && option.logoURL == nil
             ? 0
             : LayoutMetric.iconSize + LayoutMetric.iconSpacing
         let width = max(
@@ -164,9 +165,9 @@ private final class MainMatchesFilterOptionCell: UICollectionViewCell {
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
+        static let iconSize: CGFloat = 24
         static let horizontalInset: CGFloat = 12
-        static let iconSize: CGFloat = 14
-        static let iconSpacing: CGFloat = 6
+        static let iconSpacing: CGFloat = 8
         static let borderWidth: CGFloat = 1
     }
 
@@ -188,8 +189,9 @@ private final class MainMatchesFilterOptionCell: UICollectionViewCell {
     private let iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = false
         imageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(
-            pointSize: 12,
+            pointSize: 18,
             weight: .semibold
         )
         imageView.isHidden = true
@@ -211,6 +213,7 @@ private final class MainMatchesFilterOptionCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        iconImageView.sd_cancelCurrentImageLoad()
         iconImageView.image = nil
         iconImageView.isHidden = true
         titleLabel.text = nil
@@ -220,7 +223,13 @@ private final class MainMatchesFilterOptionCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with viewData: MainMatchesFilterOptionViewData) {
-        if let systemImageName = viewData.systemImageName {
+        if let logoURL = viewData.logoURL {
+            iconImageView.sd_setImage(with: logoURL)
+            iconImageView.tintColor = nil
+            iconImageView.isHidden = false
+            iconWidthConstraint?.update(offset: LayoutMetric.iconSize)
+            titleLeadingConstraint?.update(offset: LayoutMetric.iconSpacing)
+        } else if let systemImageName = viewData.systemImageName {
             iconImageView.image = UIImage(systemName: systemImageName)
             iconImageView.isHidden = false
             iconWidthConstraint?.update(offset: LayoutMetric.iconSize)

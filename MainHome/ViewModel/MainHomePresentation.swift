@@ -70,7 +70,9 @@ nonisolated struct MainHomeGameViewData: Equatable, Identifiable, Sendable {
 
     let id: Int
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayScoreText: String
     let homeScoreText: String
     let scheduledStartText: String

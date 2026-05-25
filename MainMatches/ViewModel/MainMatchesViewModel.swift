@@ -47,7 +47,7 @@ final class MainMatchesViewModel {
     }()
     private var schedule: MainMatchesSchedule?
     private var selectedDate: Date
-    private var selectedFilterOption: MainMatchesFilterOption = .all
+    private var selectedFilterOption: MainMatchesFilterOption = .allLeagues
 
     // MARK: - Initialization
 
@@ -116,6 +116,7 @@ final class MainMatchesViewModel {
     // MARK: - Rendering
 
     private func renderSchedule(_ schedule: MainMatchesSchedule) {
+        normalizeSelectedFilterOption(for: schedule.games)
         let presentation = makePresentation(from: schedule)
 
         switch presentation.hasScheduleGroups {
@@ -150,10 +151,15 @@ final class MainMatchesViewModel {
             }
         }
 
-        let sections: [MainMatchesContentSectionViewData] = [
-            .datePicker(makeDatePickerViewData()),
-            .filter(makeFilterViewData())
-        ] + makeScheduleGroups(from: sortedGames).map { group in
+        var sections: [MainMatchesContentSectionViewData] = [
+            .datePicker(makeDatePickerViewData())
+        ]
+
+        if !schedule.games.isEmpty {
+            sections.append(.filter(makeFilterViewData(from: schedule.games)))
+        }
+
+        sections += makeScheduleGroups(from: sortedGames).map { group in
             .scheduleGroup(group)
         }
 
@@ -193,13 +199,16 @@ final class MainMatchesViewModel {
         await loadSchedule()
     }
 
-    private func makeFilterViewData() -> MainMatchesFilterViewData {
-        MainMatchesFilterViewData(
-            options: MainMatchesFilterOption.allCases.map { option in
+    private func makeFilterViewData(from games: [MainMatchesGame]) -> MainMatchesFilterViewData {
+        let leagueOptions = makeLeagueFilterOptions(from: games)
+
+        return MainMatchesFilterViewData(
+            options: leagueOptions.map { option in
                 MainMatchesFilterOptionViewData(
                     option: option,
                     title: option.title,
                     systemImageName: option.systemImageName,
+                    logoURL: option.logoURL,
                     isSelected: option == selectedFilterOption
                 )
             }
@@ -209,40 +218,15 @@ final class MainMatchesViewModel {
     private func makeScheduleGroups(
         from games: [MainMatchesGame]
     ) -> [MainMatchesScheduleGroupViewData] {
-        let groupedGames = Dictionary(grouping: games) { game in
-            makeGroupTitle(from: game.scheduledStartDate, fallback: game.scheduledStartText)
-        }
-        let orderedTitles = groupedGames.keys.sorted { lhs, rhs in
-            let lhsDate = groupedGames[lhs]?.first?.scheduledStartDate
-            let rhsDate = groupedGames[rhs]?.first?.scheduledStartDate
-
-            switch (lhsDate, rhsDate) {
-            case (.some(let lhsDate), .some(let rhsDate)):
-                return lhsDate < rhsDate
-
-            case (.some, .none):
-                return true
-
-            case (.none, .some):
-                return false
-
-            case (.none, .none):
-                return lhs < rhs
-            }
+        guard !games.isEmpty else {
+            return []
         }
 
-        return orderedTitles.compactMap { title in
-            guard let games = groupedGames[title] else {
-                return nil
-            }
-
-            let items = games.map(makeGameViewData)
-            return MainMatchesScheduleGroupViewData(
-                title: title,
-                subtitle: "\(items.count) matches",
-                items: items
+        return [
+            MainMatchesScheduleGroupViewData(
+                items: games.map(makeGameViewData)
             )
-        }
+        ]
     }
 
     private func makeGameViewData(from game: MainMatchesGame) -> MainMatchesGameViewData {
@@ -253,7 +237,9 @@ final class MainMatchesViewModel {
             statusText: game.statusDescription ?? "Scheduled",
             statusStyle: makeStatusStyle(from: game.statusDescription),
             awayTeamName: game.awayTeamName,
+            awayTeamLogoURL: game.awayTeamLogoURL,
             homeTeamName: game.homeTeamName,
+            homeTeamLogoURL: game.homeTeamLogoURL,
             awayScoreText: game.awayScore ?? "-",
             homeScoreText: game.homeScore ?? "-"
         )
@@ -263,23 +249,44 @@ final class MainMatchesViewModel {
 
     private func filterGames(_ games: [MainMatchesGame]) -> [MainMatchesGame] {
         games.filter { game in
-            matchesSelectedFilterOption(makeStatusStyle(from: game.statusDescription))
+            matchesSelectedFilterOption(game)
         }
     }
 
-    private func matchesSelectedFilterOption(_ statusStyle: MainMatchesGameStatusStyle) -> Bool {
+    private func matchesSelectedFilterOption(_ game: MainMatchesGame) -> Bool {
         switch selectedFilterOption {
-        case .all:
+        case .allLeagues:
             return true
 
-        case .live:
-            return statusStyle == .live
+        case .league(let name, _):
+            return game.leagueName == name
+        }
+    }
 
-        case .upcoming:
-            return statusStyle == .upcoming
+    private func makeLeagueFilterOptions(
+        from games: [MainMatchesGame]
+    ) -> [MainMatchesFilterOption] {
+        let leagueLogoURLsByName = Dictionary(
+            grouping: games,
+            by: \.leagueName
+        ).mapValues { games in
+            games.compactMap(\.leagueLogoURL).first
+        }
+        let leagueNames = leagueLogoURLsByName.keys.sorted { lhs, rhs in
+            lhs.localizedStandardCompare(rhs) == .orderedAscending
+        }
 
-        case .finished:
-            return statusStyle == .final
+        return [.allLeagues] + leagueNames.map { name in
+            .league(name: name, logoURL: leagueLogoURLsByName[name] ?? nil)
+        }
+    }
+
+    private func normalizeSelectedFilterOption(for games: [MainMatchesGame]) {
+        let options = makeLeagueFilterOptions(from: games)
+
+        guard options.contains(selectedFilterOption) else {
+            selectedFilterOption = .allLeagues
+            return
         }
     }
 
@@ -311,11 +318,11 @@ final class MainMatchesViewModel {
 
     private func makeEmptyMessage() -> String {
         switch selectedFilterOption {
-        case .all:
+        case .allLeagues:
             return "No matches on this date."
 
-        case .live, .upcoming, .finished:
-            return "No \(selectedFilterOption.title.lowercased()) matches on this date."
+        case .league(let name, _):
+            return "No matches for \(name) on this date."
         }
     }
 
@@ -358,14 +365,6 @@ final class MainMatchesViewModel {
         formatter.locale = .current
         formatter.dateFormat = "MMM d"
         return "\(formatter.string(from: firstDate)) - \(formatter.string(from: lastDate))"
-    }
-
-    private func makeGroupTitle(from date: Date?, fallback: String) -> String {
-        guard let date else {
-            return fallback
-        }
-
-        return makeTimeText(from: date, fallback: fallback)
     }
 
     private func makeTimeText(from date: Date?, fallback: String) -> String {

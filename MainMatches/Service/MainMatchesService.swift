@@ -85,11 +85,14 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
         return MainMatchesGame(
             id: id,
             leagueName: league?.displayName ?? "Other League",
+            leagueLogoURL: league?.logoURL,
             scheduledStartDate: date?.startDate,
             scheduledStartText: time ?? date?.displayText ?? "TBD",
             statusDescription: status?.long ?? status?.short?.displayValue,
             homeTeamName: homeTeamName,
+            homeTeamLogoURL: teams?.home.logoURL,
             awayTeamName: awayTeamName,
+            awayTeamLogoURL: teams?.away.logoURL,
             homeScore: scores?.home?.displayValue,
             awayScore: scores?.away?.displayValue
         )
@@ -101,23 +104,35 @@ private nonisolated struct APISportsGameResponse: Decodable, Sendable {
 private nonisolated struct APISportsLeagueResponse: Decodable, Sendable {
 
     let displayName: String?
+    let logo: String?
+
+    var logoURL: URL? {
+        guard let logo else {
+            return nil
+        }
+
+        return URL(string: logo)
+    }
 
     init(from decoder: Decoder) throws {
         let singleValueContainer = try decoder.singleValueContainer()
 
         if let value = try? singleValueContainer.decode(String.self) {
             displayName = value
+            logo = nil
             return
         }
 
         let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
         displayName = try keyedContainer.decodeIfPresent(String.self, forKey: .name)
             ?? keyedContainer.decodeIfPresent(String.self, forKey: .type)
+        logo = try keyedContainer.decodeIfPresent(String.self, forKey: .logo)
     }
 
     private enum CodingKeys: String, CodingKey {
         case name
         case type
+        case logo
     }
 }
 
@@ -211,6 +226,15 @@ private nonisolated struct APISportsGameTeamsResponse: Decodable, Sendable {
 private nonisolated struct APISportsTeamResponse: Decodable, Sendable {
 
     let name: String?
+    let logo: String?
+
+    var logoURL: URL? {
+        guard let logo else {
+            return nil
+        }
+
+        return URL(string: logo)
+    }
 }
 
 // MARK: - API-Sports Scores

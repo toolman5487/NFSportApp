@@ -5,6 +5,7 @@
 //  Created by Willy Hsu on 2026/5/25.
 //
 
+import SDWebImage
 import SnapKit
 import UIKit
 
@@ -21,45 +22,12 @@ final class MainMatchesGameCell: UICollectionViewCell {
         static let contentInset: CGFloat = 16
         static let compactSpacing: CGFloat = 8
         static let rowSpacing: CGFloat = 12
-        static let timeColumnWidth: CGFloat = 64
-        static let dividerWidth: CGFloat = 1
-        static let scoreWidth: CGFloat = 44
         static let statusHorizontalInset: CGFloat = 8
         static let statusVerticalInset: CGFloat = 4
+        static let separatorHeight: CGFloat = 1
     }
 
     // MARK: - UI Components
-
-    private let timeLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
-        label.textColor = .primaryLabel
-        label.textAlignment = .center
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 2
-        return label
-    }()
-
-    private let statusContainerView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 6
-        view.layer.masksToBounds = true
-        return view
-    }()
-
-    private let statusLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption2)
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let dividerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator.withAlphaComponent(0.32)
-        return view
-    }()
 
     private let leagueLabel: UILabel = {
         let label = UILabel()
@@ -70,8 +38,40 @@ final class MainMatchesGameCell: UICollectionViewCell {
         return label
     }()
 
-    private let awayRowView = MatchTeamRowView(roleText: "AWAY")
-    private let homeRowView = MatchTeamRowView(roleText: "HOME")
+    private let timeLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
+        label.textAlignment = .right
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private let statusContainerView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 4
+        view.layer.masksToBounds = true
+        return view
+    }()
+
+    private let statusLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        return label
+    }()
+
+    private let awayRowView = MatchTeamRowView()
+    private let homeRowView = MatchTeamRowView()
+
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator.withAlphaComponent(0.32)
+        return view
+    }()
 
     // MARK: - Initialization
 
@@ -99,10 +99,18 @@ final class MainMatchesGameCell: UICollectionViewCell {
 
     func configure(with viewData: MainMatchesGameViewData) {
         timeLabel.text = viewData.timeText
-        statusLabel.text = viewData.statusText.uppercased()
+        statusLabel.text = viewData.statusText
         leagueLabel.text = viewData.leagueName
-        awayRowView.configure(teamName: viewData.awayTeamName, scoreText: viewData.awayScoreText)
-        homeRowView.configure(teamName: viewData.homeTeamName, scoreText: viewData.homeScoreText)
+        awayRowView.configure(
+            teamName: viewData.awayTeamName,
+            logoURL: viewData.awayTeamLogoURL,
+            scoreText: viewData.awayScoreText
+        )
+        homeRowView.configure(
+            teamName: viewData.homeTeamName,
+            logoURL: viewData.homeTeamLogoURL,
+            scoreText: viewData.homeScoreText
+        )
         applyStatusStyle(viewData.statusStyle)
     }
 
@@ -117,22 +125,27 @@ final class MainMatchesGameCell: UICollectionViewCell {
         contentView.layer.masksToBounds = true
 
         contentView.addSubview(timeLabel)
+        contentView.addSubview(leagueLabel)
         contentView.addSubview(statusContainerView)
         statusContainerView.addSubview(statusLabel)
-        contentView.addSubview(dividerView)
-        contentView.addSubview(leagueLabel)
         contentView.addSubview(awayRowView)
+        contentView.addSubview(separatorView)
         contentView.addSubview(homeRowView)
 
-        timeLabel.snp.makeConstraints { make in
+        leagueLabel.snp.makeConstraints { make in
             make.top.leading.equalToSuperview().inset(LayoutMetric.contentInset)
-            make.width.equalTo(LayoutMetric.timeColumnWidth)
+            make.trailing.lessThanOrEqualTo(timeLabel.snp.leading).offset(-LayoutMetric.compactSpacing)
+        }
+
+        timeLabel.snp.makeConstraints { make in
+            make.top.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.width.greaterThanOrEqualTo(48)
         }
 
         statusContainerView.snp.makeConstraints { make in
-            make.top.equalTo(timeLabel.snp.bottom).offset(LayoutMetric.compactSpacing)
-            make.centerX.equalTo(timeLabel)
-            make.bottom.lessThanOrEqualToSuperview().inset(LayoutMetric.contentInset)
+            make.top.equalTo(leagueLabel.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.leading.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.trailing.lessThanOrEqualToSuperview().inset(LayoutMetric.contentInset)
         }
 
         statusLabel.snp.makeConstraints { make in
@@ -140,25 +153,20 @@ final class MainMatchesGameCell: UICollectionViewCell {
             make.leading.trailing.equalToSuperview().inset(LayoutMetric.statusHorizontalInset)
         }
 
-        dividerView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
-            make.leading.equalTo(timeLabel.snp.trailing).offset(LayoutMetric.contentInset)
-            make.width.equalTo(LayoutMetric.dividerWidth)
-        }
-
-        leagueLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(LayoutMetric.contentInset)
-            make.leading.equalTo(dividerView.snp.trailing).offset(LayoutMetric.contentInset)
-            make.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
-        }
-
         awayRowView.snp.makeConstraints { make in
-            make.top.equalTo(leagueLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
-            make.leading.trailing.equalTo(leagueLabel)
+            make.top.equalTo(statusContainerView.snp.bottom).offset(LayoutMetric.rowSpacing)
+            make.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.leading.equalToSuperview().inset(LayoutMetric.contentInset)
+        }
+
+        separatorView.snp.makeConstraints { make in
+            make.top.equalTo(awayRowView.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.leading.trailing.equalTo(awayRowView)
+            make.height.equalTo(LayoutMetric.separatorHeight)
         }
 
         homeRowView.snp.makeConstraints { make in
-            make.top.equalTo(awayRowView.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.top.equalTo(separatorView.snp.bottom).offset(LayoutMetric.compactSpacing)
             make.leading.trailing.equalTo(awayRowView)
             make.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
         }
@@ -194,39 +202,40 @@ private final class MatchTeamRowView: UIView {
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
-        static let roleWidth: CGFloat = 44
-        static let teamLeadingSpacing: CGFloat = 8
+        static let logoSize: CGFloat = 24
+        static let logoSpacing: CGFloat = 8
         static let scoreLeadingSpacing: CGFloat = 12
-        static let scoreWidth: CGFloat = 44
+        static let scoreWidth: CGFloat = 48
     }
 
     // MARK: - Properties
 
-    private let roleText: String
+    private var logoWidthConstraint: Constraint?
+    private var teamLeadingConstraint: Constraint?
 
     // MARK: - UI Components
-
-    private let roleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption2)
-        label.textColor = .tertiaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
 
     private let teamNameLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .headline)
         label.textColor = .primaryLabel
         label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 2
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         return label
+    }()
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
+        return imageView
     }()
 
     private let scoreLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
+        label.font = .preferredFont(forTextStyle: .title3)
         label.textColor = .primaryLabel
         label.textAlignment = .right
         label.adjustsFontForContentSizeCategory = true
@@ -236,8 +245,7 @@ private final class MatchTeamRowView: UIView {
 
     // MARK: - Initialization
 
-    init(roleText: String) {
-        self.roleText = roleText
+    init() {
         super.init(frame: .zero)
         setupView()
     }
@@ -249,34 +257,58 @@ private final class MatchTeamRowView: UIView {
     // MARK: - Reuse
 
     func prepareForReuse() {
+        logoImageView.sd_cancelCurrentImageLoad()
+        logoImageView.image = nil
+        logoImageView.isHidden = true
         teamNameLabel.text = nil
         scoreLabel.text = nil
     }
 
     // MARK: - Configuration
 
-    func configure(teamName: String, scoreText: String) {
+    func configure(
+        teamName: String,
+        logoURL: URL?,
+        scoreText: String
+    ) {
         teamNameLabel.text = teamName
         scoreLabel.text = scoreText
+
+        switch logoURL {
+        case .some(let logoURL):
+            logoImageView.isHidden = false
+            logoWidthConstraint?.update(offset: LayoutMetric.logoSize)
+            teamLeadingConstraint?.update(offset: LayoutMetric.logoSpacing)
+            logoImageView.sd_setImage(with: logoURL)
+
+        case .none:
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = nil
+            logoImageView.isHidden = true
+            logoWidthConstraint?.update(offset: 0)
+            teamLeadingConstraint?.update(offset: 0)
+        }
     }
 
     // MARK: - Setup
 
     private func setupView() {
-        roleLabel.text = roleText
-
-        addSubview(roleLabel)
+        addSubview(logoImageView)
         addSubview(teamNameLabel)
         addSubview(scoreLabel)
 
-        roleLabel.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview()
-            make.width.equalTo(LayoutMetric.roleWidth)
+        logoImageView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.centerY.equalToSuperview()
+            logoWidthConstraint = make.width.equalTo(LayoutMetric.logoSize).constraint
+            make.height.equalTo(LayoutMetric.logoSize)
         }
 
         teamNameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.leading.equalTo(roleLabel.snp.trailing).offset(LayoutMetric.teamLeadingSpacing)
+            teamLeadingConstraint = make.leading.equalTo(logoImageView.snp.trailing)
+                .offset(LayoutMetric.logoSpacing)
+                .constraint
             make.trailing.lessThanOrEqualTo(scoreLabel.snp.leading).offset(-LayoutMetric.scoreLeadingSpacing)
             make.bottom.equalToSuperview()
         }

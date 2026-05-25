@@ -5,6 +5,7 @@
 //  Created by Willy Hsu 2026/5/23.
 //
 
+import SDWebImage
 import SnapKit
 import UIKit
 
@@ -88,8 +89,16 @@ final class MainHomeGameCell: UICollectionViewCell {
     func configure(with viewData: MainHomeGameViewData) {
         statusLabel.text = viewData.statusText.uppercased()
         scheduledStartLabel.text = viewData.scheduledStartText
-        awayRowView.configure(teamName: viewData.awayTeamName, scoreText: viewData.awayScoreText)
-        homeRowView.configure(teamName: viewData.homeTeamName, scoreText: viewData.homeScoreText)
+        awayRowView.configure(
+            teamName: viewData.awayTeamName,
+            logoURL: viewData.awayTeamLogoURL,
+            scoreText: viewData.awayScoreText
+        )
+        homeRowView.configure(
+            teamName: viewData.homeTeamName,
+            logoURL: viewData.homeTeamLogoURL,
+            scoreText: viewData.homeScoreText
+        )
         applyStatusStyle(viewData.statusStyle)
     }
 
@@ -175,6 +184,8 @@ private final class TeamScoreRowView: UIView {
     private enum LayoutMetric {
         static let roleWidth: CGFloat = 44
         static let teamLeadingSpacing: CGFloat = 8
+        static let logoSize: CGFloat = 24
+        static let logoSpacing: CGFloat = 8
         static let scoreLeadingSpacing: CGFloat = 12
         static let scoreWidth: CGFloat = 48
     }
@@ -182,6 +193,8 @@ private final class TeamScoreRowView: UIView {
     // MARK: - Properties
 
     private let roleText: String
+    private var logoWidthConstraint: Constraint?
+    private var teamLeadingConstraint: Constraint?
 
     // MARK: - UI Components
 
@@ -201,6 +214,14 @@ private final class TeamScoreRowView: UIView {
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 2
         return label
+    }()
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
+        return imageView
     }()
 
     private let scoreLabel: UILabel = {
@@ -228,15 +249,37 @@ private final class TeamScoreRowView: UIView {
     // MARK: - Reuse
 
     func prepareForReuse() {
+        logoImageView.sd_cancelCurrentImageLoad()
+        logoImageView.image = nil
+        logoImageView.isHidden = true
         teamNameLabel.text = nil
         scoreLabel.text = nil
     }
 
     // MARK: - Configuration
 
-    func configure(teamName: String, scoreText: String) {
+    func configure(
+        teamName: String,
+        logoURL: URL?,
+        scoreText: String
+    ) {
         teamNameLabel.text = teamName
         scoreLabel.text = scoreText
+
+        switch logoURL {
+        case .some(let logoURL):
+            logoImageView.isHidden = false
+            logoWidthConstraint?.update(offset: LayoutMetric.logoSize)
+            teamLeadingConstraint?.update(offset: LayoutMetric.logoSpacing)
+            logoImageView.sd_setImage(with: logoURL)
+
+        case .none:
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = nil
+            logoImageView.isHidden = true
+            logoWidthConstraint?.update(offset: 0)
+            teamLeadingConstraint?.update(offset: 0)
+        }
     }
 
     // MARK: - Setup
@@ -245,6 +288,7 @@ private final class TeamScoreRowView: UIView {
         roleLabel.text = roleText
 
         addSubview(roleLabel)
+        addSubview(logoImageView)
         addSubview(teamNameLabel)
         addSubview(scoreLabel)
 
@@ -253,9 +297,18 @@ private final class TeamScoreRowView: UIView {
             make.width.equalTo(LayoutMetric.roleWidth)
         }
 
+        logoImageView.snp.makeConstraints { make in
+            make.leading.equalTo(roleLabel.snp.trailing).offset(LayoutMetric.teamLeadingSpacing)
+            make.centerY.equalToSuperview()
+            logoWidthConstraint = make.width.equalTo(LayoutMetric.logoSize).constraint
+            make.height.equalTo(LayoutMetric.logoSize)
+        }
+
         teamNameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.leading.equalTo(roleLabel.snp.trailing).offset(LayoutMetric.teamLeadingSpacing)
+            teamLeadingConstraint = make.leading.equalTo(logoImageView.snp.trailing)
+                .offset(LayoutMetric.logoSpacing)
+                .constraint
             make.trailing.lessThanOrEqualTo(scoreLabel.snp.leading).offset(-LayoutMetric.scoreLeadingSpacing)
             make.bottom.equalToSuperview()
         }

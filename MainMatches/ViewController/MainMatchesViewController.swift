@@ -22,8 +22,7 @@ final class MainMatchesViewController: MainBaseViewController {
         static let itemSpacing: CGFloat = 8
         static let estimatedDatePickerHeight: CGFloat = 128
         static let estimatedFilterHeight: CGFloat = 60
-        static let estimatedGameHeight: CGFloat = 132
-        static let estimatedHeaderHeight: CGFloat = 48
+        static let estimatedGameHeight: CGFloat = 156
     }
 
     // MARK: - Properties
@@ -78,11 +77,6 @@ final class MainMatchesViewController: MainBaseViewController {
         collectionView.register(
             MainMatchesGameCell.self,
             forCellWithReuseIdentifier: MainMatchesGameCell.reuseIdentifier
-        )
-        collectionView.register(
-            MainMatchesSectionHeaderView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: MainMatchesSectionHeaderView.reuseIdentifier
         )
     }
 
@@ -195,16 +189,6 @@ final class MainMatchesViewController: MainBaseViewController {
             ),
             interGroupSpacing: LayoutMetric.itemSpacing
         )
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1),
-            heightDimension: .estimated(LayoutMetric.estimatedHeaderHeight)
-        )
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top
-        )
-        section.boundarySupplementaryItems = [header]
         return section
     }
 
@@ -292,24 +276,4 @@ final class MainMatchesViewController: MainBaseViewController {
         }
     }
 
-    // MARK: - Supplementary Views
-
-    func collectionView(
-        _ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String,
-        at indexPath: IndexPath
-    ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader,
-              case .some(.scheduleGroup(let groupViewData)) = sectionViewData(at: indexPath.section),
-              let headerView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: MainMatchesSectionHeaderView.reuseIdentifier,
-                for: indexPath
-              ) as? MainMatchesSectionHeaderView else {
-            return UICollectionReusableView()
-        }
-
-        headerView.configure(with: groupViewData)
-        return headerView
-    }
 }
