@@ -74,9 +74,13 @@ private extension SceneDelegate {
             selectedSport: sport,
             badgeService: MockTabBarBadgeService()
         )
+        let childViewControllerFactory = DefaultTabBarChildViewControllerFactory(
+            selectedSport: sport,
+            sportScopedNetworkClient: sportScopedNetworkClient
+        )
         let viewController = TabBarContainerViewController(
             viewModel: viewModel,
-            sportScopedNetworkClient: sportScopedNetworkClient
+            childViewControllerFactory: childViewControllerFactory
         )
         viewController.onSportSelectionRequested = { [weak self] in
             self?.showSportSelection()

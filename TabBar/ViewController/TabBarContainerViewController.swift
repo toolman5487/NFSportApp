@@ -14,7 +14,7 @@ final class TabBarContainerViewController: UIViewController {
     // MARK: - Dependencies
 
     private let viewModel: TabBarViewModel
-    private let sportScopedNetworkClient: NetworkServicing
+    private let childViewControllerFactory: TabBarChildViewControllerFactory
 
     // MARK: - UI Components
 
@@ -45,7 +45,13 @@ final class TabBarContainerViewController: UIViewController {
 
     private lazy var childViewControllersByTab: [AppTab: UINavigationController] = {
         Dictionary(uniqueKeysWithValues: AppTab.allCases.map { tab in
-            (tab, makeNavigationController(for: tab))
+            (
+                tab,
+                childViewControllerFactory.makeNavigationController(
+                    for: tab,
+                    onSportSelectionRequested: onSportSelectionRequested
+                )
+            )
         })
     }()
 
@@ -63,10 +69,10 @@ final class TabBarContainerViewController: UIViewController {
 
     init(
         viewModel: TabBarViewModel,
-        sportScopedNetworkClient: NetworkServicing
+        childViewControllerFactory: TabBarChildViewControllerFactory
     ) {
         self.viewModel = viewModel
-        self.sportScopedNetworkClient = sportScopedNetworkClient
+        self.childViewControllerFactory = childViewControllerFactory
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -170,50 +176,6 @@ final class TabBarContainerViewController: UIViewController {
             }
 
             self.viewModel.handleProgrammaticTransitionCompletion(visibleTab: self.visibleTab)
-        }
-    }
-
-    // MARK: - Navigation
-
-    private func makeNavigationController(for tab: AppTab) -> UINavigationController {
-        let rootViewController = makeRootViewController(for: tab)
-        rootViewController.navigationItem.largeTitleDisplayMode = .always
-
-        if let mainBaseViewController = rootViewController as? MainBaseViewController {
-            mainBaseViewController.onSportSelectionRequested = { [weak self] in
-                self?.onSportSelectionRequested?()
-            }
-        }
-
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.navigationBar.tintColor = .primaryLabel
-
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBackground
-        appearance.shadowColor = .clear
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
-
-        navigationController.navigationBar.standardAppearance = appearance
-        navigationController.navigationBar.scrollEdgeAppearance = appearance
-        navigationController.navigationBar.compactAppearance = appearance
-
-        return navigationController
-    }
-
-    private func makeRootViewController(for tab: AppTab) -> UIViewController {
-        switch tab {
-        case .home:
-            let homeService = MainHomeService(networkClient: sportScopedNetworkClient)
-            let homeViewModel = MainHomeViewModel(
-                selectedSport: viewModel.selectedSport,
-                homeService: homeService
-            )
-            return MainHomeViewController(viewModel: homeViewModel)
-        case .matches, .leagues, .favorites:
-            return PlaceholderViewController(title: tab.title)
         }
     }
 

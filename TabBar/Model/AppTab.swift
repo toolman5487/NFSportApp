@@ -11,7 +11,6 @@ enum AppTab: Int, CaseIterable, Sendable {
 
     case home
     case matches
-    case leagues
     case favorites
 }
 
@@ -25,8 +24,6 @@ extension AppTab {
             return "Home"
         case .matches:
             return "Matches"
-        case .leagues:
-            return "Leagues"
         case .favorites:
             return "Favorites"
         }
@@ -38,8 +35,6 @@ extension AppTab {
             return "house"
         case .matches:
             return "calendar"
-        case .leagues:
-            return "trophy"
         case .favorites:
             return "star"
         }

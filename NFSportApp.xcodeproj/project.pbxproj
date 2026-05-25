@@ -27,6 +27,7 @@
 		152000042FC01000008C60D9 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000142FC01000008C60D9 /* TabBarView.swift */; };
 		152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000152FC01000008C60D9 /* TabBarContainerViewController.swift */; };
 		152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000162FC01000008C60D9 /* TabBarViewModel.swift */; };
+		152000072FC01000008C60D9 /* TabBarChildViewControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000172FC01000008C60D9 /* TabBarChildViewControllerFactory.swift */; };
 		153000012FC10000008C60D9 /* SportType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000112FC10000008C60D9 /* SportType.swift */; };
 		153000022FC10000008C60D9 /* SportSelectionViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000122FC10000008C60D9 /* SportSelectionViewData.swift */; };
 		153000032FC10000008C60D9 /* SportCatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000132FC10000008C60D9 /* SportCatalogService.swift */; };
@@ -40,6 +41,16 @@
 		154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000162FC20000008C60D9 /* MainHomeGameCell.swift */; };
 		154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */; };
 		154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000182FC20000008C60D9 /* MainHomeFilterCell.swift */; };
+		15C9C8612FC3F797000820EE /* MainMatchesSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8712FC3F797000820EE /* MainMatchesSchedule.swift */; };
+		15C9C8622FC3F797000820EE /* MainMatchesEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8722FC3F797000820EE /* MainMatchesEndpoint.swift */; };
+		15C9C8632FC3F797000820EE /* MainMatchesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8732FC3F797000820EE /* MainMatchesService.swift */; };
+		15C9C8642FC3F797000820EE /* MainMatchesPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8742FC3F797000820EE /* MainMatchesPresentation.swift */; };
+		15C9C8652FC3F797000820EE /* MainMatchesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8752FC3F797000820EE /* MainMatchesViewModel.swift */; };
+		15C9C8662FC3F797000820EE /* MainMatchesDatePickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8762FC3F797000820EE /* MainMatchesDatePickerCell.swift */; };
+		15C9C8672FC3F797000820EE /* MainMatchesFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8772FC3F797000820EE /* MainMatchesFilterCell.swift */; };
+		15C9C8682FC3F797000820EE /* MainMatchesGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */; };
+		15C9C8692FC3F797000820EE /* MainMatchesSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8792FC3F797000820EE /* MainMatchesSectionHeaderView.swift */; };
+		15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +73,7 @@
 		152000142FC01000008C60D9 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		152000152FC01000008C60D9 /* TabBarContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarContainerViewController.swift; sourceTree = "<group>"; };
 		152000162FC01000008C60D9 /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
+		152000172FC01000008C60D9 /* TabBarChildViewControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarChildViewControllerFactory.swift; sourceTree = "<group>"; };
 		153000112FC10000008C60D9 /* SportType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportType.swift; sourceTree = "<group>"; };
 		153000122FC10000008C60D9 /* SportSelectionViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewData.swift; sourceTree = "<group>"; };
 		153000132FC10000008C60D9 /* SportCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogService.swift; sourceTree = "<group>"; };
@@ -75,6 +87,16 @@
 		154000162FC20000008C60D9 /* MainHomeGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeGameCell.swift; sourceTree = "<group>"; };
 		154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeSectionHeaderView.swift; sourceTree = "<group>"; };
 		154000182FC20000008C60D9 /* MainHomeFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeFilterCell.swift; sourceTree = "<group>"; };
+		15C9C8712FC3F797000820EE /* MainMatchesSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesSchedule.swift; sourceTree = "<group>"; };
+		15C9C8722FC3F797000820EE /* MainMatchesEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesEndpoint.swift; sourceTree = "<group>"; };
+		15C9C8732FC3F797000820EE /* MainMatchesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesService.swift; sourceTree = "<group>"; };
+		15C9C8742FC3F797000820EE /* MainMatchesPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesPresentation.swift; sourceTree = "<group>"; };
+		15C9C8752FC3F797000820EE /* MainMatchesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesViewModel.swift; sourceTree = "<group>"; };
+		15C9C8762FC3F797000820EE /* MainMatchesDatePickerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesDatePickerCell.swift; sourceTree = "<group>"; };
+		15C9C8772FC3F797000820EE /* MainMatchesFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesFilterCell.swift; sourceTree = "<group>"; };
+		15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesGameCell.swift; sourceTree = "<group>"; };
+		15C9C8792FC3F797000820EE /* MainMatchesSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesSectionHeaderView.swift; sourceTree = "<group>"; };
+		15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesViewController.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -226,12 +248,13 @@
 		15186B942FBF1393008C60D9 = {
 			isa = PBXGroup;
 			children = (
-				15182AF42FC02CF5008C60D9 /* MainHome */,
+				15C9C8502FC3F797000820EE /* MainMatches */,
 				15182ABB2FBFFFA4008C60D9 /* Features */,
-				153000202FC10000008C60D9 /* SportSelection */,
-				152000202FC01000008C60D9 /* TabBar */,
+				15182AF42FC02CF5008C60D9 /* MainHome */,
 				15186B9F2FBF1393008C60D9 /* NFSportApp */,
 				15186B9E2FBF1393008C60D9 /* Products */,
+				153000202FC10000008C60D9 /* SportSelection */,
+				152000202FC01000008C60D9 /* TabBar */,
 			);
 			sourceTree = "<group>";
 		};
@@ -247,6 +270,7 @@
 			isa = PBXGroup;
 			children = (
 				152000212FC01000008C60D9 /* Model */,
+				152000252FC01000008C60D9 /* Factory */,
 				152000222FC01000008C60D9 /* ViewModel */,
 				152000232FC01000008C60D9 /* View */,
 				152000242FC01000008C60D9 /* ViewController */,
@@ -286,6 +310,14 @@
 				152000152FC01000008C60D9 /* TabBarContainerViewController.swift */,
 			);
 			path = ViewController;
+			sourceTree = "<group>";
+		};
+		152000252FC01000008C60D9 /* Factory */ = {
+			isa = PBXGroup;
+			children = (
+				152000172FC01000008C60D9 /* TabBarChildViewControllerFactory.swift */,
+			);
+			path = Factory;
 			sourceTree = "<group>";
 		};
 		153000202FC10000008C60D9 /* SportSelection */ = {
@@ -366,6 +398,63 @@
 				154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		15C9C8502FC3F797000820EE /* MainMatches */ = {
+			isa = PBXGroup;
+			children = (
+				15C9C8812FC3F797000820EE /* Model */,
+				15C9C8822FC3F797000820EE /* Service */,
+				15C9C8832FC3F797000820EE /* ViewModel */,
+				15C9C8842FC3F797000820EE /* View */,
+				15C9C8852FC3F797000820EE /* ViewController */,
+			);
+			path = MainMatches;
+			sourceTree = "<group>";
+		};
+		15C9C8812FC3F797000820EE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				15C9C8712FC3F797000820EE /* MainMatchesSchedule.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		15C9C8822FC3F797000820EE /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				15C9C8722FC3F797000820EE /* MainMatchesEndpoint.swift */,
+				15C9C8732FC3F797000820EE /* MainMatchesService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		15C9C8832FC3F797000820EE /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				15C9C8742FC3F797000820EE /* MainMatchesPresentation.swift */,
+				15C9C8752FC3F797000820EE /* MainMatchesViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		15C9C8842FC3F797000820EE /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15C9C8762FC3F797000820EE /* MainMatchesDatePickerCell.swift */,
+				15C9C8772FC3F797000820EE /* MainMatchesFilterCell.swift */,
+				15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */,
+				15C9C8792FC3F797000820EE /* MainMatchesSectionHeaderView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		15C9C8852FC3F797000820EE /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */,
+			);
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 		15EF4F9A2FC0A60F0016E43C /* MainBaseViewController */ = {
@@ -461,6 +550,7 @@
 				152000012FC01000008C60D9 /* AppTab.swift in Sources */,
 				15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */,
 				152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */,
+				152000072FC01000008C60D9 /* TabBarChildViewControllerFactory.swift in Sources */,
 				153000052FC10000008C60D9 /* SportSelectionViewController.swift in Sources */,
 				152000032FC01000008C60D9 /* TabBarButton.swift in Sources */,
 				153000042FC10000008C60D9 /* SportSelectionViewModel.swift in Sources */,
@@ -481,9 +571,19 @@
 				154000032FC20000008C60D9 /* MainHomeService.swift in Sources */,
 				154000042FC20000008C60D9 /* MainHomeViewModel.swift in Sources */,
 				154000052FC20000008C60D9 /* MainHomePresentation.swift in Sources */,
+				15C9C8652FC3F797000820EE /* MainMatchesViewModel.swift in Sources */,
 				154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */,
+				15C9C8672FC3F797000820EE /* MainMatchesFilterCell.swift in Sources */,
 				154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */,
+				15C9C8682FC3F797000820EE /* MainMatchesGameCell.swift in Sources */,
 				154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */,
+				15C9C8632FC3F797000820EE /* MainMatchesService.swift in Sources */,
+				15C9C8642FC3F797000820EE /* MainMatchesPresentation.swift in Sources */,
+				15C9C8662FC3F797000820EE /* MainMatchesDatePickerCell.swift in Sources */,
+				15C9C8622FC3F797000820EE /* MainMatchesEndpoint.swift in Sources */,
+				15C9C8612FC3F797000820EE /* MainMatchesSchedule.swift in Sources */,
+				15C9C8692FC3F797000820EE /* MainMatchesSectionHeaderView.swift in Sources */,
+				15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
 				15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */,
