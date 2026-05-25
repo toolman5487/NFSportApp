@@ -12,7 +12,7 @@ import Foundation
 nonisolated enum MainHomeViewState: Equatable, Sendable {
 
     case idle
-    case loading
+    case loading(MainHomePresentation)
     case loaded(MainHomePresentation)
     case empty(presentation: MainHomePresentation, message: String)
     case failed(message: String)
@@ -55,7 +55,7 @@ final class MainHomeViewModel {
     // MARK: - Public Methods
 
     func loadDashboard() async {
-        state = .loading
+        state = .loading(.loading(title: selectedSport.title))
 
         do {
             let dashboard = try await homeService.fetchDashboard(

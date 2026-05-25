@@ -17,13 +17,24 @@ nonisolated struct MainHomePresentation: Equatable, Sendable {
     var hasLeagueSections: Bool {
         sections.contains { section in
             switch section {
-            case .filter:
+            case .filter, .filterSkeleton, .leagueSkeleton:
                 return false
 
             case .league:
                 return true
             }
         }
+    }
+
+    static func loading(title: String) -> MainHomePresentation {
+        MainHomePresentation(
+            title: title,
+            sections: [
+                .filterSkeleton,
+                .leagueSkeleton(MainHomeLeagueSkeletonViewData(itemCount: 3)),
+                .leagueSkeleton(MainHomeLeagueSkeletonViewData(itemCount: 2))
+            ]
+        )
     }
 }
 
@@ -33,6 +44,21 @@ nonisolated enum MainHomeContentSectionViewData: Equatable, Sendable {
 
     case filter(MainHomeFilterViewData)
     case league(MainHomeSectionViewData)
+    case filterSkeleton
+    case leagueSkeleton(MainHomeLeagueSkeletonViewData)
+
+    var itemCount: Int {
+        switch self {
+        case .filter, .filterSkeleton:
+            return 1
+
+        case .league(let sectionViewData):
+            return sectionViewData.items.count
+
+        case .leagueSkeleton(let viewData):
+            return viewData.itemCount
+        }
+    }
 }
 
 // MARK: - Filter
@@ -62,6 +88,13 @@ nonisolated struct MainHomeSectionViewData: Equatable, Sendable {
     let logoURL: URL?
     let fallbackSystemImageName: String
     let items: [MainHomeGameViewData]
+}
+
+// MARK: - League Skeleton
+
+nonisolated struct MainHomeLeagueSkeletonViewData: Equatable, Sendable {
+
+    let itemCount: Int
 }
 
 // MARK: - Game

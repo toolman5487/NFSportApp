@@ -12,7 +12,7 @@ import Foundation
 nonisolated enum MainSoccerHomeViewState: Equatable, Sendable {
 
     case idle
-    case loading
+    case loading(MainSoccerHomePresentation)
     case loaded(MainSoccerHomePresentation)
     case empty(presentation: MainSoccerHomePresentation, message: String)
     case failed(message: String)
@@ -55,7 +55,7 @@ final class MainSoccerHomeViewModel {
     // MARK: - Public Methods
 
     func loadDashboard() async {
-        state = .loading
+        state = .loading(.loading(title: selectedSport.title))
 
         do {
             let dashboard = try await homeService.fetchDashboard(
@@ -113,7 +113,7 @@ final class MainSoccerHomeViewModel {
             from: fixtures,
             fallbackSystemImageName: dashboard.sport.systemImageName
         )
-        let sections: [MainHomeContentSectionViewData] = [
+        let sections: [MainSoccerHomeContentSectionViewData] = [
             .filter(makeFilterViewData())
         ] + leagueSections.map { section in
             .league(section)

@@ -31,7 +31,7 @@ final class MainSoccerHomeViewController: MainBaseViewController {
     private let viewModel: MainSoccerHomeViewModel
     private let navigationTitleView = MainSoccerHomeNavigationTitleView()
     private var screenTitle: String
-    private var sections: [MainHomeContentSectionViewData] = []
+    private var sections: [MainSoccerHomeContentSectionViewData] = []
 
     // MARK: - Initialization
 
@@ -73,13 +73,26 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             forCellWithReuseIdentifier: MainHomeFilterCell.reuseIdentifier
         )
         collectionView.register(
+            MainHomeFilterSkeletonCell.self,
+            forCellWithReuseIdentifier: MainHomeFilterSkeletonCell.reuseIdentifier
+        )
+        collectionView.register(
             MainHomeGameCell.self,
             forCellWithReuseIdentifier: MainHomeGameCell.reuseIdentifier
+        )
+        collectionView.register(
+            MainHomeLoadingBackgroundCell.self,
+            forCellWithReuseIdentifier: MainHomeLoadingBackgroundCell.reuseIdentifier
         )
         collectionView.register(
             MainHomeSectionHeaderView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: MainHomeSectionHeaderView.reuseIdentifier
+        )
+        collectionView.register(
+            MainHomeSectionSkeletonHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: MainHomeSectionSkeletonHeaderView.reuseIdentifier
         )
     }
 
@@ -100,8 +113,9 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         case .idle:
             renderLoadingState(.idle)
 
-        case .loading:
-            renderLoadingState(.loading)
+        case .loading(let presentation):
+            renderLoadingState(.idle)
+            applyPresentation(presentation)
 
         case .loaded(let presentation):
             renderLoadingState(.idle)
@@ -177,7 +191,7 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         return sectionViewData
     }
 
-    private func sectionViewData(at index: Int) -> MainHomeContentSectionViewData? {
+    private func sectionViewData(at index: Int) -> MainSoccerHomeContentSectionViewData? {
         guard sections.indices.contains(index) else {
             return nil
         }
@@ -192,10 +206,10 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         environment: NSCollectionLayoutEnvironment
     ) -> NSCollectionLayoutSection {
         switch sectionViewData(at: sectionIndex) {
-        case .some(.filter):
+        case .some(.filter), .some(.filterSkeleton):
             return makeFilterSectionLayout()
 
-        case .some(.league), .none:
+        case .some(.league), .some(.leagueSkeleton), .none:
             return makeLeagueSectionLayout()
         }
     }
@@ -247,16 +261,7 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        switch sectionViewData(at: section) {
-        case .some(.filter):
-            return 1
-
-        case .some(.league(let sectionViewData)):
-            return sectionViewData.items.count
-
-        case .none:
-            return 0
-        }
+        sectionViewData(at: section)?.itemCount ?? 0
     }
 
     override func collectionView(
@@ -278,6 +283,16 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             }
             return cell
 
+        case .some(.filterSkeleton):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MainHomeFilterSkeletonCell.reuseIdentifier,
+                for: indexPath
+            ) as? MainHomeFilterSkeletonCell else {
+                return UICollectionViewCell()
+            }
+
+            return cell
+
         case .some(.league(let sectionViewData)):
             guard sectionViewData.items.indices.contains(indexPath.item),
                   let cell = collectionView.dequeueReusableCell(
@@ -288,6 +303,16 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             }
 
             cell.configure(with: sectionViewData.items[indexPath.item])
+            return cell
+
+        case .some(.leagueSkeleton):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MainHomeLoadingBackgroundCell.reuseIdentifier,
+                for: indexPath
+            ) as? MainHomeLoadingBackgroundCell else {
+                return UICollectionViewCell()
+            }
+
             return cell
 
         case .none:
@@ -302,22 +327,41 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         viewForSupplementaryElementOfKind kind: String,
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader,
-              case .some(.league(let sectionViewData)) = sectionViewData(at: indexPath.section),
-              let headerView = collectionView.dequeueReusableSupplementaryView(
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+
+        switch sectionViewData(at: indexPath.section) {
+        case .some(.league(let sectionViewData)):
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: MainHomeSectionHeaderView.reuseIdentifier,
                 for: indexPath
               ) as? MainHomeSectionHeaderView else {
+                return UICollectionReusableView()
+            }
+
+            headerView.configure(
+                title: sectionViewData.title,
+                logoURL: sectionViewData.logoURL,
+                fallbackSystemImageName: sectionViewData.fallbackSystemImageName
+            )
+            return headerView
+
+        case .some(.leagueSkeleton):
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: MainHomeSectionSkeletonHeaderView.reuseIdentifier,
+                for: indexPath
+              ) as? MainHomeSectionSkeletonHeaderView else {
+                return UICollectionReusableView()
+            }
+
+            return headerView
+
+        case .some(.filter), .some(.filterSkeleton), .none:
             return UICollectionReusableView()
         }
-
-        headerView.configure(
-            title: sectionViewData.title,
-            logoURL: sectionViewData.logoURL,
-            fallbackSystemImageName: sectionViewData.fallbackSystemImageName
-        )
-        return headerView
     }
 
     // MARK: - UIScrollViewDelegate

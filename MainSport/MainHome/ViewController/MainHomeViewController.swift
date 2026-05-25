@@ -26,44 +26,12 @@ final class MainHomeViewController: MainBaseViewController {
         static let estimatedHeaderHeight: CGFloat = 56
     }
 
-    // MARK: - Skeleton Section
-
-    private enum SkeletonSection: CaseIterable {
-        case filter
-        case leaguePrimary
-        case leagueSecondary
-
-        var itemCount: Int {
-            switch self {
-            case .filter:
-                return 1
-
-            case .leaguePrimary:
-                return 3
-
-            case .leagueSecondary:
-                return 2
-            }
-        }
-
-        var isLeague: Bool {
-            switch self {
-            case .filter:
-                return false
-
-            case .leaguePrimary, .leagueSecondary:
-                return true
-            }
-        }
-    }
-
     // MARK: - Properties
 
     private let viewModel: MainHomeViewModel
     private let navigationTitleView = MainHomeNavigationTitleView()
     private var screenTitle: String
     private var sections: [MainHomeContentSectionViewData] = []
-    private var isShowingSkeletonLoading = false
 
     // MARK: - Initialization
 
@@ -143,25 +111,21 @@ final class MainHomeViewController: MainBaseViewController {
     private func render(_ state: MainHomeViewState) {
         switch state {
         case .idle:
-            hideSkeletonLoading()
             renderLoadingState(.idle)
 
-        case .loading:
+        case .loading(let presentation):
             renderLoadingState(.idle)
-            showSkeletonLoading()
+            applyPresentation(presentation)
 
         case .loaded(let presentation):
-            hideSkeletonLoading()
             renderLoadingState(.idle)
             applyPresentation(presentation)
 
         case .empty(let presentation, let message):
-            hideSkeletonLoading()
             applyPresentation(presentation)
             renderLoadingState(.empty(message: message))
 
         case .failed(let message):
-            hideSkeletonLoading()
             screenTitle = viewModel.title
             title = screenTitle
             sections = []
@@ -169,27 +133,6 @@ final class MainHomeViewController: MainBaseViewController {
             updateNavigationTitle()
             renderLoadingState(.failed(message: message))
         }
-    }
-
-    // MARK: - Skeleton Loading
-
-    private func showSkeletonLoading() {
-        guard !isShowingSkeletonLoading else {
-            return
-        }
-
-        isShowingSkeletonLoading = true
-        sections = []
-        collectionView.reloadData()
-        updateNavigationTitle()
-    }
-
-    private func hideSkeletonLoading() {
-        guard isShowingSkeletonLoading else {
-            return
-        }
-
-        isShowingSkeletonLoading = false
     }
 
     // MARK: - Presentation
@@ -262,15 +205,11 @@ final class MainHomeViewController: MainBaseViewController {
         for sectionIndex: Int,
         environment: NSCollectionLayoutEnvironment
     ) -> NSCollectionLayoutSection {
-        if isShowingSkeletonLoading {
-            return makeSkeletonSectionLayout(for: sectionIndex)
-        }
-
         switch sectionViewData(at: sectionIndex) {
-        case .some(.filter):
+        case .some(.filter), .some(.filterSkeleton):
             return makeFilterSectionLayout()
 
-        case .some(.league), .none:
+        case .some(.league), .some(.leagueSkeleton), .none:
             return makeLeagueSectionLayout()
         }
     }
@@ -312,61 +251,23 @@ final class MainHomeViewController: MainBaseViewController {
         )
     }
 
-    private func makeSkeletonSectionLayout(for sectionIndex: Int) -> NSCollectionLayoutSection {
-        guard let skeletonSection = skeletonSection(at: sectionIndex) else {
-            return makeLeagueSectionLayout()
-        }
-
-        switch skeletonSection {
-        case .filter:
-            return makeFilterSectionLayout()
-
-        case .leaguePrimary, .leagueSecondary:
-            return makeLeagueSectionLayout()
-        }
-    }
-
     // MARK: - UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if isShowingSkeletonLoading {
-            return SkeletonSection.allCases.count
-        }
-
-        return sections.count
+        sections.count
     }
 
     override func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        if isShowingSkeletonLoading {
-            return skeletonSection(at: section)?.itemCount ?? 0
-        }
-
-        switch sectionViewData(at: section) {
-        case .some(.filter):
-            return 1
-
-        case .some(.league(let sectionViewData)):
-            return sectionViewData.items.count
-
-        case .none:
-            return 0
-        }
+        sectionViewData(at: section)?.itemCount ?? 0
     }
 
     override func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        if isShowingSkeletonLoading {
-            return skeletonCell(
-                collectionView,
-                cellForItemAt: indexPath
-            )
-        }
-
         switch sectionViewData(at: indexPath.section) {
         case .some(.filter(let filterViewData)):
             guard let cell = collectionView.dequeueReusableCell(
@@ -382,6 +283,16 @@ final class MainHomeViewController: MainBaseViewController {
             }
             return cell
 
+        case .some(.filterSkeleton):
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MainHomeFilterSkeletonCell.reuseIdentifier,
+                for: indexPath
+            ) as? MainHomeFilterSkeletonCell else {
+                return UICollectionViewCell()
+            }
+
+            return cell
+
         case .some(.league(let sectionViewData)):
             guard sectionViewData.items.indices.contains(indexPath.item),
                   let cell = collectionView.dequeueReusableCell(
@@ -394,27 +305,7 @@ final class MainHomeViewController: MainBaseViewController {
             cell.configure(with: sectionViewData.items[indexPath.item])
             return cell
 
-        case .none:
-            return UICollectionViewCell()
-        }
-    }
-
-    private func skeletonCell(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
-        switch skeletonSection(at: indexPath.section) {
-        case .some(.filter):
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: MainHomeFilterSkeletonCell.reuseIdentifier,
-                for: indexPath
-            ) as? MainHomeFilterSkeletonCell else {
-                return UICollectionViewCell()
-            }
-
-            return cell
-
-        case .some(.leaguePrimary), .some(.leagueSecondary):
+        case .some(.leagueSkeleton):
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: MainHomeLoadingBackgroundCell.reuseIdentifier,
                 for: indexPath
@@ -436,62 +327,47 @@ final class MainHomeViewController: MainBaseViewController {
         viewForSupplementaryElementOfKind kind: String,
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
-        if isShowingSkeletonLoading {
-            return skeletonSupplementaryView(
-                collectionView,
-                viewForSupplementaryElementOfKind: kind,
-                at: indexPath
-            )
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
         }
 
-        guard kind == UICollectionView.elementKindSectionHeader,
-              case .some(.league(let sectionViewData)) = sectionViewData(at: indexPath.section),
-              let headerView = collectionView.dequeueReusableSupplementaryView(
+        switch sectionViewData(at: indexPath.section) {
+        case .some(.league(let sectionViewData)):
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: MainHomeSectionHeaderView.reuseIdentifier,
                 for: indexPath
               ) as? MainHomeSectionHeaderView else {
-            return UICollectionReusableView()
-        }
+                return UICollectionReusableView()
+            }
 
-        headerView.configure(
-            title: sectionViewData.title,
-            logoURL: sectionViewData.logoURL,
-            fallbackSystemImageName: sectionViewData.fallbackSystemImageName
-        )
-        return headerView
-    }
+            headerView.configure(
+                title: sectionViewData.title,
+                logoURL: sectionViewData.logoURL,
+                fallbackSystemImageName: sectionViewData.fallbackSystemImageName
+            )
+            return headerView
 
-    private func skeletonSupplementaryView(
-        _ collectionView: UICollectionView,
-        viewForSupplementaryElementOfKind kind: String,
-        at indexPath: IndexPath
-    ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader,
-              skeletonSection(at: indexPath.section)?.isLeague == true,
-              let headerView = collectionView.dequeueReusableSupplementaryView(
+        case .some(.leagueSkeleton):
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: MainHomeSectionSkeletonHeaderView.reuseIdentifier,
                 for: indexPath
               ) as? MainHomeSectionSkeletonHeaderView else {
+                return UICollectionReusableView()
+            }
+
+            return headerView
+
+        case .some(.filter), .some(.filterSkeleton), .none:
             return UICollectionReusableView()
         }
-
-        return headerView
     }
 
     // MARK: - UIScrollViewDelegate
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateNavigationTitle()
-    }
-
-    private func skeletonSection(at index: Int) -> SkeletonSection? {
-        guard SkeletonSection.allCases.indices.contains(index) else {
-            return nil
-        }
-
-        return SkeletonSection.allCases[index]
     }
 }
 
