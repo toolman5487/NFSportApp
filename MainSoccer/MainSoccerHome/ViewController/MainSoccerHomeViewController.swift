@@ -20,7 +20,8 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         static let sectionBottomInset: CGFloat = 16
         static let itemSpacing: CGFloat = 8
         static let headerHeight: CGFloat = 36
-        static let liveHeroHeight: CGFloat = 136
+        static let liveHeroHeight: CGFloat = 176
+        static let liveHeroWidthFraction: CGFloat = 0.88
         static let rowHeight: CGFloat = 72
         static let leagueHeight: CGFloat = 80
         static let fallbackHeight: CGFloat = rowHeight
@@ -68,10 +69,6 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         collectionView.register(
             MainSoccerLiveHeroCell.self,
             forCellWithReuseIdentifier: MainSoccerLiveHeroCell.reuseIdentifier
-        )
-        collectionView.register(
-            MainSoccerLiveMatchCell.self,
-            forCellWithReuseIdentifier: MainSoccerLiveMatchCell.reuseIdentifier
         )
         collectionView.register(
             MainSoccerEmptyStateCell.self,
@@ -180,10 +177,27 @@ final class MainSoccerHomeViewController: MainBaseViewController {
     }
 
     private func makeLiveMatchesSectionLayout() -> NSCollectionLayoutSection {
-        makeListSectionLayout(
-            estimatedHeight: LayoutMetric.liveHeroHeight,
-            includesHeader: false
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1),
+            heightDimension: .estimated(LayoutMetric.liveHeroHeight)
         )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(LayoutMetric.liveHeroWidthFraction),
+            heightDimension: .estimated(LayoutMetric.liveHeroHeight)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(
+            top: LayoutMetric.sectionTopInset,
+            leading: LayoutMetric.horizontalInset,
+            bottom: LayoutMetric.sectionBottomInset,
+            trailing: LayoutMetric.horizontalInset
+        )
+        section.interGroupSpacing = LayoutMetric.itemSpacing
+        section.orthogonalScrollingBehavior = .groupPagingCentered
+        section.boundarySupplementaryItems = [makeSectionHeaderItem()]
+        return section
     }
 
     private func makeListSectionLayout(
@@ -281,14 +295,6 @@ final class MainSoccerHomeViewController: MainBaseViewController {
             return configuredCell(
                 MainSoccerLiveHeroCell.self,
                 reuseIdentifier: MainSoccerLiveHeroCell.reuseIdentifier,
-                collectionView: collectionView,
-                indexPath: indexPath
-            ) { $0.configure(with: viewData) }
-
-        case .some(.liveMatch(let viewData)):
-            return configuredCell(
-                MainSoccerLiveMatchCell.self,
-                reuseIdentifier: MainSoccerLiveMatchCell.reuseIdentifier,
                 collectionView: collectionView,
                 indexPath: indexPath
             ) { $0.configure(with: viewData) }

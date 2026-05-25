@@ -46,7 +46,6 @@
 		15C928252FC45000000820EE /* MainSoccerHomeCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928242FC45000000820EE /* MainSoccerHomeCardCell.swift */; };
 		15C928272FC45000000820EE /* MainSoccerHomeSectionCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928262FC45000000820EE /* MainSoccerHomeSectionCells.swift */; };
 		15C928292FC45000000820EE /* MainSoccerHomeRowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928282FC45000000820EE /* MainSoccerHomeRowViews.swift */; };
-		15C9282B2FC45000000820EE /* MainSoccerHomeCellSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9282A2FC45000000820EE /* MainSoccerHomeCellSupport.swift */; };
 		15C928312FC46000000820EE /* MainSoccerHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */; };
 		15C928332FC46000000820EE /* MainSoccerHomeEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */; };
 		15C928352FC46000000820EE /* MainSoccerHomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928342FC46000000820EE /* MainSoccerHomeService.swift */; };
@@ -103,7 +102,6 @@
 		15C928242FC45000000820EE /* MainSoccerHomeCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeCardCell.swift; sourceTree = "<group>"; };
 		15C928262FC45000000820EE /* MainSoccerHomeSectionCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeSectionCells.swift; sourceTree = "<group>"; };
 		15C928282FC45000000820EE /* MainSoccerHomeRowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeRowViews.swift; sourceTree = "<group>"; };
-		15C9282A2FC45000000820EE /* MainSoccerHomeCellSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeCellSupport.swift; sourceTree = "<group>"; };
 		15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeDashboard.swift; sourceTree = "<group>"; };
 		15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeEndpoint.swift; sourceTree = "<group>"; };
 		15C928342FC46000000820EE /* MainSoccerHomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeService.swift; sourceTree = "<group>"; };
@@ -503,7 +501,6 @@
 		15C928212FC45000000820EE /* View */ = {
 			isa = PBXGroup;
 			children = (
-				15C9282A2FC45000000820EE /* MainSoccerHomeCellSupport.swift */,
 				15C928242FC45000000820EE /* MainSoccerHomeCardCell.swift */,
 				15C928262FC45000000820EE /* MainSoccerHomeSectionCells.swift */,
 				15C928282FC45000000820EE /* MainSoccerHomeRowViews.swift */,
@@ -668,7 +665,6 @@
 				15C928352FC46000000820EE /* MainSoccerHomeService.swift in Sources */,
 				15C928372FC46000000820EE /* MainSoccerHomePresentation.swift in Sources */,
 				15C928392FC46000000820EE /* MainSoccerHomeViewModel.swift in Sources */,
-				15C9282B2FC45000000820EE /* MainSoccerHomeCellSupport.swift in Sources */,
 				15C928252FC45000000820EE /* MainSoccerHomeCardCell.swift in Sources */,
 				15C928272FC45000000820EE /* MainSoccerHomeSectionCells.swift in Sources */,
 				15C928292FC45000000820EE /* MainSoccerHomeRowViews.swift in Sources */,

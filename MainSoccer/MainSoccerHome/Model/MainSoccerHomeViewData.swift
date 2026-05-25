@@ -17,7 +17,6 @@ nonisolated struct MainSoccerLiveMatchesViewData: Equatable, Sendable {
     }
 
     let title: String
-    let badgeText: String
     let state: State
 }
 

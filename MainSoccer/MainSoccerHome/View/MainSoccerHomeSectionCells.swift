@@ -19,27 +19,41 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
     private enum LayoutMetric {
         static let badgeHorizontalInset: CGFloat = 8
         static let badgeVerticalInset: CGFloat = 4
+        static let contentSpacing: CGFloat = 12
+        static let scoreSpacing: CGFloat = 8
+        static let scoreTopPadding: CGFloat = 12
         static let stackSpacing: CGFloat = 12
         static let contentInset: CGFloat = MainSoccerHomeCardCell.LayoutMetric.contentInset
     }
 
     // MARK: - UI Components
 
-    private let titleLabel: UILabel = {
+    private let leagueLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .title2)
-        label.textColor = .primaryLabel
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 1
         return label
     }()
 
-    private let summaryLabel: UILabel = {
+    private let matchupLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .body)
-        label.textColor = .secondaryLabelColor
+        label.font = .preferredFont(forTextStyle: .title3)
+        label.textColor = .primaryLabel
+        label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 2
+        return label
+    }()
+
+    private let scoreLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .largeTitle)
+        label.textColor = .primaryLabel
+        label.textAlignment = .center
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
         return label
     }()
 
@@ -60,18 +74,26 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
         return label
     }()
 
-    private lazy var titleStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, badgeContainerView])
+    private lazy var headerStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [leagueLabel, badgeContainerView])
         stackView.axis = .horizontal
         stackView.alignment = .center
         stackView.spacing = 8
         return stackView
     }()
 
-    private lazy var contentStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleStackView, summaryLabel])
+    private lazy var scoreStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [matchupLabel, scoreLabel])
         stackView.axis = .vertical
-        stackView.spacing = LayoutMetric.stackSpacing
+        stackView.alignment = .fill
+        stackView.spacing = LayoutMetric.scoreSpacing
+        return stackView
+    }()
+
+    private lazy var contentStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [headerStackView, scoreStackView])
+        stackView.axis = .vertical
+        stackView.spacing = LayoutMetric.contentSpacing
         return stackView
     }()
 
@@ -88,24 +110,19 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        titleLabel.text = nil
+        leagueLabel.text = nil
         badgeLabel.text = nil
-        summaryLabel.text = nil
+        matchupLabel.text = nil
+        scoreLabel.text = nil
     }
 
     // MARK: - Configuration
 
-    func configure(with viewData: MainSoccerLiveMatchesViewData) {
-        titleLabel.text = viewData.title
-        badgeLabel.text = viewData.badgeText
-
-        switch viewData.state {
-        case .empty(let message):
-            summaryLabel.text = message
-
-        case .loaded(let matches):
-            summaryLabel.text = "\(matches.count) matches in progress"
-        }
+    func configure(with viewData: MainSoccerLiveMatchViewData) {
+        leagueLabel.text = viewData.leagueName
+        badgeLabel.text = viewData.minuteText
+        matchupLabel.text = "\(viewData.homeTeamName) vs \(viewData.awayTeamName)"
+        scoreLabel.text = viewData.scoreText
     }
 
     // MARK: - Setup
@@ -114,7 +131,7 @@ final class MainSoccerLiveHeroCell: MainSoccerHomeCardCell {
         badgeContainerView.addSubview(badgeLabel)
         contentView.addSubview(contentStackView)
 
-        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        leagueLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         badgeContainerView.setContentCompressionResistancePriority(.required, for: .horizontal)
 
         badgeLabel.snp.makeConstraints { make in
@@ -136,7 +153,14 @@ final class MainSoccerEmptyStateCell: MainSoccerHomeCardCell {
 
     // MARK: - UI Components
 
-    private let messageLabel = MainSoccerHomeLabelFactory.makeEmptyLabel()
+    private let messageLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .body)
+        label.textColor = .secondaryLabelColor
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
 
     // MARK: - Initialization
 

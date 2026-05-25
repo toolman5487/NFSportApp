@@ -110,7 +110,6 @@ final class MainSoccerHomeViewModel {
         return .liveMatches(
             MainSoccerLiveMatchesViewData(
                 title: "Live Matches",
-                badgeText: "\(fixtures.count) Live",
                 state: state
             )
         )

@@ -9,107 +9,6 @@ import SDWebImage
 import SnapKit
 import UIKit
 
-// MARK: - MainSoccerLiveMatchCell
-
-final class MainSoccerLiveMatchCell: MainSoccerHomeCardCell {
-
-    static let reuseIdentifier = "MainSoccerLiveMatchCell"
-
-    // MARK: - Layout Metrics
-
-    private enum LayoutMetric {
-        static let minuteWidth: CGFloat = 52
-        static let scoreWidth: CGFloat = 56
-        static let spacing: CGFloat = 12
-    }
-
-    // MARK: - UI Components
-
-    private let minuteLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
-        label.textColor = .systemRed
-        label.textAlignment = .center
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let matchupLabel = MainSoccerHomeLabelFactory.makePrimaryLabel()
-    private let leagueLabel = MainSoccerHomeLabelFactory.makeSecondaryLabel()
-
-    private let scoreLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
-        label.textColor = .primaryLabel
-        label.textAlignment = .right
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private lazy var textStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [matchupLabel, leagueLabel])
-        stackView.axis = .vertical
-        stackView.spacing = 4
-        return stackView
-    }()
-
-    // MARK: - Initialization
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        minuteLabel.text = nil
-        matchupLabel.text = nil
-        leagueLabel.text = nil
-        scoreLabel.text = nil
-    }
-
-    // MARK: - Configuration
-
-    func configure(with viewData: MainSoccerLiveMatchViewData) {
-        minuteLabel.text = viewData.minuteText
-        matchupLabel.text = "\(viewData.homeTeamName) vs \(viewData.awayTeamName)"
-        leagueLabel.text = viewData.leagueName
-        scoreLabel.text = viewData.scoreText
-    }
-
-    // MARK: - Setup
-
-    private func setupView() {
-        contentView.addSubview(minuteLabel)
-        contentView.addSubview(textStackView)
-        contentView.addSubview(scoreLabel)
-
-        minuteLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.centerY.equalToSuperview()
-            make.width.equalTo(LayoutMetric.minuteWidth)
-        }
-
-        scoreLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.centerY.equalToSuperview()
-            make.width.equalTo(LayoutMetric.scoreWidth)
-        }
-
-        textStackView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(MainSoccerHomeCardCell.LayoutMetric.contentInset)
-            make.leading.equalTo(minuteLabel.snp.trailing).offset(LayoutMetric.spacing)
-            make.trailing.equalTo(scoreLabel.snp.leading).offset(-LayoutMetric.spacing)
-        }
-    }
-}
-
 // MARK: - MainSoccerFixtureCell
 
 final class MainSoccerFixtureCell: MainSoccerHomeCardCell {
@@ -134,8 +33,23 @@ final class MainSoccerFixtureCell: MainSoccerHomeCardCell {
         return label
     }()
 
-    private let matchupLabel = MainSoccerHomeLabelFactory.makePrimaryLabel()
-    private let leagueLabel = MainSoccerHomeLabelFactory.makeSecondaryLabel()
+    private let matchupLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .subheadline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private let leagueLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
 
     private lazy var textStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [matchupLabel, leagueLabel])
@@ -221,8 +135,23 @@ final class MainSoccerLeagueCell: MainSoccerHomeCardCell {
         return imageView
     }()
 
-    private let nameLabel = MainSoccerHomeLabelFactory.makePrimaryLabel()
-    private let regionLabel = MainSoccerHomeLabelFactory.makeSecondaryLabel()
+    private let nameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .subheadline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private let regionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
 
     private lazy var textStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [nameLabel, regionLabel])
@@ -310,9 +239,32 @@ final class MainSoccerStandingCell: MainSoccerHomeCardCell {
 
     // MARK: - UI Components
 
-    private let rankLabel = MainSoccerHomeLabelFactory.makeSecondaryLabel()
-    private let teamLabel = MainSoccerHomeLabelFactory.makePrimaryLabel()
-    private let recordLabel = MainSoccerHomeLabelFactory.makeSecondaryLabel()
+    private let rankLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private let teamLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .subheadline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private let recordLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabelColor
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
 
     private let pointsLabel: UILabel = {
         let label = UILabel()

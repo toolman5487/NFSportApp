@@ -22,8 +22,8 @@ extension MainSoccerHomeSection {
 
     var title: String? {
         switch self {
-        case .liveMatches:
-            return nil
+        case .liveMatches(let viewData):
+            return viewData.title
 
         case .today(let viewData):
             return viewData.title
@@ -54,11 +54,11 @@ extension MainSoccerHomeSection {
 
     private func liveMatchItems(from viewData: MainSoccerLiveMatchesViewData) -> [MainSoccerHomeItem] {
         switch viewData.state {
-        case .empty:
-            return [.liveHero(viewData)]
+        case .empty(let message):
+            return [.empty(MainSoccerEmptyStateViewData(message: message))]
 
         case .loaded(let matches):
-            return [.liveHero(viewData)] + matches.map(MainSoccerHomeItem.liveMatch)
+            return matches.map(MainSoccerHomeItem.liveHero)
         }
     }
 
@@ -94,8 +94,7 @@ extension MainSoccerHomeSection {
 // MARK: - Item
 
 nonisolated enum MainSoccerHomeItem: Equatable, Sendable {
-    case liveHero(MainSoccerLiveMatchesViewData)
-    case liveMatch(MainSoccerLiveMatchViewData)
+    case liveHero(MainSoccerLiveMatchViewData)
     case empty(MainSoccerEmptyStateViewData)
     case fixture(MainSoccerFixtureViewData)
     case league(MainSoccerTopLeagueViewData)
@@ -110,7 +109,6 @@ extension MainSoccerHomeSection {
         .liveMatches(
             MainSoccerLiveMatchesViewData(
                 title: "Live Matches",
-                badgeText: "0 Live",
                 state: .empty(message: "No live matches")
             )
         ),
