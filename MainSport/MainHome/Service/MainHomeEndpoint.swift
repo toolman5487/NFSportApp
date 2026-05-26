@@ -11,8 +11,8 @@ import Foundation
 
 nonisolated enum MainHomeEndpoint: Sendable, Equatable {
 
-    case games(date: String, timezone: String)
-    case liveGames(timezone: String)
+    case games(date: String)
+    case liveGames
     case gameDetail(id: Int)
     case standings(leagueID: Int, season: Int)
 
@@ -30,16 +30,14 @@ nonisolated enum MainHomeEndpoint: Sendable, Equatable {
 
     var queryItems: [NetworkQueryItem] {
         switch self {
-        case .games(let date, let timezone):
+        case .games(let date):
             return [
-                NetworkQueryItem(name: "date", value: date),
-                NetworkQueryItem(name: "timezone", value: timezone)
+                NetworkQueryItem(name: "date", value: date)
             ]
 
-        case .liveGames(let timezone):
+        case .liveGames:
             return [
-                NetworkQueryItem(name: "live", value: "all"),
-                NetworkQueryItem(name: "timezone", value: timezone)
+                NetworkQueryItem(name: "live", value: "all")
             ]
 
         case .gameDetail(let id):

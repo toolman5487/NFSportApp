@@ -168,11 +168,11 @@ struct MainSoccerTabBarConfigurationBuilder: TabBarConfigurationBuilding {
 
         case .matches:
             let matchesService = MainSoccerMatchesService(networkClient: sportScopedNetworkClient)
-            let matchesViewModel = MainSoccerMatchesViewModel(
+            let matchesViewModel = MainMatchesViewModel(
                 selectedSport: selectedSport,
                 scheduleService: matchesService
             )
-            let matchesViewController = MainSoccerMatchesViewController(viewModel: matchesViewModel)
+            let matchesViewController = MainMatchesViewController(viewModel: matchesViewModel)
             matchesViewController.onSportSelectionRequested = onSportSelectionRequested
             return matchesViewController
 

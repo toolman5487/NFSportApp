@@ -11,7 +11,7 @@ import Foundation
 
 nonisolated enum MainMatchesEndpoint: Equatable, Sendable {
 
-    case games(date: String, timezone: String)
+    case games(date: String)
 
     var path: String {
         switch self {
@@ -22,10 +22,9 @@ nonisolated enum MainMatchesEndpoint: Equatable, Sendable {
 
     var queryItems: [NetworkQueryItem] {
         switch self {
-        case .games(let date, let timezone):
+        case .games(let date):
             return [
-                NetworkQueryItem(name: "date", value: date),
-                NetworkQueryItem(name: "timezone", value: timezone)
+                NetworkQueryItem(name: "date", value: date)
             ]
         }
     }
