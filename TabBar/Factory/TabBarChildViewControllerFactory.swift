@@ -7,35 +7,30 @@
 
 import UIKit
 
-// MARK: - TabBarChildViewControllerFactory
+// MARK: - Root View Controller
 
 @MainActor
-protocol TabBarChildViewControllerFactory {
-    func makeNavigationController(
-        for tab: AppTab,
-        onSportSelectionRequested: (() -> Void)?
-    ) -> UINavigationController
+protocol TabBarRootViewController: UIViewController, TabBarItemConfigurable, TabBarSelectionHandling {}
+
+// MARK: - Configuration
+
+struct TabBarConfiguration {
+    let tabs: [AppTab]
+    let initialSelectedTab: AppTab
+    let navigationControllersByTab: [AppTab: UINavigationController]
 }
 
-// MARK: - DefaultTabBarChildViewControllerFactory
+@MainActor
+protocol TabBarConfigurationBuilding {
+    func makeTabBarConfiguration(
+        onSportSelectionRequested: (() -> Void)?
+    ) -> TabBarConfiguration
+}
+
+// MARK: - Main Sport
 
 @MainActor
-struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory {
-
-    private enum SportRootFlow {
-        case standard
-        case soccer
-
-        init(sportID: String) {
-            switch sportID {
-            case "soccer":
-                self = .soccer
-
-            default:
-                self = .standard
-            }
-        }
-    }
+struct MainSportTabBarConfigurationBuilder: TabBarConfigurationBuilding {
 
     private let selectedSport: SportType
     private let sportScopedNetworkClient: NetworkServicing
@@ -48,58 +43,38 @@ struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory
         self.sportScopedNetworkClient = sportScopedNetworkClient
     }
 
-    func makeNavigationController(
-        for tab: AppTab,
+    func makeTabBarConfiguration(
         onSportSelectionRequested: (() -> Void)?
-    ) -> UINavigationController {
-        let rootViewController = makeRootViewController(
-            for: tab,
-            onSportSelectionRequested: onSportSelectionRequested
+    ) -> TabBarConfiguration {
+        let tabs = MainSportTab.allCases.map(AppTab.mainSport)
+        let navigationControllersByTab = Dictionary(uniqueKeysWithValues: tabs.map { tab in
+            (
+                tab,
+                makeNavigationController(
+                    rootViewController: makeRootViewController(
+                        for: tab,
+                        onSportSelectionRequested: onSportSelectionRequested
+                    )
+                )
+            )
+        })
+
+        return TabBarConfiguration(
+            tabs: tabs,
+            initialSelectedTab: tabs[0],
+            navigationControllersByTab: navigationControllersByTab
         )
-        rootViewController.navigationItem.largeTitleDisplayMode = .always
-
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.navigationBar.tintColor = .primaryLabel
-
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBackground
-        appearance.shadowColor = .clear
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
-
-        navigationController.navigationBar.standardAppearance = appearance
-        navigationController.navigationBar.scrollEdgeAppearance = appearance
-        navigationController.navigationBar.compactAppearance = appearance
-
-        return navigationController
     }
 
     private func makeRootViewController(
         for tab: AppTab,
         onSportSelectionRequested: (() -> Void)?
-    ) -> UIViewController {
-        switch SportRootFlow(sportID: selectedSport.id) {
-        case .standard:
-            return makeStandardRootViewController(
-                for: tab,
-                onSportSelectionRequested: onSportSelectionRequested
-            )
-
-        case .soccer:
-            return makeSoccerRootViewController(
-                for: tab,
-                onSportSelectionRequested: onSportSelectionRequested
-            )
+    ) -> TabBarRootViewController {
+        guard case .mainSport(let mainSportTab) = tab else {
+            fatalError("Unexpected non-main-sport tab in MainSportTabBarConfigurationBuilder")
         }
-    }
 
-    private func makeStandardRootViewController(
-        for tab: AppTab,
-        onSportSelectionRequested: (() -> Void)?
-    ) -> UIViewController {
-        switch tab {
+        switch mainSportTab {
         case .home:
             let homeService = MainHomeService(networkClient: sportScopedNetworkClient)
             let homeViewModel = MainHomeViewModel(
@@ -121,15 +96,65 @@ struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory
             return matchesViewController
 
         case .favorites:
-            return PlaceholderViewController(title: tab.title)
+            return PlaceholderViewController(
+                title: mainSportTab.title,
+                tabBarItemConfiguration: TabBarItemConfiguration(
+                    title: mainSportTab.title,
+                    systemImageName: mainSportTab.systemImageName
+                )
+            )
         }
     }
+}
 
-    private func makeSoccerRootViewController(
+// MARK: - Main Soccer
+
+@MainActor
+struct MainSoccerTabBarConfigurationBuilder: TabBarConfigurationBuilding {
+
+    private let selectedSport: SportType
+    private let sportScopedNetworkClient: NetworkServicing
+
+    init(
+        selectedSport: SportType,
+        sportScopedNetworkClient: NetworkServicing
+    ) {
+        self.selectedSport = selectedSport
+        self.sportScopedNetworkClient = sportScopedNetworkClient
+    }
+
+    func makeTabBarConfiguration(
+        onSportSelectionRequested: (() -> Void)?
+    ) -> TabBarConfiguration {
+        let tabs = MainSoccerTab.allCases.map(AppTab.mainSoccer)
+        let navigationControllersByTab = Dictionary(uniqueKeysWithValues: tabs.map { tab in
+            (
+                tab,
+                makeNavigationController(
+                    rootViewController: makeRootViewController(
+                        for: tab,
+                        onSportSelectionRequested: onSportSelectionRequested
+                    )
+                )
+            )
+        })
+
+        return TabBarConfiguration(
+            tabs: tabs,
+            initialSelectedTab: tabs[0],
+            navigationControllersByTab: navigationControllersByTab
+        )
+    }
+
+    private func makeRootViewController(
         for tab: AppTab,
         onSportSelectionRequested: (() -> Void)?
-    ) -> UIViewController {
-        switch tab {
+    ) -> TabBarRootViewController {
+        guard case .mainSoccer(let mainSoccerTab) = tab else {
+            fatalError("Unexpected non-soccer tab in MainSoccerTabBarConfigurationBuilder")
+        }
+
+        switch mainSoccerTab {
         case .home:
             let homeService = MainSoccerHomeService(networkClient: sportScopedNetworkClient)
             let homeViewModel = MainSoccerHomeViewModel(
@@ -151,7 +176,38 @@ struct DefaultTabBarChildViewControllerFactory: TabBarChildViewControllerFactory
             return matchesViewController
 
         case .favorites:
-            return PlaceholderViewController(title: tab.title)
+            return PlaceholderViewController(
+                title: mainSoccerTab.title,
+                tabBarItemConfiguration: TabBarItemConfiguration(
+                    title: mainSoccerTab.title,
+                    systemImageName: mainSoccerTab.systemImageName
+                )
+            )
         }
     }
+}
+
+// MARK: - Navigation Controller
+
+private func makeNavigationController(
+    rootViewController: UIViewController
+) -> UINavigationController {
+    rootViewController.navigationItem.largeTitleDisplayMode = .always
+
+    let navigationController = UINavigationController(rootViewController: rootViewController)
+    navigationController.navigationBar.prefersLargeTitles = true
+    navigationController.navigationBar.tintColor = .primaryLabel
+
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithOpaqueBackground()
+    appearance.backgroundColor = .systemBackground
+    appearance.shadowColor = .clear
+    appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
+    appearance.titleTextAttributes = [.foregroundColor: UIColor.primaryLabel]
+
+    navigationController.navigationBar.standardAppearance = appearance
+    navigationController.navigationBar.scrollEdgeAppearance = appearance
+    navigationController.navigationBar.compactAppearance = appearance
+
+    return navigationController
 }

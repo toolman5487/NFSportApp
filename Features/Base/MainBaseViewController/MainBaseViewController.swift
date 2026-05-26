@@ -9,7 +9,7 @@ import SnapKit
 import UIKit
 
 @MainActor
-class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UICollectionViewDelegate, TabBarContentScrollable {
 
     // MARK: - Layout Metrics
 
@@ -119,6 +119,18 @@ class MainBaseViewController: BaseViewController, UICollectionViewDataSource, UI
         section.contentInsets = contentInsets
         section.interGroupSpacing = interGroupSpacing
         return section
+    }
+
+    var isScrolledAwayFromTop: Bool {
+        collectionView.contentOffset.y > -collectionView.adjustedContentInset.top
+    }
+
+    func scrollToTop(animated: Bool) {
+        let topContentOffset = CGPoint(
+            x: 0,
+            y: -collectionView.adjustedContentInset.top
+        )
+        collectionView.setContentOffset(topContentOffset, animated: animated)
     }
 
     // MARK: - Actions

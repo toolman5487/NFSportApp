@@ -14,7 +14,7 @@ final class TabBarContainerViewController: UIViewController {
     // MARK: - Dependencies
 
     private let viewModel: TabBarViewModel
-    private let childViewControllerFactory: TabBarChildViewControllerFactory
+    private let configuration: TabBarConfiguration
 
     // MARK: - UI Components
 
@@ -44,14 +44,16 @@ final class TabBarContainerViewController: UIViewController {
     // MARK: - Child View Controllers
 
     private lazy var childViewControllersByTab: [AppTab: UINavigationController] = {
-        Dictionary(uniqueKeysWithValues: AppTab.allCases.map { tab in
-            (
-                tab,
-                childViewControllerFactory.makeNavigationController(
-                    for: tab,
-                    onSportSelectionRequested: onSportSelectionRequested
-                )
-            )
+        configuration.navigationControllersByTab
+    }()
+
+    private lazy var rootViewControllersByTab: [AppTab: TabBarRootViewController] = {
+        Dictionary(uniqueKeysWithValues: childViewControllersByTab.compactMap { tab, navigationController in
+            guard let rootViewController = navigationController.viewControllers.first as? TabBarRootViewController else {
+                return nil
+            }
+
+            return (tab, rootViewController)
         })
     }()
 
@@ -61,18 +63,14 @@ final class TabBarContainerViewController: UIViewController {
         })
     }()
 
-    // MARK: - Callbacks
-
-    var onSportSelectionRequested: (() -> Void)?
-
     // MARK: - Initialization
 
     init(
         viewModel: TabBarViewModel,
-        childViewControllerFactory: TabBarChildViewControllerFactory
+        configuration: TabBarConfiguration
     ) {
         self.viewModel = viewModel
-        self.childViewControllerFactory = childViewControllerFactory
+        self.configuration = configuration
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -116,8 +114,8 @@ final class TabBarContainerViewController: UIViewController {
             make.top.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-48)
         }
 
-        tabBarView.onTabSelected = { [weak self] tab in
-            self?.viewModel.handleTabSelection(tab)
+        tabBarView.onTabSelected = { [weak self] event in
+            self?.handleTabSelectionEvent(event)
         }
     }
 
@@ -144,7 +142,7 @@ final class TabBarContainerViewController: UIViewController {
 
     private func render() {
         let presentation = viewModel.presentation
-        tabBarView.render(items: presentation.items)
+        tabBarView.render(items: makeTabBarItems(from: presentation))
         displayContent()
     }
 
@@ -163,6 +161,7 @@ final class TabBarContainerViewController: UIViewController {
                 animated: false
             )
             viewModel.handleProgrammaticTransitionCompletion(visibleTab: transition.targetTab)
+            notifyDidSelectTab(transition.targetTab)
             return
         }
 
@@ -176,6 +175,7 @@ final class TabBarContainerViewController: UIViewController {
             }
 
             self.viewModel.handleProgrammaticTransitionCompletion(visibleTab: self.visibleTab)
+            self.notifyDidSelectTab(self.visibleTab)
         }
     }
 
@@ -209,6 +209,71 @@ final class TabBarContainerViewController: UIViewController {
 
         return tab(for: visibleViewController)
     }
+
+    private func handleTabSelectionEvent(_ event: TabBarSelectionEvent) {
+        guard shouldSelectTab(event.tab) else {
+            return
+        }
+
+        switch event.isReselection {
+        case true:
+            handleTabReselection(for: event.tab)
+
+        case false:
+            viewModel.handleTabSelection(event.tab)
+        }
+    }
+
+    private func handleTabReselection(for tab: AppTab) {
+        guard visibleTab == tab,
+              let navigationController = childViewControllersByTab[tab] else {
+            return
+        }
+
+        guard navigationController.viewControllers.count == 1 else {
+            navigationController.popToRootViewController(animated: true)
+            return
+        }
+
+        guard let rootViewController = navigationController.viewControllers.first as? TabBarRootReselectHandling else {
+            return
+        }
+
+        Task {
+            await rootViewController.handleRootTabReselection()
+        }
+    }
+
+    private func makeTabBarItems(from presentation: TabBarPresentation) -> [TabBarItemViewData] {
+        configuration.tabs.compactMap { tab in
+            guard let rootViewController = rootViewControllersByTab[tab] else {
+                return nil
+            }
+
+            let configuration = rootViewController.tabBarItemConfiguration
+
+            return TabBarItemViewData(
+                tab: tab,
+                title: configuration.title,
+                systemImageName: configuration.systemImageName,
+                badgeCount: presentation.badges[tab, default: 0],
+                isSelected: presentation.selectedTab == tab
+            )
+        }
+    }
+
+    private func shouldSelectTab(_ tab: AppTab) -> Bool {
+        rootViewControllersByTab[tab]?.shouldSelectTab() ?? true
+    }
+
+    private func notifyDidSelectTab(_ tab: AppTab?) {
+        guard let tab,
+              let rootViewController = rootViewControllersByTab[tab] else {
+            return
+        }
+
+        rootViewController.didSelectTab()
+    }
 }
 
 // MARK: - UIPageViewControllerDataSource
@@ -219,24 +284,26 @@ extension TabBarContainerViewController: UIPageViewControllerDataSource {
         _ pageViewController: UIPageViewController,
         viewControllerBefore currentViewController: UIViewController
     ) -> UIViewController? {
-        guard let currentTab = tab(for: currentViewController) else {
+        guard let currentTab = tab(for: currentViewController),
+              let currentIndex = configuration.tabs.firstIndex(of: currentTab),
+              currentIndex > 0 else {
             return nil
         }
 
-        let previousTab = AppTab(rawValue: currentTab.rawValue - 1)
-        return makeViewController(for: previousTab)
+        return makeViewController(for: configuration.tabs[currentIndex - 1])
     }
 
     func pageViewController(
         _ pageViewController: UIPageViewController,
         viewControllerAfter currentViewController: UIViewController
     ) -> UIViewController? {
-        guard let currentTab = tab(for: currentViewController) else {
+        guard let currentTab = tab(for: currentViewController),
+              let currentIndex = configuration.tabs.firstIndex(of: currentTab),
+              currentIndex < configuration.tabs.count - 1 else {
             return nil
         }
 
-        let nextTab = AppTab(rawValue: currentTab.rawValue + 1)
-        return makeViewController(for: nextTab)
+        return makeViewController(for: configuration.tabs[currentIndex + 1])
     }
 }
 
@@ -261,5 +328,11 @@ extension TabBarContainerViewController: UIPageViewControllerDelegate {
             visibleTab: visibleTab,
             didComplete: finished && completed
         )
+
+        guard finished && completed else {
+            return
+        }
+
+        notifyDidSelectTab(visibleTab)
     }
 }

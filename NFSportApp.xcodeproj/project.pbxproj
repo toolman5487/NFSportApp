@@ -28,6 +28,7 @@
 		152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000152FC01000008C60D9 /* TabBarContainerViewController.swift */; };
 		152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000162FC01000008C60D9 /* TabBarViewModel.swift */; };
 		152000072FC01000008C60D9 /* TabBarChildViewControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000172FC01000008C60D9 /* TabBarChildViewControllerFactory.swift */; };
+		152000082FC01000008C60D9 /* TabBarProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000182FC01000008C60D9 /* TabBarProtocols.swift */; };
 		153000012FC10000008C60D9 /* SportType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000112FC10000008C60D9 /* SportType.swift */; };
 		153000022FC10000008C60D9 /* SportSelectionViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000122FC10000008C60D9 /* SportSelectionViewData.swift */; };
 		153000032FC10000008C60D9 /* SportCatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153000132FC10000008C60D9 /* SportCatalogService.swift */; };
@@ -81,6 +82,7 @@
 		152000152FC01000008C60D9 /* TabBarContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarContainerViewController.swift; sourceTree = "<group>"; };
 		152000162FC01000008C60D9 /* TabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
 		152000172FC01000008C60D9 /* TabBarChildViewControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarChildViewControllerFactory.swift; sourceTree = "<group>"; };
+		152000182FC01000008C60D9 /* TabBarProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarProtocols.swift; sourceTree = "<group>"; };
 		153000112FC10000008C60D9 /* SportType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportType.swift; sourceTree = "<group>"; };
 		153000122FC10000008C60D9 /* SportSelectionViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportSelectionViewData.swift; sourceTree = "<group>"; };
 		153000132FC10000008C60D9 /* SportCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogService.swift; sourceTree = "<group>"; };
@@ -297,6 +299,7 @@
 			children = (
 				152000112FC01000008C60D9 /* AppTab.swift */,
 				152000122FC01000008C60D9 /* TabBarItemViewData.swift */,
+				152000182FC01000008C60D9 /* TabBarProtocols.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -643,6 +646,7 @@
 				152000012FC01000008C60D9 /* AppTab.swift in Sources */,
 				15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */,
 				152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */,
+				152000082FC01000008C60D9 /* TabBarProtocols.swift in Sources */,
 				152000072FC01000008C60D9 /* TabBarChildViewControllerFactory.swift in Sources */,
 				153000052FC10000008C60D9 /* SportSelectionViewController.swift in Sources */,
 				152000032FC01000008C60D9 /* TabBarButton.swift in Sources */,

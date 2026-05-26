@@ -12,7 +12,7 @@ import UIKit
 // MARK: - MainSoccerHomeViewController
 
 @MainActor
-final class MainSoccerHomeViewController: MainBaseViewController {
+final class MainSoccerHomeViewController: MainBaseViewController, TabBarRootViewController, TabBarRootReselectHandling {
 
     // MARK: - Layout Metrics
 
@@ -32,6 +32,13 @@ final class MainSoccerHomeViewController: MainBaseViewController {
     private let navigationTitleView = MainSoccerHomeNavigationTitleView()
     private var screenTitle: String
     private var sections: [MainSoccerHomeContentSectionViewData] = []
+
+    var tabBarItemConfiguration: TabBarItemConfiguration {
+        TabBarItemConfiguration(
+            title: "Home",
+            systemImageName: "house"
+        )
+    }
 
     // MARK: - Initialization
 
@@ -104,6 +111,10 @@ final class MainSoccerHomeViewController: MainBaseViewController {
         }
 
         render(viewModel.state)
+    }
+
+    func refreshOnTabReselection() async {
+        await viewModel.loadDashboard()
     }
 
     // MARK: - Rendering

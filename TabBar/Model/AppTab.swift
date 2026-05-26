@@ -7,16 +7,19 @@
 
 import Foundation
 
-enum AppTab: Int, CaseIterable, Sendable {
+enum AppTab: Hashable, Sendable {
+    case mainSport(MainSportTab)
+    case mainSoccer(MainSoccerTab)
+}
+
+enum MainSportTab: Int, CaseIterable, Sendable {
 
     case home
     case matches
     case favorites
 }
 
-// MARK: - Display
-
-extension AppTab {
+extension MainSportTab {
 
     var title: String {
         switch self {
@@ -37,6 +40,61 @@ extension AppTab {
             return "calendar"
         case .favorites:
             return "star"
+        }
+    }
+}
+
+enum MainSoccerTab: Int, CaseIterable, Sendable {
+
+    case home
+    case matches
+    case favorites
+}
+
+extension MainSoccerTab {
+
+    var title: String {
+        switch self {
+        case .home:
+            return "Home"
+        case .matches:
+            return "Matches"
+        case .favorites:
+            return "Favorites"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .home:
+            return "house"
+        case .matches:
+            return "calendar"
+        case .favorites:
+            return "star"
+        }
+    }
+}
+
+// MARK: - Display
+
+extension AppTab {
+
+    var title: String {
+        switch self {
+        case .mainSport(let tab):
+            return tab.title
+        case .mainSoccer(let tab):
+            return tab.title
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .mainSport(let tab):
+            return tab.systemImageName
+        case .mainSoccer(let tab):
+            return tab.systemImageName
         }
     }
 }

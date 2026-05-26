@@ -8,11 +8,16 @@
 import SnapKit
 import UIKit
 
+struct TabBarSelectionEvent {
+    let tab: AppTab
+    let isReselection: Bool
+}
+
 final class TabBarView: UIView {
 
     // MARK: - Callbacks
 
-    var onTabSelected: ((AppTab) -> Void)?
+    var onTabSelected: ((TabBarSelectionEvent) -> Void)?
 
     // MARK: - Properties
 
@@ -112,11 +117,18 @@ final class TabBarView: UIView {
             return
         }
 
-        if tab != selectedTab {
+        let isReselection = tab == selectedTab
+
+        if !isReselection {
             handleFeedback(.selectionChanged)
         }
 
-        onTabSelected?(tab)
+        onTabSelected?(
+            TabBarSelectionEvent(
+                tab: tab,
+                isReselection: isReselection
+            )
+        )
     }
 
     // MARK: - Feedback

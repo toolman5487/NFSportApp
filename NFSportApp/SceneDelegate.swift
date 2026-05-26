@@ -70,23 +70,39 @@ private extension SceneDelegate {
     }
 
     func showTabBar(for sport: SportType) {
-        let viewModel = TabBarViewModel(
-            selectedSport: sport,
-            badgeService: MockTabBarBadgeService()
+        let configurationBuilder = makeTabBarConfigurationBuilder(for: sport)
+        let configuration = configurationBuilder.makeTabBarConfiguration(
+            onSportSelectionRequested: { [weak self] in
+                self?.showSportSelection()
+            }
         )
-        let childViewControllerFactory = DefaultTabBarChildViewControllerFactory(
-            selectedSport: sport,
-            sportScopedNetworkClient: sportScopedNetworkClient
+        let viewModel = TabBarViewModel(
+            tabs: configuration.tabs,
+            initialSelectedTab: configuration.initialSelectedTab,
+            badgeService: MockTabBarBadgeService()
         )
         let viewController = TabBarContainerViewController(
             viewModel: viewModel,
-            childViewControllerFactory: childViewControllerFactory
+            configuration: configuration
         )
-        viewController.onSportSelectionRequested = { [weak self] in
-            self?.showSportSelection()
-        }
 
         window?.rootViewController = viewController
+    }
+
+    func makeTabBarConfigurationBuilder(for sport: SportType) -> TabBarConfigurationBuilding {
+        switch sport.id {
+        case "soccer":
+            return MainSoccerTabBarConfigurationBuilder(
+                selectedSport: sport,
+                sportScopedNetworkClient: sportScopedNetworkClient
+            )
+
+        default:
+            return MainSportTabBarConfigurationBuilder(
+                selectedSport: sport,
+                sportScopedNetworkClient: sportScopedNetworkClient
+            )
+        }
     }
 
     func showSportSelection() {

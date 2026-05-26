@@ -12,7 +12,7 @@ import UIKit
 // MARK: - MainHomeViewController
 
 @MainActor
-final class MainHomeViewController: MainBaseViewController {
+final class MainHomeViewController: MainBaseViewController, TabBarRootViewController, TabBarRootReselectHandling {
 
     // MARK: - Layout Metrics
 
@@ -32,6 +32,13 @@ final class MainHomeViewController: MainBaseViewController {
     private let navigationTitleView = MainHomeNavigationTitleView()
     private var screenTitle: String
     private var sections: [MainHomeContentSectionViewData] = []
+
+    var tabBarItemConfiguration: TabBarItemConfiguration {
+        TabBarItemConfiguration(
+            title: "Home",
+            systemImageName: "house"
+        )
+    }
 
     // MARK: - Initialization
 
@@ -104,6 +111,10 @@ final class MainHomeViewController: MainBaseViewController {
         }
 
         render(viewModel.state)
+    }
+
+    func refreshOnTabReselection() async {
+        await viewModel.loadDashboard()
     }
 
     // MARK: - Rendering

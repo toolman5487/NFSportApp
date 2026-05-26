@@ -11,7 +11,7 @@ import UIKit
 // MARK: - MainMatchesViewController
 
 @MainActor
-final class MainMatchesViewController: MainBaseViewController {
+final class MainMatchesViewController: MainBaseViewController, TabBarRootViewController, TabBarRootReselectHandling {
 
     // MARK: - Layout Metrics
 
@@ -30,6 +30,13 @@ final class MainMatchesViewController: MainBaseViewController {
     private let viewModel: MainMatchesViewModel
     private var screenTitle: String
     private var sections: [MainMatchesContentSectionViewData] = []
+
+    var tabBarItemConfiguration: TabBarItemConfiguration {
+        TabBarItemConfiguration(
+            title: "Matches",
+            systemImageName: "calendar"
+        )
+    }
 
     // MARK: - Initialization
 
@@ -88,6 +95,10 @@ final class MainMatchesViewController: MainBaseViewController {
         }
 
         render(viewModel.state)
+    }
+
+    func refreshOnTabReselection() async {
+        await viewModel.loadSchedule()
     }
 
     // MARK: - Rendering

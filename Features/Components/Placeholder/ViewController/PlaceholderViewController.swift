@@ -10,7 +10,7 @@ import SnapKit
 import UIKit
 
 @MainActor
-final class PlaceholderViewController: UIViewController {
+final class PlaceholderViewController: UIViewController, TabBarRootViewController, TabBarContentScrollable, TabBarRootReselectHandling {
 
     // MARK: - Section
 
@@ -55,11 +55,24 @@ final class PlaceholderViewController: UIViewController {
     }()
 
     private let placeholderTitle: String
+    private let itemConfiguration: TabBarItemConfiguration
+
+    var tabBarItemConfiguration: TabBarItemConfiguration {
+        itemConfiguration
+    }
+
+    var isScrolledAwayFromTop: Bool {
+        tableView.contentOffset.y > -tableView.adjustedContentInset.top
+    }
 
     // MARK: - Initialization
 
-    init(title: String = "") {
+    init(
+        title: String = "",
+        tabBarItemConfiguration: TabBarItemConfiguration
+    ) {
         self.placeholderTitle = title
+        self.itemConfiguration = tabBarItemConfiguration
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -105,6 +118,14 @@ final class PlaceholderViewController: UIViewController {
         tableView.register(PlaceholderBannerCell.self, forCellReuseIdentifier: PlaceholderBannerCell.reuseIdentifier)
         tableView.register(PlaceholderSectionTitleCell.self, forCellReuseIdentifier: PlaceholderSectionTitleCell.reuseIdentifier)
         tableView.register(PlaceholderListCell.self, forCellReuseIdentifier: PlaceholderListCell.reuseIdentifier)
+    }
+
+    func scrollToTop(animated: Bool) {
+        let topContentOffset = CGPoint(
+            x: 0,
+            y: -tableView.adjustedContentInset.top
+        )
+        tableView.setContentOffset(topContentOffset, animated: animated)
     }
 }
 

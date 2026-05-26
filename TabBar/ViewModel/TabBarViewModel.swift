@@ -54,7 +54,7 @@ extension TabBarViewState {
 
 struct TabBarPresentation: Sendable {
     let selectedTab: AppTab
-    let items: [TabBarItemViewData]
+    let badges: [AppTab: Int]
 }
 
 // MARK: - Page Transition
@@ -89,7 +89,7 @@ final class TabBarViewModel {
     
     // MARK: - Properties
     
-    private(set) var state: TabBarViewState = .idle(selectedTab: .home) {
+    private(set) var state: TabBarViewState {
         didSet {
             onStateChange?(state)
         }
@@ -97,7 +97,7 @@ final class TabBarViewModel {
     
     var onStateChange: ((TabBarViewState) -> Void)?
 
-    let selectedSport: SportType
+    let tabs: [AppTab]
 
     private let badgeService: TabBarBadgeServicing
     private var currentDisplayedTab: AppTab?
@@ -106,30 +106,21 @@ final class TabBarViewModel {
     private var isProgrammaticTransitionInProgress = false
     
     var presentation: TabBarPresentation {
-        let selectedTab = state.selectedTab
-        let badges = state.badges
-        
-        return TabBarPresentation(
-            selectedTab: selectedTab,
-            items: AppTab.allCases.map { tab in
-                TabBarItemViewData(
-                    tab: tab,
-                    title: tab.title,
-                    systemImageName: tab.systemImageName,
-                    badgeCount: badges[tab, default: 0],
-                    isSelected: selectedTab == tab
-                )
-            }
+        TabBarPresentation(
+            selectedTab: state.selectedTab,
+            badges: state.badges
         )
     }
 
     // MARK: - Initialization
 
     init(
-        selectedSport: SportType,
+        tabs: [AppTab],
+        initialSelectedTab: AppTab,
         badgeService: TabBarBadgeServicing
     ) {
-        self.selectedSport = selectedSport
+        self.tabs = tabs
+        self.state = .idle(selectedTab: initialSelectedTab)
         self.badgeService = badgeService
     }
     
@@ -224,11 +215,13 @@ final class TabBarViewModel {
     }
     
     private func makePageTransitionDirection(to tab: AppTab) -> TabBarPageTransitionDirection {
-        guard let currentDisplayedTab else {
+        guard let currentDisplayedTab,
+              let currentIndex = tabs.firstIndex(of: currentDisplayedTab),
+              let targetIndex = tabs.firstIndex(of: tab) else {
             return .forward
         }
         
-        switch tab.rawValue >= currentDisplayedTab.rawValue {
+        switch targetIndex >= currentIndex {
         case true:
             return .forward
         case false:
@@ -237,11 +230,13 @@ final class TabBarViewModel {
     }
     
     private func shouldAnimatePageTransition(to tab: AppTab) -> Bool {
-        guard let currentDisplayedTab else {
+        guard let currentDisplayedTab,
+              let currentIndex = tabs.firstIndex(of: currentDisplayedTab),
+              let targetIndex = tabs.firstIndex(of: tab) else {
             return false
         }
         
-        let tabDistance = abs(tab.rawValue - currentDisplayedTab.rawValue)
+        let tabDistance = abs(targetIndex - currentIndex)
         return tabDistance == 1
     }
     
