@@ -13,6 +13,7 @@
 		15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */; };
 		15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */; };
 		15182AF32FC02BFF008C60D9 /* SkeletonView in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AF22FC02BFF008C60D9 /* SkeletonView */; };
+		15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A100112FC5600000BEEF00 /* ContentStateView.swift */; };
 		15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */; };
 		15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */; };
 		15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B052FC03D43008C60D9 /* HTTPMethod.swift */; };
@@ -42,6 +43,13 @@
 		154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000162FC20000008C60D9 /* MainHomeGameCell.swift */; };
 		154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */; };
 		154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000182FC20000008C60D9 /* MainHomeFilterCell.swift */; };
+		159053332FC5584400C7D0D6 /* MainSearchTeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159053392FC5584A00C7D0D6 /* MainSearchTeam.swift */; };
+		159053342FC5584500C7D0D6 /* MainSearchEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533A2FC5584B00C7D0D6 /* MainSearchEndpoint.swift */; };
+		159053352FC5584600C7D0D6 /* MainSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533B2FC5584C00C7D0D6 /* MainSearchService.swift */; };
+		159053362FC5584700C7D0D6 /* MainSearchPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533C2FC5584D00C7D0D6 /* MainSearchPresentation.swift */; };
+		159053372FC5584800C7D0D6 /* MainSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533D2FC5584E00C7D0D6 /* MainSearchViewModel.swift */; };
+		159053382FC5584900C7D0D6 /* MainSearchTeamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533E2FC5584F00C7D0D6 /* MainSearchTeamCell.swift */; };
+		1590532E2FC557BF00C7D0D6 /* MainSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590532C2FC557BF00C7D0D6 /* MainSearchViewController.swift */; };
 		15C927DE2FC43D7B000820EE /* MainSoccerHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */; };
 		15C928312FC46000000820EE /* MainSoccerHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */; };
 		15C928332FC46000000820EE /* MainSoccerHomeEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */; };
@@ -66,6 +74,7 @@
 		15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderViewController.swift; sourceTree = "<group>"; };
+		15A100112FC5600000BEEF00 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
 		15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeViewController.swift; sourceTree = "<group>"; };
 		15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		15182B052FC03D43008C60D9 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
@@ -96,6 +105,13 @@
 		154000162FC20000008C60D9 /* MainHomeGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeGameCell.swift; sourceTree = "<group>"; };
 		154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeSectionHeaderView.swift; sourceTree = "<group>"; };
 		154000182FC20000008C60D9 /* MainHomeFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeFilterCell.swift; sourceTree = "<group>"; };
+		1590532C2FC557BF00C7D0D6 /* MainSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchViewController.swift; sourceTree = "<group>"; };
+		159053392FC5584A00C7D0D6 /* MainSearchTeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchTeam.swift; sourceTree = "<group>"; };
+		1590533A2FC5584B00C7D0D6 /* MainSearchEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchEndpoint.swift; sourceTree = "<group>"; };
+		1590533B2FC5584C00C7D0D6 /* MainSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchService.swift; sourceTree = "<group>"; };
+		1590533C2FC5584D00C7D0D6 /* MainSearchPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchPresentation.swift; sourceTree = "<group>"; };
+		1590533D2FC5584E00C7D0D6 /* MainSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchViewModel.swift; sourceTree = "<group>"; };
+		1590533E2FC5584F00C7D0D6 /* MainSearchTeamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchTeamCell.swift; sourceTree = "<group>"; };
 		15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeViewController.swift; sourceTree = "<group>"; };
 		15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeDashboard.swift; sourceTree = "<group>"; };
 		15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeEndpoint.swift; sourceTree = "<group>"; };
@@ -166,9 +182,26 @@
 		15182ABC2FBFFFB0008C60D9 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				15A100212FC5600000BEEF00 /* ContentState */,
 				15182ABD2FBFFFD0008C60D9 /* Placeholder */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		15A100212FC5600000BEEF00 /* ContentState */ = {
+			isa = PBXGroup;
+			children = (
+				15A100312FC5600000BEEF00 /* View */,
+			);
+			path = ContentState;
+			sourceTree = "<group>";
+		};
+		15A100312FC5600000BEEF00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15A100112FC5600000BEEF00 /* ContentStateView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		15182ABD2FBFFFD0008C60D9 /* Placeholder */ = {
@@ -209,9 +242,9 @@
 			children = (
 				154000202FC20000008C60D9 /* Model */,
 				154000212FC20000008C60D9 /* Service */,
-				154000222FC20000008C60D9 /* ViewModel */,
 				154000232FC20000008C60D9 /* View */,
 				15182AF52FC02CFF008C60D9 /* ViewController */,
+				154000222FC20000008C60D9 /* ViewModel */,
 			);
 			path = MainHome;
 			sourceTree = "<group>";
@@ -401,8 +434,8 @@
 		154000222FC20000008C60D9 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				154000142FC20000008C60D9 /* MainHomeViewModel.swift */,
 				154000152FC20000008C60D9 /* MainHomePresentation.swift */,
+				154000142FC20000008C60D9 /* MainHomeViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -413,6 +446,60 @@
 				154000182FC20000008C60D9 /* MainHomeFilterCell.swift */,
 				154000162FC20000008C60D9 /* MainHomeGameCell.swift */,
 				154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		1590532D2FC557BF00C7D0D6 /* MainSearch */ = {
+			isa = PBXGroup;
+			children = (
+				159053302FC5582800C7D0D6 /* Model */,
+				159053322FC5583B00C7D0D6 /* Service */,
+				1590533F2FC5585000C7D0D6 /* View */,
+				1590532F2FC5581F00C7D0D6 /* ViewController */,
+				159053312FC5582F00C7D0D6 /* ViewModel */,
+			);
+			path = MainSearch;
+			sourceTree = "<group>";
+		};
+		1590532F2FC5581F00C7D0D6 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				1590532C2FC557BF00C7D0D6 /* MainSearchViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		159053302FC5582800C7D0D6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				159053392FC5584A00C7D0D6 /* MainSearchTeam.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		159053312FC5582F00C7D0D6 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				1590533C2FC5584D00C7D0D6 /* MainSearchPresentation.swift */,
+				1590533D2FC5584E00C7D0D6 /* MainSearchViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		159053322FC5583B00C7D0D6 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				1590533A2FC5584B00C7D0D6 /* MainSearchEndpoint.swift */,
+				1590533B2FC5584C00C7D0D6 /* MainSearchService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		1590533F2FC5585000C7D0D6 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				1590533E2FC5584F00C7D0D6 /* MainSearchTeamCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -465,9 +552,9 @@
 			children = (
 				15C9C8812FC3F797000820EE /* Model */,
 				15C9C8822FC3F797000820EE /* Service */,
-				15C9C8832FC3F797000820EE /* ViewModel */,
 				15C9C8842FC3F797000820EE /* View */,
 				15C9C8852FC3F797000820EE /* ViewController */,
+				15C9C8832FC3F797000820EE /* ViewModel */,
 			);
 			path = MainMatches;
 			sourceTree = "<group>";
@@ -475,6 +562,7 @@
 		15C9C8732FC4314A000820EE /* MainSport */ = {
 			isa = PBXGroup;
 			children = (
+				1590532D2FC557BF00C7D0D6 /* MainSearch */,
 				15C9C8502FC3F797000820EE /* MainMatches */,
 				15182AF42FC02CF5008C60D9 /* MainHome */,
 			);
@@ -660,6 +748,7 @@
 				15C928392FC46000000820EE /* MainSoccerHomeViewModel.swift in Sources */,
 				15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */,
 				15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */,
+				15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */,
 				153000012FC10000008C60D9 /* SportType.swift in Sources */,
 				15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */,
 				15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */,
@@ -688,8 +777,15 @@
 				15C9C8622FC3F797000820EE /* MainMatchesEndpoint.swift in Sources */,
 				15C9C8612FC3F797000820EE /* MainMatchesSchedule.swift in Sources */,
 				15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */,
+				159053332FC5584400C7D0D6 /* MainSearchTeam.swift in Sources */,
+				159053342FC5584500C7D0D6 /* MainSearchEndpoint.swift in Sources */,
+				159053352FC5584600C7D0D6 /* MainSearchService.swift in Sources */,
+				159053362FC5584700C7D0D6 /* MainSearchPresentation.swift in Sources */,
+				159053372FC5584800C7D0D6 /* MainSearchViewModel.swift in Sources */,
+				159053382FC5584900C7D0D6 /* MainSearchTeamCell.swift in Sources */,
 				152000052FC01000008C60D9 /* TabBarContainerViewController.swift in Sources */,
 				152000062FC01000008C60D9 /* TabBarViewModel.swift in Sources */,
+				1590532E2FC557BF00C7D0D6 /* MainSearchViewController.swift in Sources */,
 				15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */,
 				15182AC22FC00BE3008C60D9 /* UIColor+Extension.swift in Sources */,
 				15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */,

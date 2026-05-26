@@ -16,7 +16,7 @@ enum MainSportTab: Int, CaseIterable, Sendable {
 
     case home
     case matches
-    case favorites
+    case search
 }
 
 extension MainSportTab {
@@ -27,8 +27,8 @@ extension MainSportTab {
             return "Home"
         case .matches:
             return "Matches"
-        case .favorites:
-            return "Favorites"
+        case .search:
+            return "Search"
         }
     }
 
@@ -38,8 +38,8 @@ extension MainSportTab {
             return "house"
         case .matches:
             return "calendar"
-        case .favorites:
-            return "star"
+        case .search:
+            return "magnifyingglass"
         }
     }
 }

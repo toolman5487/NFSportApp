@@ -31,8 +31,8 @@ nonisolated struct MainSoccerHomePresentation: Equatable, Sendable {
             title: title,
             sections: [
                 .filterSkeleton,
-                .leagueSkeleton(MainSoccerHomeLeagueSkeletonViewData(itemCount: 3)),
-                .leagueSkeleton(MainSoccerHomeLeagueSkeletonViewData(itemCount: 2))
+                .leagueSkeleton(MainSoccerHomeLeagueSkeletonViewData(itemCount: 4)),
+                .leagueSkeleton(MainSoccerHomeLeagueSkeletonViewData(itemCount: 1))
             ]
         )
     }
