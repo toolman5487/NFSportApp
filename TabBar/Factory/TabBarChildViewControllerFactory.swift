@@ -155,6 +155,15 @@ struct MainSoccerTabBarConfigurationBuilder: TabBarConfigurationBuilding {
             fatalError("Unexpected non-soccer tab in MainSoccerTabBarConfigurationBuilder")
         }
 
+        let makeMatchDetailViewController: (Int) -> UIViewController = { fixtureID in
+            let detailService = SoccerMatchDetailService(networkClient: sportScopedNetworkClient)
+            let detailViewModel = SoccerMatchDetailViewModel(
+                fixtureID: fixtureID,
+                detailService: detailService
+            )
+            return SoccerMatchDetailViewController(viewModel: detailViewModel)
+        }
+
         switch mainSoccerTab {
         case .home:
             let homeService = MainSoccerHomeService(networkClient: sportScopedNetworkClient)
@@ -164,16 +173,18 @@ struct MainSoccerTabBarConfigurationBuilder: TabBarConfigurationBuilding {
             )
             let homeViewController = MainSoccerHomeViewController(viewModel: homeViewModel)
             homeViewController.onSportSelectionRequested = onSportSelectionRequested
+            homeViewController.makeMatchDetailViewController = makeMatchDetailViewController
             return homeViewController
 
         case .matches:
             let matchesService = MainSoccerMatchesService(networkClient: sportScopedNetworkClient)
-            let matchesViewModel = MainMatchesViewModel(
+            let matchesViewModel = MainSoccerMatchesViewModel(
                 selectedSport: selectedSport,
                 scheduleService: matchesService
             )
-            let matchesViewController = MainMatchesViewController(viewModel: matchesViewModel)
+            let matchesViewController = MainSoccerMatchesViewController(viewModel: matchesViewModel)
             matchesViewController.onSportSelectionRequested = onSportSelectionRequested
+            matchesViewController.makeMatchDetailViewController = makeMatchDetailViewController
             return matchesViewController
 
         case .search:

@@ -37,8 +37,15 @@ nonisolated struct MainHomeService: MainHomeServicing {
         for sport: SportType,
         date: Date
     ) async throws -> MainHomeDashboard {
-        async let liveGames = fetchGames(from: .liveGames)
-        async let todayGames = fetchGames(from: .games(date: makeAPIDateString(from: date)))
+        let timezone = TimeZone.current.identifier
+
+        async let liveGames = fetchGames(from: .liveGames(timezone: timezone))
+        async let todayGames = fetchGames(
+            from: .games(
+                date: makeAPIDateString(from: date),
+                timezone: timezone
+            )
+        )
 
         return try await MainHomeDashboard(
             sport: sport,

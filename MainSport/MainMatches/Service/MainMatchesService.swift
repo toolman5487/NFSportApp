@@ -31,7 +31,10 @@ nonisolated struct MainMatchesService: MainMatchesServicing {
         for sport: SportType,
         date: Date
     ) async throws -> MainMatchesSchedule {
-        let endpoint = MainMatchesEndpoint.games(date: makeAPIDateString(from: date))
+        let endpoint = MainMatchesEndpoint.games(
+            date: makeAPIDateString(from: date),
+            timezone: TimeZone.current.identifier
+        )
         let response = try await networkClient.get(
             endpoint.path,
             queryItems: endpoint.queryItems,

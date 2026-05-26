@@ -56,6 +56,14 @@
 		159054042FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054142FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift */; };
 		159054052FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054152FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift */; };
 		159054062FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054162FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift */; };
+		159090542FC5A16400C7D0D6 /* SoccerMatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090532FC5A16400C7D0D6 /* SoccerMatchDetailViewController.swift */; };
+		159090722FC6B00000C7D0D6 /* SoccerMatchDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907B2FC6B00000C7D0D6 /* SoccerMatchDetail.swift */; };
+		159090732FC6B00000C7D0D6 /* SoccerMatchDetailEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907C2FC6B00000C7D0D6 /* SoccerMatchDetailEndpoint.swift */; };
+		159090742FC6B00000C7D0D6 /* SoccerMatchDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907D2FC6B00000C7D0D6 /* SoccerMatchDetailService.swift */; };
+		159090752FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */; };
+		159090762FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */; };
+		159090772FC6B4A000C7D0D6 /* SoccerMatchScoreHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090802FC6B4A000C7D0D6 /* SoccerMatchScoreHeaderCell.swift */; };
+		1590906C2FC5A60B00C7D0D6 /* MatchBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590906B2FC5A60B00C7D0D6 /* MatchBaseViewController.swift */; };
 		15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A100112FC5600000BEEF00 /* ContentStateView.swift */; };
 		15C927DE2FC43D7B000820EE /* MainSoccerHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */; };
 		15C928312FC46000000820EE /* MainSoccerHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */; };
@@ -75,6 +83,13 @@
 		15C9C8682FC3F797000820EE /* MainMatchesGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */; };
 		15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
+		16A001012FC6000000A10001 /* MainSoccerMatchesSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001112FC6000000A10001 /* MainSoccerMatchesSchedule.swift */; };
+		16A001022FC6000000A10001 /* MainSoccerMatchesPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001122FC6000000A10001 /* MainSoccerMatchesPresentation.swift */; };
+		16A001032FC6000000A10001 /* MainSoccerMatchesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001132FC6000000A10001 /* MainSoccerMatchesViewModel.swift */; };
+		16A001042FC6000000A10001 /* MainSoccerMatchesDatePickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001142FC6000000A10001 /* MainSoccerMatchesDatePickerCell.swift */; };
+		16A001052FC6000000A10001 /* MainSoccerMatchesFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001152FC6000000A10001 /* MainSoccerMatchesFilterCell.swift */; };
+		16A001062FC6000000A10001 /* MainSoccerMatchesGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001162FC6000000A10001 /* MainSoccerMatchesGameCell.swift */; };
+		16A001072FC6000000A10001 /* MainSoccerMatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001172FC6000000A10001 /* MainSoccerMatchesViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -125,6 +140,14 @@
 		159054142FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchPresentation.swift; sourceTree = "<group>"; };
 		159054152FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchViewModel.swift; sourceTree = "<group>"; };
 		159054162FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchTeamCell.swift; sourceTree = "<group>"; };
+		159090532FC5A16400C7D0D6 /* SoccerMatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailViewController.swift; sourceTree = "<group>"; };
+		1590907B2FC6B00000C7D0D6 /* SoccerMatchDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetail.swift; sourceTree = "<group>"; };
+		1590907C2FC6B00000C7D0D6 /* SoccerMatchDetailEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailEndpoint.swift; sourceTree = "<group>"; };
+		1590907D2FC6B00000C7D0D6 /* SoccerMatchDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailService.swift; sourceTree = "<group>"; };
+		1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailPresentation.swift; sourceTree = "<group>"; };
+		1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailViewModel.swift; sourceTree = "<group>"; };
+		159090802FC6B4A000C7D0D6 /* SoccerMatchScoreHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchScoreHeaderCell.swift; sourceTree = "<group>"; };
+		1590906B2FC5A60B00C7D0D6 /* MatchBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchBaseViewController.swift; sourceTree = "<group>"; };
 		15A100112FC5600000BEEF00 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
 		15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeViewController.swift; sourceTree = "<group>"; };
 		15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeDashboard.swift; sourceTree = "<group>"; };
@@ -144,6 +167,13 @@
 		15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesGameCell.swift; sourceTree = "<group>"; };
 		15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesViewController.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
+		16A001112FC6000000A10001 /* MainSoccerMatchesSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesSchedule.swift; sourceTree = "<group>"; };
+		16A001122FC6000000A10001 /* MainSoccerMatchesPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesPresentation.swift; sourceTree = "<group>"; };
+		16A001132FC6000000A10001 /* MainSoccerMatchesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesViewModel.swift; sourceTree = "<group>"; };
+		16A001142FC6000000A10001 /* MainSoccerMatchesDatePickerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesDatePickerCell.swift; sourceTree = "<group>"; };
+		16A001152FC6000000A10001 /* MainSoccerMatchesFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesFilterCell.swift; sourceTree = "<group>"; };
+		16A001162FC6000000A10001 /* MainSoccerMatchesGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesGameCell.swift; sourceTree = "<group>"; };
+		16A001172FC6000000A10001 /* MainSoccerMatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerMatchesViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -258,6 +288,7 @@
 		15182AF82FC03AE3008C60D9 /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				1590906A2FC5A5D800C7D0D6 /* MatchBaseViewController */,
 				15EF4F9A2FC0A60F0016E43C /* MainBaseViewController */,
 				15182AF92FC03AEC008C60D9 /* BaseViewController */,
 			);
@@ -295,6 +326,7 @@
 		15186B942FBF1393008C60D9 = {
 			isa = PBXGroup;
 			children = (
+				159090512FC5A12D00C7D0D6 /* MatchDetail */,
 				15182ABB2FBFFFA4008C60D9 /* Features */,
 				15C9C8742FC431BD000820EE /* MainSoccer */,
 				15C9C8732FC4314A000820EE /* MainSport */,
@@ -556,6 +588,76 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		159090512FC5A12D00C7D0D6 /* MatchDetail */ = {
+			isa = PBXGroup;
+			children = (
+				159090552FC5A17100C7D0D6 /* Soccer */,
+			);
+			path = MatchDetail;
+			sourceTree = "<group>";
+		};
+		159090522FC5A13C00C7D0D6 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				159090532FC5A16400C7D0D6 /* SoccerMatchDetailViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		159090552FC5A17100C7D0D6 /* Soccer */ = {
+			isa = PBXGroup;
+			children = (
+				159090562FC6B00000C7D0D6 /* Model */,
+				159090572FC6B00000C7D0D6 /* Service */,
+				159090592FC6B4A000C7D0D6 /* View */,
+				159090582FC6B00000C7D0D6 /* ViewModel */,
+				159090522FC5A13C00C7D0D6 /* ViewController */,
+			);
+			path = Soccer;
+			sourceTree = "<group>";
+		};
+		159090562FC6B00000C7D0D6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				1590907B2FC6B00000C7D0D6 /* SoccerMatchDetail.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		159090572FC6B00000C7D0D6 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				1590907C2FC6B00000C7D0D6 /* SoccerMatchDetailEndpoint.swift */,
+				1590907D2FC6B00000C7D0D6 /* SoccerMatchDetailService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		159090582FC6B00000C7D0D6 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */,
+				1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		159090592FC6B4A000C7D0D6 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				159090802FC6B4A000C7D0D6 /* SoccerMatchScoreHeaderCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		1590906A2FC5A5D800C7D0D6 /* MatchBaseViewController */ = {
+			isa = PBXGroup;
+			children = (
+				1590906B2FC5A60B00C7D0D6 /* MatchBaseViewController.swift */,
+			);
+			path = MatchBaseViewController;
+			sourceTree = "<group>";
+		};
 		15A100212FC5600000BEEF00 /* ContentState */ = {
 			isa = PBXGroup;
 			children = (
@@ -661,7 +763,11 @@
 		15C9C8762FC431DD000820EE /* MainSoccerMatches */ = {
 			isa = PBXGroup;
 			children = (
+				16A001202FC6000000A10001 /* Model */,
 				15C929202FC50000000820EE /* Service */,
+				16A001212FC6000000A10001 /* ViewModel */,
+				16A001222FC6000000A10001 /* View */,
+				16A001232FC6000000A10001 /* ViewController */,
 			);
 			path = MainSoccerMatches;
 			sourceTree = "<group>";
@@ -716,6 +822,41 @@
 				15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */,
 			);
 			path = MainBaseViewController;
+			sourceTree = "<group>";
+		};
+		16A001202FC6000000A10001 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16A001112FC6000000A10001 /* MainSoccerMatchesSchedule.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16A001212FC6000000A10001 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16A001122FC6000000A10001 /* MainSoccerMatchesPresentation.swift */,
+				16A001132FC6000000A10001 /* MainSoccerMatchesViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16A001222FC6000000A10001 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16A001142FC6000000A10001 /* MainSoccerMatchesDatePickerCell.swift */,
+				16A001152FC6000000A10001 /* MainSoccerMatchesFilterCell.swift */,
+				16A001162FC6000000A10001 /* MainSoccerMatchesGameCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16A001232FC6000000A10001 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				16A001172FC6000000A10001 /* MainSoccerMatchesViewController.swift */,
+			);
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -831,6 +972,13 @@
 				159054052FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift in Sources */,
 				159054062FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift in Sources */,
 				154000022FC20000008C60D9 /* MainHomeEndpoint.swift in Sources */,
+				1590906C2FC5A60B00C7D0D6 /* MatchBaseViewController.swift in Sources */,
+				159090722FC6B00000C7D0D6 /* SoccerMatchDetail.swift in Sources */,
+				159090732FC6B00000C7D0D6 /* SoccerMatchDetailEndpoint.swift in Sources */,
+				159090742FC6B00000C7D0D6 /* SoccerMatchDetailService.swift in Sources */,
+				159090752FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift in Sources */,
+				159090762FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift in Sources */,
+				159090772FC6B4A000C7D0D6 /* SoccerMatchScoreHeaderCell.swift in Sources */,
 				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
 				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
 				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
@@ -839,19 +987,27 @@
 				154000032FC20000008C60D9 /* MainHomeService.swift in Sources */,
 				154000042FC20000008C60D9 /* MainHomeViewModel.swift in Sources */,
 				154000052FC20000008C60D9 /* MainHomePresentation.swift in Sources */,
+				16A001032FC6000000A10001 /* MainSoccerMatchesViewModel.swift in Sources */,
 				15C9C8652FC3F797000820EE /* MainMatchesViewModel.swift in Sources */,
 				15C929012FC50000000820EE /* MainSoccerMatchesEndpoint.swift in Sources */,
 				15C929022FC50000000820EE /* MainSoccerMatchesService.swift in Sources */,
 				154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */,
+				16A001052FC6000000A10001 /* MainSoccerMatchesFilterCell.swift in Sources */,
+				159090542FC5A16400C7D0D6 /* SoccerMatchDetailViewController.swift in Sources */,
 				15C9C8672FC3F797000820EE /* MainMatchesFilterCell.swift in Sources */,
 				154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */,
+				16A001062FC6000000A10001 /* MainSoccerMatchesGameCell.swift in Sources */,
 				15C9C8682FC3F797000820EE /* MainMatchesGameCell.swift in Sources */,
 				154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */,
 				15C9C8632FC3F797000820EE /* MainMatchesService.swift in Sources */,
+				16A001022FC6000000A10001 /* MainSoccerMatchesPresentation.swift in Sources */,
 				15C9C8642FC3F797000820EE /* MainMatchesPresentation.swift in Sources */,
+				16A001042FC6000000A10001 /* MainSoccerMatchesDatePickerCell.swift in Sources */,
 				15C9C8662FC3F797000820EE /* MainMatchesDatePickerCell.swift in Sources */,
 				15C9C8622FC3F797000820EE /* MainMatchesEndpoint.swift in Sources */,
+				16A001012FC6000000A10001 /* MainSoccerMatchesSchedule.swift in Sources */,
 				15C9C8612FC3F797000820EE /* MainMatchesSchedule.swift in Sources */,
+				16A001072FC6000000A10001 /* MainSoccerMatchesViewController.swift in Sources */,
 				15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */,
 				159053332FC5584400C7D0D6 /* MainSearchTeam.swift in Sources */,
 				159053342FC5584500C7D0D6 /* MainSearchEndpoint.swift in Sources */,
@@ -885,6 +1041,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -916,6 +1073,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
