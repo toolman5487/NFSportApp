@@ -64,7 +64,6 @@ final class ContentStateView: UIView {
         static let iconSize: CGFloat = 40
         static let spacing: CGFloat = 12
         static let textSpacing: CGFloat = 4
-        static let horizontalInset: CGFloat = 32
     }
 
     // MARK: - UI Components
@@ -167,7 +166,6 @@ final class ContentStateView: UIView {
 
         stackView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.leading.trailing.equalToSuperview().inset(LayoutMetric.horizontalInset)
         }
     }
 

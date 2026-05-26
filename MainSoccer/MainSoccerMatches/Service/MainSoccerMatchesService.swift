@@ -7,9 +7,19 @@
 
 import Foundation
 
+// MARK: - MainSoccerMatchesServicing
+
+nonisolated protocol MainSoccerMatchesServicing: Sendable {
+
+    func fetchSchedule(
+        for sport: SportType,
+        date: Date
+    ) async throws -> MainSoccerMatchesSchedule
+}
+
 // MARK: - MainSoccerMatchesService
 
-nonisolated struct MainSoccerMatchesService: MainMatchesServicing {
+nonisolated struct MainSoccerMatchesService: MainSoccerMatchesServicing {
 
     // MARK: - Dependencies
 
@@ -26,7 +36,7 @@ nonisolated struct MainSoccerMatchesService: MainMatchesServicing {
     func fetchSchedule(
         for sport: SportType,
         date: Date
-    ) async throws -> MainMatchesSchedule {
+    ) async throws -> MainSoccerMatchesSchedule {
         let endpoint = MainSoccerMatchesEndpoint.fixtures(
             date: makeAPIDateString(from: date),
             timezone: TimeZone.current.identifier
@@ -38,7 +48,7 @@ nonisolated struct MainSoccerMatchesService: MainMatchesServicing {
             as: APISoccerMatchesResponse<[APISoccerMatchesFixtureResponse]>.self
         )
 
-        return MainMatchesSchedule(
+        return MainSoccerMatchesSchedule(
             sport: sport,
             date: date,
             games: response.response.compactMap(\.mainMatchesGame)
@@ -73,14 +83,14 @@ private nonisolated struct APISoccerMatchesFixtureResponse: Decodable, Sendable 
     let teams: APISoccerMatchesTeamsResponse?
     let goals: APISoccerMatchesGoalsResponse?
 
-    var mainMatchesGame: MainMatchesGame? {
+    var mainMatchesGame: MainSoccerMatchesGame? {
         guard let id = fixture?.id,
               let homeTeamName = teams?.home.name,
               let awayTeamName = teams?.away.name else {
             return nil
         }
 
-        return MainMatchesGame(
+        return MainSoccerMatchesGame(
             id: id,
             leagueName: league?.name ?? "Other League",
             leagueLogoURL: league?.logoURL,
