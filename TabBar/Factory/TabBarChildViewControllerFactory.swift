@@ -176,14 +176,15 @@ struct MainSoccerTabBarConfigurationBuilder: TabBarConfigurationBuilding {
             matchesViewController.onSportSelectionRequested = onSportSelectionRequested
             return matchesViewController
 
-        case .favorites:
-            return PlaceholderViewController(
-                title: mainSoccerTab.title,
-                tabBarItemConfiguration: TabBarItemConfiguration(
-                    title: mainSoccerTab.title,
-                    systemImageName: mainSoccerTab.systemImageName
-                )
+        case .search:
+            let searchService = MainSoccerSearchService(networkClient: sportScopedNetworkClient)
+            let searchViewModel = MainSoccerSearchViewModel(
+                selectedSport: selectedSport,
+                searchService: searchService
             )
+            let searchViewController = MainSoccerSearchViewController(viewModel: searchViewModel)
+            searchViewController.onSportSelectionRequested = onSportSelectionRequested
+            return searchViewController
         }
     }
 }

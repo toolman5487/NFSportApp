@@ -48,7 +48,7 @@ enum MainSoccerTab: Int, CaseIterable, Sendable {
 
     case home
     case matches
-    case favorites
+    case search
 }
 
 extension MainSoccerTab {
@@ -59,8 +59,8 @@ extension MainSoccerTab {
             return "Home"
         case .matches:
             return "Matches"
-        case .favorites:
-            return "Favorites"
+        case .search:
+            return "Search"
         }
     }
 
@@ -70,8 +70,8 @@ extension MainSoccerTab {
             return "house"
         case .matches:
             return "calendar"
-        case .favorites:
-            return "star"
+        case .search:
+            return "magnifyingglass"
         }
     }
 }

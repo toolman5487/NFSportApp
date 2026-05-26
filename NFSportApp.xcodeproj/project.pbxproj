@@ -13,7 +13,6 @@
 		15182AC42FC00BE4008C60D9 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */; };
 		15182AF02FC02B47008C60D9 /* PlaceholderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */; };
 		15182AF32FC02BFF008C60D9 /* SkeletonView in Frameworks */ = {isa = PBXBuildFile; productRef = 15182AF22FC02BFF008C60D9 /* SkeletonView */; };
-		15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A100112FC5600000BEEF00 /* ContentStateView.swift */; };
 		15182AF72FC02D12008C60D9 /* MainHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */; };
 		15182AFB2FC03AFF008C60D9 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */; };
 		15182B002FC03D43008C60D9 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B052FC03D43008C60D9 /* HTTPMethod.swift */; };
@@ -43,13 +42,21 @@
 		154000062FC20000008C60D9 /* MainHomeGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000162FC20000008C60D9 /* MainHomeGameCell.swift */; };
 		154000072FC20000008C60D9 /* MainHomeSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000172FC20000008C60D9 /* MainHomeSectionHeaderView.swift */; };
 		154000082FC20000008C60D9 /* MainHomeFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154000182FC20000008C60D9 /* MainHomeFilterCell.swift */; };
+		1590532E2FC557BF00C7D0D6 /* MainSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590532C2FC557BF00C7D0D6 /* MainSearchViewController.swift */; };
 		159053332FC5584400C7D0D6 /* MainSearchTeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159053392FC5584A00C7D0D6 /* MainSearchTeam.swift */; };
 		159053342FC5584500C7D0D6 /* MainSearchEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533A2FC5584B00C7D0D6 /* MainSearchEndpoint.swift */; };
 		159053352FC5584600C7D0D6 /* MainSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533B2FC5584C00C7D0D6 /* MainSearchService.swift */; };
 		159053362FC5584700C7D0D6 /* MainSearchPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533C2FC5584D00C7D0D6 /* MainSearchPresentation.swift */; };
 		159053372FC5584800C7D0D6 /* MainSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533D2FC5584E00C7D0D6 /* MainSearchViewModel.swift */; };
 		159053382FC5584900C7D0D6 /* MainSearchTeamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590533E2FC5584F00C7D0D6 /* MainSearchTeamCell.swift */; };
-		1590532E2FC557BF00C7D0D6 /* MainSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590532C2FC557BF00C7D0D6 /* MainSearchViewController.swift */; };
+		159053962FC5734200C7D0D6 /* MainSoccerSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159053952FC5734200C7D0D6 /* MainSoccerSearchViewController.swift */; };
+		159054012FC5740000C7D0D6 /* MainSoccerSearchTeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054112FC5740000C7D0D6 /* MainSoccerSearchTeam.swift */; };
+		159054022FC5740000C7D0D6 /* MainSoccerSearchEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054122FC5740000C7D0D6 /* MainSoccerSearchEndpoint.swift */; };
+		159054032FC5740000C7D0D6 /* MainSoccerSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054132FC5740000C7D0D6 /* MainSoccerSearchService.swift */; };
+		159054042FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054142FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift */; };
+		159054052FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054152FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift */; };
+		159054062FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159054162FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift */; };
+		15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A100112FC5600000BEEF00 /* ContentStateView.swift */; };
 		15C927DE2FC43D7B000820EE /* MainSoccerHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */; };
 		15C928312FC46000000820EE /* MainSoccerHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */; };
 		15C928332FC46000000820EE /* MainSoccerHomeEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */; };
@@ -74,7 +81,6 @@
 		15182AC12FC00BE3008C60D9 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		15182AC32FC00BE4008C60D9 /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 		15182AEF2FC02B47008C60D9 /* PlaceholderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderViewController.swift; sourceTree = "<group>"; };
-		15A100112FC5600000BEEF00 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
 		15182AF62FC02D12008C60D9 /* MainHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeViewController.swift; sourceTree = "<group>"; };
 		15182AFA2FC03AFF008C60D9 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		15182B052FC03D43008C60D9 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
@@ -112,6 +118,14 @@
 		1590533C2FC5584D00C7D0D6 /* MainSearchPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchPresentation.swift; sourceTree = "<group>"; };
 		1590533D2FC5584E00C7D0D6 /* MainSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchViewModel.swift; sourceTree = "<group>"; };
 		1590533E2FC5584F00C7D0D6 /* MainSearchTeamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchTeamCell.swift; sourceTree = "<group>"; };
+		159053952FC5734200C7D0D6 /* MainSoccerSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchViewController.swift; sourceTree = "<group>"; };
+		159054112FC5740000C7D0D6 /* MainSoccerSearchTeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchTeam.swift; sourceTree = "<group>"; };
+		159054122FC5740000C7D0D6 /* MainSoccerSearchEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchEndpoint.swift; sourceTree = "<group>"; };
+		159054132FC5740000C7D0D6 /* MainSoccerSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchService.swift; sourceTree = "<group>"; };
+		159054142FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchPresentation.swift; sourceTree = "<group>"; };
+		159054152FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchViewModel.swift; sourceTree = "<group>"; };
+		159054162FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerSearchTeamCell.swift; sourceTree = "<group>"; };
+		15A100112FC5600000BEEF00 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
 		15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeViewController.swift; sourceTree = "<group>"; };
 		15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeDashboard.swift; sourceTree = "<group>"; };
 		15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeEndpoint.swift; sourceTree = "<group>"; };
@@ -186,22 +200,6 @@
 				15182ABD2FBFFFD0008C60D9 /* Placeholder */,
 			);
 			path = Components;
-			sourceTree = "<group>";
-		};
-		15A100212FC5600000BEEF00 /* ContentState */ = {
-			isa = PBXGroup;
-			children = (
-				15A100312FC5600000BEEF00 /* View */,
-			);
-			path = ContentState;
-			sourceTree = "<group>";
-		};
-		15A100312FC5600000BEEF00 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				15A100112FC5600000BEEF00 /* ContentStateView.swift */,
-			);
-			path = View;
 			sourceTree = "<group>";
 		};
 		15182ABD2FBFFFD0008C60D9 /* Placeholder */ = {
@@ -504,6 +502,76 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		159053932FC5730C00C7D0D6 /* MainSoccerSearch */ = {
+			isa = PBXGroup;
+			children = (
+				159054202FC5740000C7D0D6 /* Model */,
+				159054212FC5740000C7D0D6 /* Service */,
+				159054222FC5740000C7D0D6 /* View */,
+				159053942FC5731F00C7D0D6 /* ViewController */,
+				159054232FC5740000C7D0D6 /* ViewModel */,
+			);
+			path = MainSoccerSearch;
+			sourceTree = "<group>";
+		};
+		159054202FC5740000C7D0D6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				159054112FC5740000C7D0D6 /* MainSoccerSearchTeam.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		159054212FC5740000C7D0D6 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				159054122FC5740000C7D0D6 /* MainSoccerSearchEndpoint.swift */,
+				159054132FC5740000C7D0D6 /* MainSoccerSearchService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		159054222FC5740000C7D0D6 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				159054162FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		159053942FC5731F00C7D0D6 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				159053952FC5734200C7D0D6 /* MainSoccerSearchViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		159054232FC5740000C7D0D6 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				159054142FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift */,
+				159054152FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		15A100212FC5600000BEEF00 /* ContentState */ = {
+			isa = PBXGroup;
+			children = (
+				15A100312FC5600000BEEF00 /* View */,
+			);
+			path = ContentState;
+			sourceTree = "<group>";
+		};
+		15A100312FC5600000BEEF00 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15A100112FC5600000BEEF00 /* ContentStateView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		15C927DC2FC43D60000820EE /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -572,6 +640,7 @@
 		15C9C8742FC431BD000820EE /* MainSoccer */ = {
 			isa = PBXGroup;
 			children = (
+				159053932FC5730C00C7D0D6 /* MainSoccerSearch */,
 				15C9C8762FC431DD000820EE /* MainSoccerMatches */,
 				15C9C8752FC431CF000820EE /* MainSoccerHome */,
 			);
@@ -754,6 +823,13 @@
 				15182B012FC03D43008C60D9 /* NetworkQueryItem.swift in Sources */,
 				15182B022FC03D43008C60D9 /* NetworkRequest.swift in Sources */,
 				154000012FC20000008C60D9 /* MainHomeDashboard.swift in Sources */,
+				159053962FC5734200C7D0D6 /* MainSoccerSearchViewController.swift in Sources */,
+				159054012FC5740000C7D0D6 /* MainSoccerSearchTeam.swift in Sources */,
+				159054022FC5740000C7D0D6 /* MainSoccerSearchEndpoint.swift in Sources */,
+				159054032FC5740000C7D0D6 /* MainSoccerSearchService.swift in Sources */,
+				159054042FC5740000C7D0D6 /* MainSoccerSearchPresentation.swift in Sources */,
+				159054052FC5740000C7D0D6 /* MainSoccerSearchViewModel.swift in Sources */,
+				159054062FC5740000C7D0D6 /* MainSoccerSearchTeamCell.swift in Sources */,
 				154000022FC20000008C60D9 /* MainHomeEndpoint.swift in Sources */,
 				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
 				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
