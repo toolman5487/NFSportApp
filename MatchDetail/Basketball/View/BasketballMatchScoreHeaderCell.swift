@@ -1,19 +1,19 @@
 //
-//  SoccerMatchScoreHeaderCell.swift
+//  BasketballMatchScoreHeaderCell.swift
 //  NFSportApp
 //
-//  Created by Codex on 2026/5/26.
+//  Created by Willy Hsu on 2026/5/27.
 //
 
 import SDWebImage
 import SnapKit
 import UIKit
 
-// MARK: - SoccerMatchScoreHeaderCell
+// MARK: - BasketballMatchScoreHeaderCell
 
-final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
+final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
 
-    static let reuseIdentifier = "SoccerMatchScoreHeaderCell"
+    static let reuseIdentifier = "BasketballMatchScoreHeaderCell"
 
     private enum LayoutMetric {
         static let cardCornerRadius: CGFloat = 12
@@ -23,7 +23,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         static let teamSpacing: CGFloat = 12
         static let statusHorizontalInset: CGFloat = 8
         static let statusVerticalInset: CGFloat = 4
-        static let teamLogoSize: CGFloat = 40
         static let scoreWidth: CGFloat = 88
     }
 
@@ -42,8 +41,8 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         return label
     }()
 
-    private let homeTeamView = SoccerMatchScoreHeaderTeamView()
-    private let awayTeamView = SoccerMatchScoreHeaderTeamView()
+    private let homeTeamView = BasketballMatchScoreHeaderTeamView()
+    private let awayTeamView = BasketballMatchScoreHeaderTeamView()
 
     private let homeScoreLabel: UILabel = {
         let label = UILabel()
@@ -66,7 +65,7 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
 
     private let awayScoreLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .title2)
+        label.font = .preferredFont(forTextStyle: .title1)
         label.textColor = .primaryLabel
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
@@ -100,7 +99,7 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         awayTeamView.prepareForReuse()
     }
 
-    func configure(with viewData: SoccerMatchDetailHeaderViewData) {
+    func configure(with viewData: BasketballMatchDetailHeaderViewData) {
         statusLabel.text = viewData.statusText
         homeScoreLabel.text = viewData.homeScoreText
         awayScoreLabel.text = viewData.awayScoreText
@@ -158,7 +157,7 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         }
     }
 
-    private func applyStatusStyle(_ style: SoccerMatchDetailHeaderStatusStyle) {
+    private func applyStatusStyle(_ style: BasketballMatchDetailHeaderStatusStyle) {
         switch style {
         case .live:
             statusContainerView.backgroundColor = .systemRed.withAlphaComponent(0.18)
@@ -179,7 +178,7 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
     }
 }
 
-private final class SoccerMatchScoreHeaderTeamView: UIView {
+private final class BasketballMatchScoreHeaderTeamView: UIView {
 
     private enum LayoutMetric {
         static let spacing: CGFloat = 8

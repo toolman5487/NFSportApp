@@ -74,6 +74,36 @@ struct MainSportTabBarConfigurationBuilder: TabBarConfigurationBuilding {
             fatalError("Unexpected non-main-sport tab in MainSportTabBarConfigurationBuilder")
         }
 
+        let makeMatchDetailViewController: ((Int) -> UIViewController) = { gameID in
+            switch selectedSport.id {
+            case "basketball":
+                let detailService = BasketballMatchDetailService(networkClient: sportScopedNetworkClient)
+                let detailViewModel = BasketballMatchDetailViewModel(
+                    gameID: gameID,
+                    detailService: detailService
+                )
+                return BasketballMatchDetailViewController(viewModel: detailViewModel)
+
+            case "baseball", "football", "hockey", "volleyball", "handball", "rugby":
+                return PlaceholderViewController(
+                    title: "\(selectedSport.title) Match Detail",
+                    tabBarItemConfiguration: TabBarItemConfiguration(
+                        title: selectedSport.title,
+                        systemImageName: selectedSport.systemImageName
+                    )
+                )
+
+            default:
+                return PlaceholderViewController(
+                    title: "\(selectedSport.title) Match Detail",
+                    tabBarItemConfiguration: TabBarItemConfiguration(
+                        title: selectedSport.title,
+                        systemImageName: selectedSport.systemImageName
+                    )
+                )
+            }
+        }
+
         switch mainSportTab {
         case .home:
             let homeService = MainHomeService(networkClient: sportScopedNetworkClient)
@@ -83,6 +113,7 @@ struct MainSportTabBarConfigurationBuilder: TabBarConfigurationBuilding {
             )
             let homeViewController = MainHomeViewController(viewModel: homeViewModel)
             homeViewController.onSportSelectionRequested = onSportSelectionRequested
+            homeViewController.makeMatchDetailViewController = makeMatchDetailViewController
             return homeViewController
 
         case .matches:
@@ -93,6 +124,7 @@ struct MainSportTabBarConfigurationBuilder: TabBarConfigurationBuilding {
             )
             let matchesViewController = MainMatchesViewController(viewModel: matchesViewModel)
             matchesViewController.onSportSelectionRequested = onSportSelectionRequested
+            matchesViewController.makeMatchDetailViewController = makeMatchDetailViewController
             return matchesViewController
 
         case .search:

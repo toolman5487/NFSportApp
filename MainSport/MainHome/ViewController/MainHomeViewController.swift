@@ -32,6 +32,7 @@ final class MainHomeViewController: MainBaseViewController, TabBarRootViewContro
     private let navigationTitleView = MainHomeNavigationTitleView()
     private var screenTitle: String
     private var sections: [MainHomeContentSectionViewData] = []
+    var makeMatchDetailViewController: ((Int) -> UIViewController)?
 
     var tabBarItemConfiguration: TabBarItemConfiguration {
         TabBarItemConfiguration(
@@ -332,6 +333,19 @@ final class MainHomeViewController: MainBaseViewController, TabBarRootViewContro
     }
 
     // MARK: - Supplementary Views
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        guard case .some(.league(let sectionViewData)) = sectionViewData(at: indexPath.section),
+              sectionViewData.items.indices.contains(indexPath.item),
+              let detailViewController = makeMatchDetailViewController?(sectionViewData.items[indexPath.item].id) else {
+            return
+        }
+
+        navigationController?.pushViewController(detailViewController, animated: true)
+    }
 
     func collectionView(
         _ collectionView: UICollectionView,

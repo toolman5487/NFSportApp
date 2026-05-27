@@ -34,7 +34,6 @@ nonisolated struct SoccerMatchDetailHeaderViewData: Equatable, Sendable {
     let statusText: String
     let statusStyle: SoccerMatchDetailHeaderStatusStyle
     let timeText: String
-    let venueText: String?
     let homeTeamName: String
     let homeTeamLogoURL: URL?
     let awayTeamName: String

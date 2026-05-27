@@ -30,6 +30,7 @@ final class MainMatchesViewController: MainBaseViewController, TabBarRootViewCon
     private let viewModel: MainMatchesViewModel
     private var screenTitle: String
     private var sections: [MainMatchesContentSectionViewData] = []
+    var makeMatchDetailViewController: ((Int) -> UIViewController)?
 
     var tabBarItemConfiguration: TabBarItemConfiguration {
         TabBarItemConfiguration(
@@ -285,6 +286,19 @@ final class MainMatchesViewController: MainBaseViewController, TabBarRootViewCon
         case .none:
             return UICollectionViewCell()
         }
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        guard case .some(.scheduleGroup(let groupViewData)) = sectionViewData(at: indexPath.section),
+              groupViewData.items.indices.contains(indexPath.item),
+              let detailViewController = makeMatchDetailViewController?(groupViewData.items[indexPath.item].id) else {
+            return
+        }
+
+        navigationController?.pushViewController(detailViewController, animated: true)
     }
 
 }

@@ -121,7 +121,6 @@ final class SoccerMatchDetailViewModel {
                 from: fixture.scheduledStartDate,
                 fallback: fixture.scheduledStartText ?? "TBD"
             ),
-            venueText: makeVenueText(from: fixture),
             homeTeamName: fixture.homeTeam.name,
             homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
@@ -322,23 +321,4 @@ final class SoccerMatchDetailViewModel {
         return formatter.string(from: date)
     }
 
-    private func makeVenueText(from fixture: SoccerMatchFixtureDetail) -> String? {
-        let components: [String] = [
-            fixture.venueName?.trimmingCharacters(in: .whitespacesAndNewlines),
-            fixture.venueCity?.trimmingCharacters(in: .whitespacesAndNewlines)
-        ].compactMap { component in
-            guard let component,
-                  !component.isEmpty else {
-                return nil
-            }
-
-            return component
-        }
-
-        guard !components.isEmpty else {
-            return nil
-        }
-
-        return components.joined(separator: " · ")
-    }
 }
