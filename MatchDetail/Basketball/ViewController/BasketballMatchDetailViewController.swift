@@ -74,7 +74,9 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
         switch sectionViewData(at: sectionIndex) {
         case .some(.header):
             return makeListSectionLayout(
-                itemHeight: .estimated(LayoutMetric.estimatedHeaderHeight)
+                itemHeight: .estimated(LayoutMetric.estimatedHeaderHeight),
+                contentInsets: .zero,
+                interGroupSpacing: 0
             )
 
         case .none:

@@ -18,29 +18,10 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
     private enum LayoutMetric {
         static let cardCornerRadius: CGFloat = 12
         static let contentInset: CGFloat = 16
-        static let headerSpacing: CGFloat = 12
         static let compactSpacing: CGFloat = 8
         static let teamSpacing: CGFloat = 12
-        static let statusHorizontalInset: CGFloat = 8
-        static let statusVerticalInset: CGFloat = 4
-        static let teamLogoSize: CGFloat = 40
         static let scoreWidth: CGFloat = 88
     }
-
-    private let statusContainerView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 6
-        view.layer.masksToBounds = true
-        return view
-    }()
-
-    private let statusLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 1
-        return label
-    }()
 
     private let homeTeamView = SoccerMatchScoreHeaderTeamView()
     private let awayTeamView = SoccerMatchScoreHeaderTeamView()
@@ -93,7 +74,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        statusLabel.text = nil
         homeScoreLabel.text = nil
         awayScoreLabel.text = nil
         homeTeamView.prepareForReuse()
@@ -101,7 +81,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
     }
 
     func configure(with viewData: SoccerMatchDetailHeaderViewData) {
-        statusLabel.text = viewData.statusText
         homeScoreLabel.text = viewData.homeScoreText
         awayScoreLabel.text = viewData.awayScoreText
         homeTeamView.configure(
@@ -112,8 +91,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
             teamName: viewData.awayTeamName,
             logoURL: viewData.awayTeamLogoURL
         )
-
-        applyStatusStyle(viewData.statusStyle)
     }
 
     private func setupView() {
@@ -122,26 +99,12 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         contentView.layer.cornerRadius = LayoutMetric.cardCornerRadius
         contentView.layer.masksToBounds = true
 
-        contentView.addSubview(statusContainerView)
-        statusContainerView.addSubview(statusLabel)
-
         contentView.addSubview(homeTeamView)
         contentView.addSubview(scoreStackView)
         contentView.addSubview(awayTeamView)
 
-        statusContainerView.snp.makeConstraints { make in
-            make.top.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
-        }
-
-        statusLabel.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(LayoutMetric.statusVerticalInset)
-            make.leading.trailing.equalToSuperview().inset(LayoutMetric.statusHorizontalInset)
-        }
-
         homeTeamView.snp.makeConstraints { make in
-            make.top.equalTo(statusContainerView.snp.bottom).offset(LayoutMetric.headerSpacing)
-            make.leading.equalToSuperview().inset(LayoutMetric.contentInset)
-            make.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.top.leading.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
         }
 
         scoreStackView.snp.makeConstraints { make in
@@ -155,26 +118,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
             make.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
             make.top.bottom.equalTo(homeTeamView)
             make.width.equalTo(homeTeamView)
-        }
-    }
-
-    private func applyStatusStyle(_ style: SoccerMatchDetailHeaderStatusStyle) {
-        switch style {
-        case .live:
-            statusContainerView.backgroundColor = .systemRed.withAlphaComponent(0.18)
-            statusLabel.textColor = .systemRed
-
-        case .final:
-            statusContainerView.backgroundColor = .secondaryLabelColor.withAlphaComponent(0.16)
-            statusLabel.textColor = .secondaryLabelColor
-
-        case .upcoming:
-            statusContainerView.backgroundColor = .systemBlue.withAlphaComponent(0.18)
-            statusLabel.textColor = .systemBlue
-
-        case .neutral:
-            statusContainerView.backgroundColor = .tertiarySystemFill
-            statusLabel.textColor = .secondaryLabelColor
         }
     }
 }

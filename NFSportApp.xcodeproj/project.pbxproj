@@ -695,19 +695,18 @@
 				15A1EE572FC6DA10001F9FBC /* Model */,
 				15A1EE5B2FC6DA20001F9FBC /* Service */,
 				15A1EE582FC6DA10001F9FBC /* View */,
-				15A1EE592FC6DA10001F9FBC /* ViewModel */,
 				15A1EE4A2FC6D974001F9FBC /* ViewController */,
+				15A1EE592FC6DA10001F9FBC /* ViewModel */,
 			);
 			path = Basketball;
 			sourceTree = "<group>";
 		};
-		15A1EE5B2FC6DA20001F9FBC /* Service */ = {
+		15A1EE4A2FC6D974001F9FBC /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				15A1EE572FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift */,
-				15A1EE592FC6DA20001F9FBC /* BasketballMatchDetailService.swift */,
+				15A1EE4D2FC6D9BE001F9FBC /* BasketballMatchDetailViewController.swift */,
 			);
-			path = Service;
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 		15A1EE572FC6DA10001F9FBC /* Model */ = {
@@ -735,12 +734,13 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		15A1EE4A2FC6D974001F9FBC /* ViewController */ = {
+		15A1EE5B2FC6DA20001F9FBC /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				15A1EE4D2FC6D9BE001F9FBC /* BasketballMatchDetailViewController.swift */,
+				15A1EE572FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift */,
+				15A1EE592FC6DA20001F9FBC /* BasketballMatchDetailService.swift */,
 			);
-			path = ViewController;
+			path = Service;
 			sourceTree = "<group>";
 		};
 		15C927DC2FC43D60000820EE /* ViewController */ = {
