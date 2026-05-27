@@ -27,23 +27,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         static let scoreWidth: CGFloat = 88
     }
 
-    private let leagueLogoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.isHidden = true
-        return imageView
-    }()
-
-    private let leagueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .secondaryLabelColor
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 2
-        return label
-    }()
-
     private let statusContainerView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 6
@@ -56,16 +39,6 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
         label.font = .preferredFont(forTextStyle: .caption1)
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 1
-        return label
-    }()
-
-    private let timeLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
-        label.textColor = .primaryLabel
-        label.textAlignment = .center
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 0
         return label
     }()
 
@@ -130,12 +103,7 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        leagueLogoImageView.sd_cancelCurrentImageLoad()
-        leagueLogoImageView.image = nil
-        leagueLogoImageView.isHidden = true
-        leagueLabel.text = nil
         statusLabel.text = nil
-        timeLabel.text = nil
         venueLabel.text = nil
         homeScoreLabel.text = nil
         awayScoreLabel.text = nil
@@ -144,9 +112,7 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
     }
 
     func configure(with viewData: SoccerMatchDetailHeaderViewData) {
-        leagueLabel.text = viewData.leagueName
         statusLabel.text = viewData.statusText
-        timeLabel.text = viewData.timeText
         venueLabel.text = viewData.venueText
         venueLabel.isHidden = viewData.venueText == nil
         homeScoreLabel.text = viewData.homeScoreText
@@ -160,55 +126,25 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
             logoURL: viewData.awayTeamLogoURL
         )
 
-        if let leagueLogoURL = viewData.leagueLogoURL {
-            leagueLogoImageView.sd_setImage(with: leagueLogoURL)
-            leagueLogoImageView.isHidden = false
-        } else {
-            leagueLogoImageView.sd_cancelCurrentImageLoad()
-            leagueLogoImageView.image = nil
-            leagueLogoImageView.isHidden = true
-        }
-
         applyStatusStyle(viewData.statusStyle)
     }
 
     private func setupView() {
-        contentView.backgroundColor = .secondaryBackgroundColor
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
         contentView.layer.cornerRadius = LayoutMetric.cardCornerRadius
         contentView.layer.masksToBounds = true
 
-        let leagueRow = UIStackView(arrangedSubviews: [leagueLogoImageView, leagueLabel])
-        leagueRow.axis = .horizontal
-        leagueRow.alignment = .center
-        leagueRow.spacing = LayoutMetric.compactSpacing
-
-        let topRow = UIView()
-        contentView.addSubview(topRow)
-        topRow.addSubview(leagueRow)
-        topRow.addSubview(statusContainerView)
+        contentView.addSubview(statusContainerView)
         statusContainerView.addSubview(statusLabel)
 
-        contentView.addSubview(timeLabel)
         contentView.addSubview(venueLabel)
         contentView.addSubview(homeTeamView)
         contentView.addSubview(scoreStackView)
         contentView.addSubview(awayTeamView)
 
-        leagueLogoImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(20)
-        }
-
-        topRow.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
-        }
-
-        leagueRow.snp.makeConstraints { make in
-            make.top.leading.bottom.equalToSuperview()
-            make.trailing.lessThanOrEqualTo(statusContainerView.snp.leading).offset(-LayoutMetric.compactSpacing)
-        }
-
         statusContainerView.snp.makeConstraints { make in
-            make.top.trailing.bottom.equalToSuperview()
+            make.top.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
         }
 
         statusLabel.snp.makeConstraints { make in
@@ -216,13 +152,8 @@ final class SoccerMatchScoreHeaderCell: UICollectionViewCell {
             make.leading.trailing.equalToSuperview().inset(LayoutMetric.statusHorizontalInset)
         }
 
-        timeLabel.snp.makeConstraints { make in
-            make.top.equalTo(topRow.snp.bottom).offset(LayoutMetric.headerSpacing)
-            make.leading.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
-        }
-
         venueLabel.snp.makeConstraints { make in
-            make.top.equalTo(timeLabel.snp.bottom).offset(LayoutMetric.compactSpacing)
+            make.top.equalTo(statusContainerView.snp.bottom).offset(LayoutMetric.headerSpacing)
             make.leading.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
         }
 
