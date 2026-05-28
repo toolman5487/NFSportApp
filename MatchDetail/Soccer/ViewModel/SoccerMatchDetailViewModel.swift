@@ -22,6 +22,8 @@ nonisolated enum SoccerMatchDetailViewState: Equatable, Sendable {
 @MainActor
 final class SoccerMatchDetailViewModel {
 
+    // MARK: - Constants
+
     private enum Constant {
         static let preferredStatisticOrder: [String] = [
             "Ball Possession",
@@ -42,6 +44,8 @@ final class SoccerMatchDetailViewModel {
             "Passes %"
         ]
     }
+
+    // MARK: - Properties
 
     private(set) var state: SoccerMatchDetailViewState = .idle {
         didSet {
@@ -64,6 +68,8 @@ final class SoccerMatchDetailViewModel {
         return calendar
     }()
 
+    // MARK: - Initialization
+
     init(
         fixtureID: Int,
         detailService: SoccerMatchDetailServicing
@@ -71,6 +77,8 @@ final class SoccerMatchDetailViewModel {
         self.fixtureID = fixtureID
         self.detailService = detailService
     }
+
+    // MARK: - Actions
 
     func loadMatchDetail() async {
         state = .loading
@@ -87,6 +95,8 @@ final class SoccerMatchDetailViewModel {
             )
         }
     }
+
+    // MARK: - Presentation Builders
 
     private func makePresentation(from detail: SoccerMatchDetail) -> SoccerMatchDetailPresentation {
         var sections: [SoccerMatchDetailSectionViewData] = [
@@ -112,11 +122,18 @@ final class SoccerMatchDetailViewModel {
     }
 
     private func makeHeaderViewData(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailHeaderViewData {
-        SoccerMatchDetailHeaderViewData(
+        let statusStyle = makeStatusStyle(from: fixture)
+        let statusText = makeStatusText(from: fixture)
+
+        return SoccerMatchDetailHeaderViewData(
             leagueName: fixture.leagueName,
             leagueLogoURL: fixture.leagueLogoURL,
-            statusText: makeStatusText(from: fixture),
-            statusStyle: makeStatusStyle(from: fixture),
+            statusText: statusText,
+            statusStyle: statusStyle,
+            navigationBadgeViewData: makeNavigationBadgeViewData(
+                text: statusText,
+                statusStyle: statusStyle
+            ),
             timeText: makeTimeText(
                 from: fixture.scheduledStartDate,
                 fallback: fixture.scheduledStartText ?? "TBD"
@@ -130,6 +147,39 @@ final class SoccerMatchDetailViewModel {
             venue: makeVenueSection(from: fixture)
         )
     }
+
+    // MARK: - Navigation Badge
+
+    private func makeNavigationStatusStyle(
+        from statusStyle: SoccerMatchDetailHeaderStatusStyle
+    ) -> MatchDetailNavigationStatusStyle {
+        switch statusStyle {
+        case .live:
+            return .live
+        case .final:
+            return .final
+        case .upcoming:
+            return .upcoming
+        case .postponed:
+            return .postponed
+        case .cancelled:
+            return .cancelled
+        case .neutral:
+            return .neutral
+        }
+    }
+
+    private func makeNavigationBadgeViewData(
+        text: String,
+        statusStyle: SoccerMatchDetailHeaderStatusStyle
+    ) -> MatchDetailNavigationBadgeViewData {
+        MatchDetailNavigationBadgeViewData(
+            text: text,
+            style: makeNavigationStatusStyle(from: statusStyle)
+        )
+    }
+
+    // MARK: - Section Builders
 
     private func makeStatisticsSection(from detail: SoccerMatchDetail) -> SoccerMatchDetailStatisticsSectionViewData? {
         guard let homeStatistics = detail.statistics.first(where: { matchesTeam($0.team, detail.fixture.homeTeam) }),
@@ -270,6 +320,8 @@ final class SoccerMatchDetailViewModel {
         )
     }
 
+    // MARK: - Team Matching
+
     private func matchesTeam(_ lhs: SoccerMatchTeam, _ rhs: SoccerMatchTeam) -> Bool {
         if let lhsID = lhs.teamID,
            let rhsID = rhs.teamID {
@@ -278,6 +330,8 @@ final class SoccerMatchDetailViewModel {
 
         return lhs.name == rhs.name
     }
+
+    // MARK: - Status Mapping
 
     private func makeStatusText(from fixture: SoccerMatchFixtureDetail) -> String {
         let statusShort = fixture.statusShort?.lowercased()
@@ -380,6 +434,8 @@ final class SoccerMatchDetailViewModel {
             return .neutral
         }
     }
+
+    // MARK: - Helpers
 
     private func makeTimeText(from date: Date?, fallback: String) -> String {
         guard let date else {

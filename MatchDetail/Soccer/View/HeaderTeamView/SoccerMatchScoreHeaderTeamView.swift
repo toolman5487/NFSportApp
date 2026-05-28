@@ -9,12 +9,18 @@ import SDWebImage
 import SnapKit
 import UIKit
 
+// MARK: - SoccerMatchScoreHeaderTeamView
+
 final class SoccerMatchScoreHeaderTeamView: UIView {
+
+    // MARK: - Layout Metrics
 
     private enum LayoutMetric {
         static let spacing: CGFloat = 8
         static let logoSize: CGFloat = 40
     }
+
+    // MARK: - UI Components
 
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -34,6 +40,8 @@ final class SoccerMatchScoreHeaderTeamView: UIView {
         return label
     }()
 
+    // MARK: - Initialization
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -42,6 +50,8 @@ final class SoccerMatchScoreHeaderTeamView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Configuration
 
     func prepareForReuse() {
         logoImageView.sd_cancelCurrentImageLoad()
@@ -62,6 +72,8 @@ final class SoccerMatchScoreHeaderTeamView: UIView {
             logoImageView.isHidden = true
         }
     }
+
+    // MARK: - Setup
 
     private func setupView() {
         let stackView = UIStackView(arrangedSubviews: [logoImageView, teamNameLabel])

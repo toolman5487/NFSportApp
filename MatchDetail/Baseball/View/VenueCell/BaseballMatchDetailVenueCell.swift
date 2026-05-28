@@ -7,6 +7,8 @@
 
 import UIKit
 
+// MARK: - BaseballMatchDetailVenueCell
+
 final class BaseballMatchDetailVenueCell: MatchBaseVenueCell {
 
     static let reuseIdentifier = "BaseballMatchDetailVenueCell"

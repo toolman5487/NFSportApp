@@ -11,16 +11,22 @@ import UIKit
 @MainActor
 final class BaseballMatchDetailViewController: MatchBaseViewController {
 
+    // MARK: - Layout Metrics
+
     private enum LayoutMetric {
-        static let estimatedHeaderHeight: CGFloat = 300
+        static let estimatedHeaderHeight: CGFloat = 360
         static let estimatedVenueHeight: CGFloat = 96
     }
+
+    // MARK: - Properties
 
     private let viewModel: BaseballMatchDetailViewModel
     private let navigationTitleView = MatchDetailNavigationTitleView()
     private var screenTitle: String
     private var headerViewData: BaseballMatchDetailHeaderViewData?
     private var sections: [BaseballMatchDetailSectionViewData] = []
+
+    // MARK: - Initialization
 
     init(viewModel: BaseballMatchDetailViewModel) {
         self.viewModel = viewModel
@@ -31,6 +37,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Setup
 
     override func setupMatchNavigation() {
         title = screenTitle
@@ -63,6 +71,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         }
     }
 
+    // MARK: - UICollectionViewDataSource
+
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         sections.count
     }
@@ -76,6 +86,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             return 0
         }
     }
+
+    // MARK: - Layout
 
     override func makeSectionLayout(
         for sectionIndex: Int,
@@ -95,7 +107,6 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            header.pinToVisibleBounds = true
             section.boundarySupplementaryItems = [header]
             return section
 
@@ -125,6 +136,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         }
     }
 
+    // MARK: - Supplementary Views
+
     func collectionView(
         _ collectionView: UICollectionView,
         viewForSupplementaryElementOfKind kind: String,
@@ -151,6 +164,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             return UICollectionReusableView()
         }
     }
+
+    // MARK: - Rendering
 
     private func render(_ state: BaseballMatchDetailViewState) {
         switch state {
@@ -188,6 +203,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         }
     }
 
+    // MARK: - Navigation Title
+
     private func updateNavigationTitle() {
         guard isScrolledAwayFromTop,
               let headerViewData else {
@@ -201,27 +218,13 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             leadingScoreText: headerViewData.homeScoreText,
             trailingLogoURL: headerViewData.awayTeamLogoURL,
             trailingScoreText: headerViewData.awayScoreText,
-            statusText: headerViewData.statusText,
-            statusStyle: navigationStatusStyle(from: headerViewData.statusStyle)
+            navigationBadgeViewData: headerViewData.navigationBadgeViewData
         )
         navigationItem.title = nil
         navigationItem.titleView = navigationTitleView
     }
 
-    private func navigationStatusStyle(
-        from style: BaseballMatchDetailHeaderStatusStyle
-    ) -> MatchDetailNavigationStatusStyle {
-        switch style {
-        case .live:
-            return .live
-        case .final:
-            return .final
-        case .upcoming:
-            return .upcoming
-        case .neutral:
-            return .neutral
-        }
-    }
+    // MARK: - Section Access
 
     private func sectionViewData(at index: Int) -> BaseballMatchDetailSectionViewData? {
         guard sections.indices.contains(index) else {
@@ -230,6 +233,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
 
         return sections[index]
     }
+
+    // MARK: - UIScrollViewDelegate
 
     override func handleMatchScrollDidScroll(_ scrollView: UIScrollView) {
         updateNavigationTitle()

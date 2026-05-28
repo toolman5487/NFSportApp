@@ -12,7 +12,11 @@ import UIKit
 
 final class SoccerMatchScoreHeaderView: UICollectionReusableView {
 
+    // MARK: - Constants
+
     static let reuseIdentifier = "SoccerMatchScoreHeaderView"
+
+    // MARK: - Layout Metrics
 
     private enum LayoutMetric {
         static let contentInset: CGFloat = 16
@@ -21,6 +25,8 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
         static let minimumScoreWidth: CGFloat = 120
         static let minimumScoreLabelWidth: CGFloat = 44
     }
+
+    // MARK: - UI Components
 
     private let homeTeamView = SoccerMatchScoreHeaderTeamView()
     private let awayTeamView = SoccerMatchScoreHeaderTeamView()
@@ -62,6 +68,8 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
         return stackView
     }()
 
+    // MARK: - Initialization
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -70,6 +78,8 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Configuration
 
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -91,6 +101,8 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
             logoURL: viewData.awayTeamLogoURL
         )
     }
+
+    // MARK: - Setup
 
     private func setupView() {
         backgroundColor = .systemBackground

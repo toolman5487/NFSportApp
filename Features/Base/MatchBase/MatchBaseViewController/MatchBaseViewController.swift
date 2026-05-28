@@ -9,6 +9,8 @@ import SDWebImage
 import SnapKit
 import UIKit
 
+// MARK: - MatchBaseViewController
+
 @MainActor
 class MatchBaseViewController: BaseViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
@@ -153,6 +155,8 @@ extension MatchBaseViewController {
 @MainActor
 final class MatchDetailNavigationTitleView: UIView {
 
+    // MARK: - Layout Metrics
+
     private enum LayoutMetric {
         static let logoSize: CGFloat = 20
         static let spacing: CGFloat = 8
@@ -160,6 +164,8 @@ final class MatchDetailNavigationTitleView: UIView {
         static let badgeVerticalInset: CGFloat = 6
         static let badgeCornerRadius: CGFloat = 10
     }
+
+    // MARK: - UI Components
 
     private let leadingLogoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -226,6 +232,8 @@ final class MatchDetailNavigationTitleView: UIView {
         return stackView
     }()
 
+    // MARK: - Initialization
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -234,6 +242,8 @@ final class MatchDetailNavigationTitleView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Configuration
 
     func configure(
         leadingLogoURL: URL?,
@@ -245,8 +255,7 @@ final class MatchDetailNavigationTitleView: UIView {
             leadingScoreText: leadingScoreText,
             trailingLogoURL: trailingLogoURL,
             trailingScoreText: "-",
-            statusText: nil,
-            statusStyle: nil
+            navigationBadgeViewData: nil
         )
     }
 
@@ -255,15 +264,16 @@ final class MatchDetailNavigationTitleView: UIView {
         leadingScoreText: String,
         trailingLogoURL: URL?,
         trailingScoreText: String,
-        statusText: String?,
-        statusStyle: MatchDetailNavigationStatusStyle?
+        navigationBadgeViewData: MatchDetailNavigationBadgeViewData?
     ) {
         leadingScoreLabel.text = leadingScoreText
         trailingScoreLabel.text = trailingScoreText
         configureLogoImageView(leadingLogoImageView, with: leadingLogoURL)
         configureLogoImageView(trailingLogoImageView, with: trailingLogoURL)
-        configureStatus(text: statusText, style: statusStyle)
+        configureStatus(with: navigationBadgeViewData)
     }
+
+    // MARK: - Private Methods
 
     private func configureLogoImageView(_ imageView: UIImageView, with logoURL: URL?) {
         let fallbackImage = UIImage(systemName: "sportscourt")?.withRenderingMode(.alwaysTemplate)
@@ -277,6 +287,8 @@ final class MatchDetailNavigationTitleView: UIView {
             imageView.image = fallbackImage
         }
     }
+
+    // MARK: - Setup
 
     private func setupView() {
         statusContainerView.addSubview(statusLabel)
@@ -304,17 +316,17 @@ final class MatchDetailNavigationTitleView: UIView {
         }
     }
 
-    private func configureStatus(text: String?, style: MatchDetailNavigationStatusStyle?) {
-        guard let text,
-              !text.isEmpty,
-              let style else {
+    // MARK: - Status Style
+
+    private func configureStatus(with navigationBadgeViewData: MatchDetailNavigationBadgeViewData?) {
+        guard let navigationBadgeViewData else {
             statusLabel.text = nil
             statusContainerView.isHidden = true
             return
         }
 
-        statusLabel.text = text
-        applyStatusStyle(style)
+        statusLabel.text = navigationBadgeViewData.text
+        applyStatusStyle(navigationBadgeViewData.style)
         statusContainerView.isHidden = false
     }
 
@@ -349,4 +361,9 @@ nonisolated enum MatchDetailNavigationStatusStyle: Equatable, Sendable {
     case postponed
     case cancelled
     case neutral
+}
+
+nonisolated struct MatchDetailNavigationBadgeViewData: Equatable, Sendable {
+    let text: String
+    let style: MatchDetailNavigationStatusStyle
 }

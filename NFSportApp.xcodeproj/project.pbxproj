@@ -995,15 +995,6 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		15EBBC572FC8220000F3083A /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				15EBBC552FC8220000F3083A /* BaseballMatchDetailEndpoint.swift */,
-				15EBBC562FC8220000F3083A /* BaseballMatchDetailService.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
 		15EBBC502FC8210000F3083A /* HeaderTeamView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1019,6 +1010,15 @@
 				15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueCell.swift */,
 			);
 			path = VenueCell;
+			sourceTree = "<group>";
+		};
+		15EBBC572FC8220000F3083A /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				15EBBC552FC8220000F3083A /* BaseballMatchDetailEndpoint.swift */,
+				15EBBC562FC8220000F3083A /* BaseballMatchDetailService.swift */,
+			);
+			path = Service;
 			sourceTree = "<group>";
 		};
 		15EBDF322FC7F18F00F3083A /* HeaderTeamView */ = {

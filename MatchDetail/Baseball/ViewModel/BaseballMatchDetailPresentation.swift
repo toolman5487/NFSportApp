@@ -30,6 +30,7 @@ nonisolated struct BaseballMatchDetailHeaderViewData: Equatable, Sendable {
     let leagueLogoURL: URL?
     let statusText: String
     let statusStyle: BaseballMatchDetailHeaderStatusStyle
+    let navigationBadgeViewData: MatchDetailNavigationBadgeViewData
     let timeText: String
     let homeTeamName: String
     let homeTeamLogoURL: URL?

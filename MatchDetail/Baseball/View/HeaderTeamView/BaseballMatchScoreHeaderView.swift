@@ -8,9 +8,15 @@
 import SnapKit
 import UIKit
 
+// MARK: - BaseballMatchScoreHeaderView
+
 final class BaseballMatchScoreHeaderView: UICollectionReusableView {
 
+    // MARK: - Constants
+
     static let reuseIdentifier = "BaseballMatchScoreHeaderView"
+
+    // MARK: - Layout Metrics
 
     private enum LayoutMetric {
         static let contentInset: CGFloat = 16
@@ -19,6 +25,8 @@ final class BaseballMatchScoreHeaderView: UICollectionReusableView {
         static let minimumScoreWidth: CGFloat = 120
         static let minimumScoreLabelWidth: CGFloat = 44
     }
+
+    // MARK: - UI Components
 
     private let homeTeamView = BaseballMatchScoreHeaderTeamView()
     private let awayTeamView = BaseballMatchScoreHeaderTeamView()
@@ -60,6 +68,8 @@ final class BaseballMatchScoreHeaderView: UICollectionReusableView {
         return stackView
     }()
 
+    // MARK: - Initialization
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -68,6 +78,8 @@ final class BaseballMatchScoreHeaderView: UICollectionReusableView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Configuration
 
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -89,6 +101,8 @@ final class BaseballMatchScoreHeaderView: UICollectionReusableView {
             logoURL: viewData.awayTeamLogoURL
         )
     }
+
+    // MARK: - Setup
 
     private func setupView() {
         backgroundColor = .systemBackground

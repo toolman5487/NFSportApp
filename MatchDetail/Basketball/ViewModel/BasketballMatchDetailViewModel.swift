@@ -22,6 +22,65 @@ nonisolated enum BasketballMatchDetailViewState: Equatable, Sendable {
 @MainActor
 final class BasketballMatchDetailViewModel {
 
+    // MARK: - Types
+
+    private enum MatchStatus: Equatable {
+        case live(quarterText: String?)
+        case scheduled
+        case tbd
+        case halfTime
+        case overtime
+        case breakTime
+        case final
+        case postponed
+        case cancelled
+        case unknown
+
+        var displayText: String {
+            switch self {
+            case .live(let quarterText):
+                return quarterText ?? "Live"
+            case .scheduled:
+                return "Scheduled"
+            case .tbd:
+                return "TBD"
+            case .halfTime:
+                return "Half Time"
+            case .overtime:
+                return "Overtime"
+            case .breakTime:
+                return "Break"
+            case .final:
+                return "Final"
+            case .postponed:
+                return "Postponed"
+            case .cancelled:
+                return "Cancelled"
+            case .unknown:
+                return "Scheduled"
+            }
+        }
+
+        var style: BasketballMatchDetailHeaderStatusStyle {
+            switch self {
+            case .live:
+                return .live
+            case .final:
+                return .final
+            case .scheduled, .tbd:
+                return .upcoming
+            case .postponed:
+                return .postponed
+            case .cancelled:
+                return .cancelled
+            case .halfTime, .overtime, .breakTime, .unknown:
+                return .neutral
+            }
+        }
+    }
+
+    // MARK: - Properties
+
     private(set) var state: BasketballMatchDetailViewState = .idle {
         didSet {
             onStateChange?(state)
@@ -43,6 +102,8 @@ final class BasketballMatchDetailViewModel {
         return calendar
     }()
 
+    // MARK: - Initialization
+
     init(
         gameID: Int,
         detailService: BasketballMatchDetailServicing
@@ -50,6 +111,8 @@ final class BasketballMatchDetailViewModel {
         self.gameID = gameID
         self.detailService = detailService
     }
+
+    // MARK: - Actions
 
     func loadMatchDetail() async {
         state = .loading
@@ -67,6 +130,8 @@ final class BasketballMatchDetailViewModel {
         }
     }
 
+    // MARK: - Presentation Builders
+
     private func makePresentation(from detail: BasketballMatchDetail) -> BasketballMatchDetailPresentation {
         let sections: [BasketballMatchDetailSectionViewData] = [
             .header(makeHeaderViewData(from: detail.fixture))
@@ -79,11 +144,18 @@ final class BasketballMatchDetailViewModel {
     }
 
     private func makeHeaderViewData(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailHeaderViewData {
-        BasketballMatchDetailHeaderViewData(
+        let statusStyle = makeStatusStyle(from: fixture)
+        let statusText = makeStatusText(from: fixture)
+
+        return BasketballMatchDetailHeaderViewData(
             leagueName: fixture.leagueName,
             leagueLogoURL: fixture.leagueLogoURL,
-            statusText: makeStatusText(from: fixture),
-            statusStyle: makeStatusStyle(from: fixture),
+            statusText: statusText,
+            statusStyle: statusStyle,
+            navigationBadgeViewData: makeNavigationBadgeViewData(
+                text: statusText,
+                statusStyle: statusStyle
+            ),
             timeText: makeTimeText(
                 from: fixture.scheduledStartDate,
                 fallback: fixture.scheduledStartText ?? "TBD"
@@ -98,93 +170,91 @@ final class BasketballMatchDetailViewModel {
         )
     }
 
+    // MARK: - Status Mapping
+
     private func makeStatusText(from fixture: BasketballMatchFixtureDetail) -> String {
-        let statusShort = fixture.statusShort?.lowercased()
-        let statusLong = fixture.statusLong?.lowercased()
-        let normalizedStatus = statusShort ?? statusLong
-
-        if let normalizedStatus,
-           isLiveStatus(normalizedStatus) {
-            if let quarterText = makeQuarterText(from: normalizedStatus) {
-                return quarterText
-            }
-
-            return "Live"
-        }
-
-        guard let normalizedStatus else {
-            return "Scheduled"
-        }
-
-        switch normalizedStatus {
-        case "ns", "not started":
-            return "Scheduled"
-        case "tbd":
-            return "TBD"
-        case "ht", "half time":
-            return "Half Time"
-        case "ot", "overtime":
-            return "Overtime"
-        case "bt", "break time":
-            return "Break"
-        case "ft", "aot", "after overtime", "final":
-            return "Final"
-        case "pst", "postponed":
-            return "Postponed"
-        case "canc", "cancelled", "abd", "abandoned", "susp", "suspended":
-            return "Cancelled"
-        default:
-            if let statusLong,
+        let matchStatus = makeMatchStatus(from: fixture)
+        if case .unknown = matchStatus {
+            if let statusLong = fixture.statusLong,
                !statusLong.isEmpty {
-                return fixture.statusLong ?? "Scheduled"
+                return statusLong
             }
 
             return fixture.statusShort ?? "Scheduled"
         }
+
+        return matchStatus.displayText
     }
 
     private func makeStatusStyle(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailHeaderStatusStyle {
-        let normalizedStatus = fixture.statusShort?.lowercased() ?? fixture.statusLong?.lowercased()
+        makeMatchStatus(from: fixture).style
+    }
 
-        guard let normalizedStatus else {
-            return .neutral
-        }
+    // MARK: - Navigation Badge
 
-        if isLiveStatus(normalizedStatus) {
+    private func makeNavigationBadgeViewData(
+        text: String,
+        statusStyle: BasketballMatchDetailHeaderStatusStyle
+    ) -> MatchDetailNavigationBadgeViewData {
+        MatchDetailNavigationBadgeViewData(
+            text: text,
+            style: makeNavigationStatusStyle(from: statusStyle)
+        )
+    }
+
+    private func makeNavigationStatusStyle(
+        from statusStyle: BasketballMatchDetailHeaderStatusStyle
+    ) -> MatchDetailNavigationStatusStyle {
+        switch statusStyle {
+        case .live:
             return .live
-        }
-
-        switch normalizedStatus {
-        case let status where status.contains("ft")
-            || status.contains("aot")
-            || status.contains("finish")
-            || status.contains("final")
-            || status.contains("ended")
-            || status.contains("after"):
+        case .final:
             return .final
-
-        case let status where status.contains("ns")
-            || status.contains("scheduled")
-            || status.contains("not started")
-            || status.contains("tbd"):
+        case .upcoming:
             return .upcoming
-
-        case let status where status.contains("postponed")
-            || status == "pst":
+        case .postponed:
             return .postponed
-
-        case let status where status.contains("cancel")
-            || status.contains("abandoned")
-            || status.contains("suspended")
-            || status == "abd"
-            || status == "canc"
-            || status == "susp":
+        case .cancelled:
             return .cancelled
-
-        default:
+        case .neutral:
             return .neutral
         }
     }
+
+    // MARK: - Match Status Parsing
+
+    private func makeMatchStatus(from fixture: BasketballMatchFixtureDetail) -> MatchStatus {
+        guard let normalizedStatus = fixture.statusShort?.lowercased() ?? fixture.statusLong?.lowercased() else {
+            return .unknown
+        }
+
+        if isLiveStatus(normalizedStatus) {
+            return .live(quarterText: makeQuarterText(from: normalizedStatus))
+        }
+
+        switch normalizedStatus {
+        case "ns", "not started":
+            return .scheduled
+        case "tbd":
+            return .tbd
+        case "ht", "half time":
+            return .halfTime
+        case "ot", "overtime":
+            return .overtime
+        case "bt", "break time":
+            return .breakTime
+        case "ft", "aot", "after overtime", "final":
+            return .final
+        case "pst", "postponed":
+            return .postponed
+        case "canc", "cancelled", "abd", "abandoned", "susp", "suspended":
+            return .cancelled
+        default:
+            return .unknown
+        }
+    }
+
+    // MARK: - Helpers
 
     private func isLiveStatus(_ status: String) -> Bool {
         status.contains("q1")
