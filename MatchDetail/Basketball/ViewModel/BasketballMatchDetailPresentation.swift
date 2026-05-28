@@ -37,7 +37,7 @@ nonisolated struct BasketballMatchDetailHeaderViewData: Equatable, Sendable {
     let awayTeamLogoURL: URL?
     let homeScoreText: String
     let awayScoreText: String
-    let venue: BasketballMatchDetailVenueViewData
+    let venue: BasketballMatchDetailVenueViewData?
 }
 
 nonisolated enum BasketballMatchDetailHeaderStatusStyle: Equatable, Sendable {
@@ -45,6 +45,8 @@ nonisolated enum BasketballMatchDetailHeaderStatusStyle: Equatable, Sendable {
     case live
     case final
     case upcoming
+    case postponed
+    case cancelled
     case neutral
 }
 
@@ -52,6 +54,5 @@ nonisolated enum BasketballMatchDetailHeaderStatusStyle: Equatable, Sendable {
 
 nonisolated struct BasketballMatchDetailVenueViewData: Equatable, Sendable {
 
-    let title: String
     let venueText: String
 }

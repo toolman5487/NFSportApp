@@ -99,12 +99,48 @@ final class BasketballMatchDetailViewModel {
     }
 
     private func makeStatusText(from fixture: BasketballMatchFixtureDetail) -> String {
-        if let statusShort = fixture.statusShort,
-           isLiveStatus(statusShort.lowercased()) {
-            return statusShort
+        let statusShort = fixture.statusShort?.lowercased()
+        let statusLong = fixture.statusLong?.lowercased()
+        let normalizedStatus = statusShort ?? statusLong
+
+        if let normalizedStatus,
+           isLiveStatus(normalizedStatus) {
+            if let quarterText = makeQuarterText(from: normalizedStatus) {
+                return quarterText
+            }
+
+            return "Live"
         }
 
-        return fixture.statusShort ?? fixture.statusLong ?? "Scheduled"
+        guard let normalizedStatus else {
+            return "Scheduled"
+        }
+
+        switch normalizedStatus {
+        case "ns", "not started":
+            return "Scheduled"
+        case "tbd":
+            return "TBD"
+        case "ht", "half time":
+            return "Half Time"
+        case "ot", "overtime":
+            return "Overtime"
+        case "bt", "break time":
+            return "Break"
+        case "ft", "aot", "after overtime", "final":
+            return "Final"
+        case "pst", "postponed":
+            return "Postponed"
+        case "canc", "cancelled", "abd", "abandoned", "susp", "suspended":
+            return "Cancelled"
+        default:
+            if let statusLong,
+               !statusLong.isEmpty {
+                return fixture.statusLong ?? "Scheduled"
+            }
+
+            return fixture.statusShort ?? "Scheduled"
+        }
     }
 
     private func makeStatusStyle(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailHeaderStatusStyle {
@@ -133,6 +169,18 @@ final class BasketballMatchDetailViewModel {
             || status.contains("tbd"):
             return .upcoming
 
+        case let status where status.contains("postponed")
+            || status == "pst":
+            return .postponed
+
+        case let status where status.contains("cancel")
+            || status.contains("abandoned")
+            || status.contains("suspended")
+            || status == "abd"
+            || status == "canc"
+            || status == "susp":
+            return .cancelled
+
         default:
             return .neutral
         }
@@ -150,12 +198,30 @@ final class BasketballMatchDetailViewModel {
             || status.contains("half")
     }
 
-    private func makeVenueSection(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailVenueViewData {
-        let venueName = fixture.venueName?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return BasketballMatchDetailVenueViewData(
-            title: "Venue",
-            venueText: venueName?.isEmpty == false ? venueName ?? "TBD" : "TBD"
-        )
+    private func makeQuarterText(from status: String) -> String? {
+        switch status {
+        case let value where value.contains("q1"):
+            return "Q1"
+        case let value where value.contains("q2"):
+            return "Q2"
+        case let value where value.contains("q3"):
+            return "Q3"
+        case let value where value.contains("q4"):
+            return "Q4"
+        case let value where value.contains("ot"):
+            return "OT"
+        default:
+            return nil
+        }
+    }
+
+    private func makeVenueSection(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailVenueViewData? {
+        guard let venueName = fixture.venueName?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !venueName.isEmpty else {
+            return nil
+        }
+
+        return BasketballMatchDetailVenueViewData(venueText: venueName)
     }
 
     private func makeTimeText(from date: Date?, fallback: String) -> String {

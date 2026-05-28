@@ -254,16 +254,19 @@ final class SoccerMatchDetailViewModel {
         )
     }
 
-    private func makeVenueSection(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailVenueViewData {
+    private func makeVenueSection(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailVenueViewData? {
         let venueParts = [fixture.venueName, fixture.venueCity]
             .compactMap { value in
                 let trimmedValue = value?.trimmingCharacters(in: .whitespacesAndNewlines)
                 return trimmedValue?.isEmpty == false ? trimmedValue : nil
             }
 
+        guard !venueParts.isEmpty else {
+            return nil
+        }
+
         return SoccerMatchDetailVenueViewData(
-            title: "Venue",
-            venueText: venueParts.isEmpty ? "TBD" : venueParts.joined(separator: ", ")
+            venueText: venueParts.joined(separator: ", ")
         )
     }
 
@@ -277,13 +280,55 @@ final class SoccerMatchDetailViewModel {
     }
 
     private func makeStatusText(from fixture: SoccerMatchFixtureDetail) -> String {
+        let statusShort = fixture.statusShort?.lowercased()
+        let statusLong = fixture.statusLong?.lowercased()
+        let normalizedStatus = statusShort ?? statusLong
+
         if let elapsedMinute = fixture.elapsedMinute,
-           let statusShort = fixture.statusShort?.lowercased(),
-           statusShort == "1h" || statusShort == "2h" || statusShort == "et" || statusShort == "bt" || statusShort == "p" {
+           let normalizedStatus,
+           normalizedStatus == "1h"
+            || normalizedStatus == "2h"
+            || normalizedStatus == "et"
+            || normalizedStatus == "bt"
+            || normalizedStatus == "live" {
             return "\(elapsedMinute)'"
         }
 
-        return fixture.statusShort ?? fixture.statusLong ?? "Scheduled"
+        guard let normalizedStatus else {
+            return "Scheduled"
+        }
+
+        switch normalizedStatus {
+        case "ns", "not started":
+            return "Scheduled"
+        case "tbd", "time to be defined":
+            return "TBD"
+        case "1h", "2h", "live":
+            return "Live"
+        case "ht", "half time":
+            return "Half Time"
+        case "et", "extra time":
+            return "Extra Time"
+        case "bt", "break time":
+            return "Break"
+        case "p", "pen", "penalty in progress":
+            return "Penalties"
+        case "ft", "aet", "aft", "final", "match finished":
+            return "Final"
+        case "pst", "postponed":
+            return "Postponed"
+        case "canc", "cancelled", "abandoned", "abd":
+            return "Cancelled"
+        case "int", "interrupted", "susp", "suspended":
+            return "Suspended"
+        default:
+            if let statusLong,
+               !statusLong.isEmpty {
+                return fixture.statusLong ?? "Scheduled"
+            }
+
+            return fixture.statusShort ?? "Scheduled"
+        }
     }
 
     private func makeStatusStyle(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailHeaderStatusStyle {
@@ -316,6 +361,20 @@ final class SoccerMatchDetailViewModel {
             || status.contains("not started")
             || status.contains("time to be defined"):
             return .upcoming
+
+        case let status where status.contains("postponed")
+            || status == "pst":
+            return .postponed
+
+        case let status where status.contains("cancel")
+            || status.contains("abandoned")
+            || status.contains("suspended")
+            || status.contains("interrupted")
+            || status == "abd"
+            || status == "int"
+            || status == "canc"
+            || status == "susp":
+            return .cancelled
 
         default:
             return .neutral

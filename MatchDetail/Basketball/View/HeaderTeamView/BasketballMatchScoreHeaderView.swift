@@ -15,7 +15,6 @@ final class BasketballMatchScoreHeaderView: UICollectionReusableView {
     static let reuseIdentifier = "BasketballMatchScoreHeaderView"
 
     private enum LayoutMetric {
-        static let cardCornerRadius: CGFloat = 12
         static let contentInset: CGFloat = 16
         static let compactSpacing: CGFloat = 8
         static let teamSpacing: CGFloat = 12
@@ -107,11 +106,6 @@ final class BasketballMatchScoreHeaderView: UICollectionReusableView {
         addSubview(scoreStackView)
         addSubview(awayTeamView)
 
-        homeScoreLabel.snp.makeConstraints { make in
-            make.width.equalTo(awayScoreLabel)
-            make.width.greaterThanOrEqualTo(LayoutMetric.minimumScoreLabelWidth)
-        }
-
         homeTeamView.snp.makeConstraints { make in
             make.top.leading.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
         }
@@ -127,6 +121,11 @@ final class BasketballMatchScoreHeaderView: UICollectionReusableView {
             make.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
             make.top.bottom.equalTo(homeTeamView)
             make.width.equalTo(homeTeamView)
+        }
+
+        homeScoreLabel.snp.makeConstraints { make in
+            make.width.equalTo(awayScoreLabel)
+            make.width.greaterThanOrEqualTo(LayoutMetric.minimumScoreLabelWidth)
         }
     }
 }

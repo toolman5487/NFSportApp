@@ -84,7 +84,15 @@ struct MainSportTabBarConfigurationBuilder: TabBarConfigurationBuilding {
                 )
                 return BasketballMatchDetailViewController(viewModel: detailViewModel)
 
-            case "baseball", "football", "hockey", "volleyball", "handball", "rugby":
+            case "baseball":
+                let detailService = BaseballMatchDetailService(networkClient: sportScopedNetworkClient)
+                let detailViewModel = BaseballMatchDetailViewModel(
+                    gameID: gameID,
+                    detailService: detailService
+                )
+                return BaseballMatchDetailViewController(viewModel: detailViewModel)
+
+            case "football", "hockey", "volleyball", "handball", "rugby":
                 return PlaceholderViewController(
                     title: "\(selectedSport.title) Match Detail",
                     tabBarItemConfiguration: TabBarItemConfiguration(

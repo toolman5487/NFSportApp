@@ -1,27 +1,28 @@
 //
-//  SoccerMatchDetailViewController.swift
+//  BaseballMatchDetailViewController.swift
 //  NFSportApp
 //
-//  Created by Willy Hsu on 2026/5/26.
+//  Created by Willy Hsu on 2026/5/28.
 //
 
 import SnapKit
 import UIKit
 
 @MainActor
-final class SoccerMatchDetailViewController: MatchBaseViewController {
+final class BaseballMatchDetailViewController: MatchBaseViewController {
 
     private enum LayoutMetric {
         static let estimatedHeaderHeight: CGFloat = 300
+        static let estimatedVenueHeight: CGFloat = 96
     }
 
-    private let viewModel: SoccerMatchDetailViewModel
-    private var screenTitle: String
+    private let viewModel: BaseballMatchDetailViewModel
     private let navigationTitleView = MatchDetailNavigationTitleView()
-    private var headerViewData: SoccerMatchDetailHeaderViewData?
-    private var sections: [SoccerMatchDetailSectionViewData] = []
+    private var screenTitle: String
+    private var headerViewData: BaseballMatchDetailHeaderViewData?
+    private var sections: [BaseballMatchDetailSectionViewData] = []
 
-    init(viewModel: SoccerMatchDetailViewModel) {
+    init(viewModel: BaseballMatchDetailViewModel) {
         self.viewModel = viewModel
         self.screenTitle = viewModel.title
         super.init(nibName: nil, bundle: nil)
@@ -38,13 +39,13 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
     override func registerReusableViews() {
         collectionView.register(
-            SoccerMatchDetailVenueCell.self,
-            forCellWithReuseIdentifier: SoccerMatchDetailVenueCell.reuseIdentifier
+            BaseballMatchScoreHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: BaseballMatchScoreHeaderView.reuseIdentifier
         )
         collectionView.register(
-            SoccerMatchScoreHeaderView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier
+            BaseballMatchDetailVenueCell.self,
+            forCellWithReuseIdentifier: BaseballMatchDetailVenueCell.reuseIdentifier
         )
     }
 
@@ -71,7 +72,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.header(let viewData)):
             return viewData.venue == nil ? 0 : 1
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .none:
             return 0
         }
     }
@@ -83,14 +84,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         switch sectionViewData(at: sectionIndex) {
         case .some(.header):
             let section = makeListSectionLayout(
-                itemHeight: .estimated(88),
-                contentInsets: NSDirectionalEdgeInsets(
-                    top: 0,
-                    leading: 16,
-                    bottom: 16,
-                    trailing: 16
-                ),
-                interGroupSpacing: 0
+                itemHeight: .estimated(LayoutMetric.estimatedVenueHeight)
             )
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
@@ -105,7 +99,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             section.boundarySupplementaryItems = [header]
             return section
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .none:
             return makeListSectionLayout()
         }
     }
@@ -118,16 +112,15 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.header(let viewData)):
             guard let venue = viewData.venue,
                   let cell = collectionView.dequeueReusableCell(
-                      withReuseIdentifier: SoccerMatchDetailVenueCell.reuseIdentifier,
+                      withReuseIdentifier: BaseballMatchDetailVenueCell.reuseIdentifier,
                       for: indexPath
-                  ) as? SoccerMatchDetailVenueCell else {
+                  ) as? BaseballMatchDetailVenueCell else {
                 return UICollectionViewCell()
             }
-
             cell.configure(with: venue)
             return cell
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .none:
             return UICollectionViewCell()
         }
     }
@@ -145,21 +138,21 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.header(let viewData)):
             guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier,
+                withReuseIdentifier: BaseballMatchScoreHeaderView.reuseIdentifier,
                 for: indexPath
-            ) as? SoccerMatchScoreHeaderView else {
+            ) as? BaseballMatchScoreHeaderView else {
                 return UICollectionReusableView()
             }
 
             headerView.configure(with: viewData)
             return headerView
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .none:
             return UICollectionReusableView()
         }
     }
 
-    private func render(_ state: SoccerMatchDetailViewState) {
+    private func render(_ state: BaseballMatchDetailViewState) {
         switch state {
         case .idle:
             headerViewData = nil
@@ -174,7 +167,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .loaded(let presentation):
             screenTitle = presentation.title
             title = presentation.title
-            headerViewData = presentation.sections.compactMap { section -> SoccerMatchDetailHeaderViewData? in
+            headerViewData = presentation.sections.compactMap { section -> BaseballMatchDetailHeaderViewData? in
                 guard case .header(let viewData) = section else {
                     return nil
                 }
@@ -216,7 +209,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
     }
 
     private func navigationStatusStyle(
-        from style: SoccerMatchDetailHeaderStatusStyle
+        from style: BaseballMatchDetailHeaderStatusStyle
     ) -> MatchDetailNavigationStatusStyle {
         switch style {
         case .live:
@@ -225,16 +218,12 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             return .final
         case .upcoming:
             return .upcoming
-        case .postponed:
-            return .postponed
-        case .cancelled:
-            return .cancelled
         case .neutral:
             return .neutral
         }
     }
 
-    private func sectionViewData(at index: Int) -> SoccerMatchDetailSectionViewData? {
+    private func sectionViewData(at index: Int) -> BaseballMatchDetailSectionViewData? {
         guard sections.indices.contains(index) else {
             return nil
         }

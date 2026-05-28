@@ -1,18 +1,16 @@
 //
-//  SoccerMatchScoreHeaderCell.swift
+//  BaseballMatchScoreHeaderView.swift
 //  NFSportApp
 //
-//  Created by Codex on 2026/5/26.
+//  Created by Codex on 2026/5/28.
 //
 
 import SnapKit
 import UIKit
 
-// MARK: - SoccerMatchScoreHeaderView
+final class BaseballMatchScoreHeaderView: UICollectionReusableView {
 
-final class SoccerMatchScoreHeaderView: UICollectionReusableView {
-
-    static let reuseIdentifier = "SoccerMatchScoreHeaderView"
+    static let reuseIdentifier = "BaseballMatchScoreHeaderView"
 
     private enum LayoutMetric {
         static let contentInset: CGFloat = 16
@@ -22,8 +20,8 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
         static let minimumScoreLabelWidth: CGFloat = 44
     }
 
-    private let homeTeamView = SoccerMatchScoreHeaderTeamView()
-    private let awayTeamView = SoccerMatchScoreHeaderTeamView()
+    private let homeTeamView = BaseballMatchScoreHeaderTeamView()
+    private let awayTeamView = BaseballMatchScoreHeaderTeamView()
 
     private let homeScoreLabel: UILabel = {
         let label = UILabel()
@@ -79,7 +77,7 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
         awayTeamView.prepareForReuse()
     }
 
-    func configure(with viewData: SoccerMatchDetailHeaderViewData) {
+    func configure(with viewData: BaseballMatchDetailHeaderViewData) {
         homeScoreLabel.text = viewData.homeScoreText
         awayScoreLabel.text = viewData.awayScoreText
         homeTeamView.configure(
@@ -106,6 +104,11 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
         addSubview(scoreStackView)
         addSubview(awayTeamView)
 
+        homeScoreLabel.snp.makeConstraints { make in
+            make.width.equalTo(awayScoreLabel)
+            make.width.greaterThanOrEqualTo(LayoutMetric.minimumScoreLabelWidth)
+        }
+
         homeTeamView.snp.makeConstraints { make in
             make.top.leading.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
         }
@@ -122,10 +125,6 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
             make.top.bottom.equalTo(homeTeamView)
             make.width.equalTo(homeTeamView)
         }
-
-        homeScoreLabel.snp.makeConstraints { make in
-            make.width.equalTo(awayScoreLabel)
-            make.width.greaterThanOrEqualTo(LayoutMetric.minimumScoreLabelWidth)
-        }
     }
 }
+
