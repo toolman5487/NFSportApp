@@ -12,7 +12,7 @@ import UIKit
 final class SoccerMatchDetailViewController: MatchBaseViewController {
 
     private enum LayoutMetric {
-        static let estimatedHeaderHeight: CGFloat = 252
+        static let estimatedHeaderHeight: CGFloat = 300
     }
 
     private let viewModel: SoccerMatchDetailViewModel
@@ -34,8 +34,13 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
     override func registerReusableViews() {
         collectionView.register(
-            SoccerMatchScoreHeaderCell.self,
-            forCellWithReuseIdentifier: SoccerMatchScoreHeaderCell.reuseIdentifier
+            SoccerMatchDetailVenueCell.self,
+            forCellWithReuseIdentifier: SoccerMatchDetailVenueCell.reuseIdentifier
+        )
+        collectionView.register(
+            SoccerMatchScoreHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier
         )
     }
 
@@ -73,9 +78,28 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
     ) -> NSCollectionLayoutSection {
         switch sectionViewData(at: sectionIndex) {
         case .some(.header):
-            return makeListSectionLayout(
-                itemHeight: .estimated(LayoutMetric.estimatedHeaderHeight)
+            let section = makeListSectionLayout(
+                itemHeight: .estimated(88),
+                contentInsets: NSDirectionalEdgeInsets(
+                    top: 0,
+                    leading: 16,
+                    bottom: 16,
+                    trailing: 16
+                ),
+                interGroupSpacing: 0
             )
+            let headerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .estimated(LayoutMetric.estimatedHeaderHeight)
+            )
+            let header = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            header.pinToVisibleBounds = true
+            section.boundarySupplementaryItems = [header]
+            return section
 
         case .some(.statistics), .some(.events), .some(.lineups), .none:
             return makeListSectionLayout()
@@ -89,17 +113,44 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         switch sectionViewData(at: indexPath.section) {
         case .some(.header(let viewData)):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: SoccerMatchScoreHeaderCell.reuseIdentifier,
+                withReuseIdentifier: SoccerMatchDetailVenueCell.reuseIdentifier,
                 for: indexPath
-            ) as? SoccerMatchScoreHeaderCell else {
+            ) as? SoccerMatchDetailVenueCell else {
                 return UICollectionViewCell()
             }
 
-            cell.configure(with: viewData)
+            cell.configure(with: viewData.venue)
             return cell
 
         case .some(.statistics), .some(.events), .some(.lineups), .none:
             return UICollectionViewCell()
+        }
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+
+        switch sectionViewData(at: indexPath.section) {
+        case .some(.header(let viewData)):
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier,
+                for: indexPath
+            ) as? SoccerMatchScoreHeaderView else {
+                return UICollectionReusableView()
+            }
+
+            headerView.configure(with: viewData)
+            return headerView
+
+        case .some(.statistics), .some(.events), .some(.lineups), .none:
+            return UICollectionReusableView()
         }
     }
 

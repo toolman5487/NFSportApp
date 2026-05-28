@@ -12,7 +12,8 @@ import UIKit
 final class BasketballMatchDetailViewController: MatchBaseViewController {
 
     private enum LayoutMetric {
-        static let estimatedHeaderHeight: CGFloat = 252
+        static let estimatedHeaderHeight: CGFloat = 300
+        static let estimatedVenueHeight: CGFloat = 96
     }
 
     private let viewModel: BasketballMatchDetailViewModel
@@ -34,8 +35,13 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
 
     override func registerReusableViews() {
         collectionView.register(
-            BasketballMatchScoreHeaderCell.self,
-            forCellWithReuseIdentifier: BasketballMatchScoreHeaderCell.reuseIdentifier
+            BasketballMatchScoreHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: BasketballMatchScoreHeaderView.reuseIdentifier
+        )
+        collectionView.register(
+            BasketballMatchDetailVenueCell.self,
+            forCellWithReuseIdentifier: BasketballMatchDetailVenueCell.reuseIdentifier
         )
     }
 
@@ -73,11 +79,21 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
     ) -> NSCollectionLayoutSection {
         switch sectionViewData(at: sectionIndex) {
         case .some(.header):
-            return makeListSectionLayout(
-                itemHeight: .estimated(LayoutMetric.estimatedHeaderHeight),
-                contentInsets: .zero,
-                interGroupSpacing: 0
+            let section = makeListSectionLayout(
+                itemHeight: .estimated(LayoutMetric.estimatedVenueHeight)
             )
+            let headerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .estimated(LayoutMetric.estimatedHeaderHeight)
+            )
+            let header = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            header.pinToVisibleBounds = true
+            section.boundarySupplementaryItems = [header]
+            return section
 
         case .none:
             return makeListSectionLayout()
@@ -91,17 +107,43 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
         switch sectionViewData(at: indexPath.section) {
         case .some(.header(let viewData)):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: BasketballMatchScoreHeaderCell.reuseIdentifier,
+                withReuseIdentifier: BasketballMatchDetailVenueCell.reuseIdentifier,
                 for: indexPath
-            ) as? BasketballMatchScoreHeaderCell else {
+            ) as? BasketballMatchDetailVenueCell else {
                 return UICollectionViewCell()
             }
-
-            cell.configure(with: viewData)
+            cell.configure(with: viewData.venue)
             return cell
 
         case .none:
             return UICollectionViewCell()
+        }
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+
+        switch sectionViewData(at: indexPath.section) {
+        case .some(.header(let viewData)):
+            guard let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: BasketballMatchScoreHeaderView.reuseIdentifier,
+                for: indexPath
+            ) as? BasketballMatchScoreHeaderView else {
+                return UICollectionReusableView()
+            }
+
+            headerView.configure(with: viewData)
+            return headerView
+
+        case .none:
+            return UICollectionReusableView()
         }
     }
 

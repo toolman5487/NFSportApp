@@ -40,6 +40,7 @@ nonisolated struct SoccerMatchDetailHeaderViewData: Equatable, Sendable {
     let awayTeamLogoURL: URL?
     let homeScoreText: String
     let awayScoreText: String
+    let venue: SoccerMatchDetailVenueViewData
 }
 
 nonisolated enum SoccerMatchDetailHeaderStatusStyle: Equatable, Sendable {
@@ -102,4 +103,12 @@ nonisolated struct SoccerMatchDetailLineupViewData: Equatable, Sendable {
     let coachName: String?
     let starters: [String]
     let substitutes: [String]
+}
+
+// MARK: - Venue
+
+nonisolated struct SoccerMatchDetailVenueViewData: Equatable, Sendable {
+
+    let title: String
+    let venueText: String
 }

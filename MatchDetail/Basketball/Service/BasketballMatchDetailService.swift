@@ -60,6 +60,7 @@ private nonisolated struct APIBasketballMatchGameResponse: Decodable, Sendable {
     let id: Int?
     let date: String?
     let time: String?
+    let venue: String?
     let status: APIBasketballMatchStatusResponse?
     let league: APIBasketballMatchLeagueResponse?
     let teams: APIBasketballMatchTeamsResponse?
@@ -76,6 +77,7 @@ private nonisolated struct APIBasketballMatchGameResponse: Decodable, Sendable {
             id: gameID,
             leagueName: league?.name ?? "Other League",
             leagueLogoURL: league?.logoURL,
+            venueName: venue,
             scheduledStartDate: date.flatMap(Self.makeDate(from:)),
             scheduledStartText: Self.makeScheduledStartText(date: date, time: time),
             statusLong: status?.long,

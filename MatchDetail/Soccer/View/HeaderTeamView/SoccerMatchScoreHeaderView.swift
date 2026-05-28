@@ -1,30 +1,30 @@
 //
-//  BasketballMatchScoreHeaderCell.swift
+//  SoccerMatchScoreHeaderCell.swift
 //  NFSportApp
 //
-//  Created by Willy Hsu on 2026/5/27.
+//  Created by Codex on 2026/5/26.
 //
 
-import SDWebImage
 import SnapKit
 import UIKit
 
-// MARK: - BasketballMatchScoreHeaderCell
+// MARK: - SoccerMatchScoreHeaderView
 
-final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
+final class SoccerMatchScoreHeaderView: UICollectionReusableView {
 
-    static let reuseIdentifier = "BasketballMatchScoreHeaderCell"
+    static let reuseIdentifier = "SoccerMatchScoreHeaderView"
 
     private enum LayoutMetric {
         static let cardCornerRadius: CGFloat = 12
         static let contentInset: CGFloat = 16
         static let compactSpacing: CGFloat = 8
         static let teamSpacing: CGFloat = 12
-        static let scoreWidth: CGFloat = 88
+        static let minimumScoreWidth: CGFloat = 120
+        static let minimumScoreLabelWidth: CGFloat = 44
     }
 
-    private let homeTeamView = BasketballMatchScoreHeaderTeamView()
-    private let awayTeamView = BasketballMatchScoreHeaderTeamView()
+    private let homeTeamView = SoccerMatchScoreHeaderTeamView()
+    private let awayTeamView = SoccerMatchScoreHeaderTeamView()
 
     private let homeScoreLabel: UILabel = {
         let label = UILabel()
@@ -58,7 +58,7 @@ final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
         let stackView = UIStackView(arrangedSubviews: [homeScoreLabel, scoreDividerLabel, awayScoreLabel])
         stackView.axis = .horizontal
         stackView.alignment = .center
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fill
         stackView.spacing = LayoutMetric.compactSpacing
         return stackView
     }()
@@ -80,7 +80,7 @@ final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
         awayTeamView.prepareForReuse()
     }
 
-    func configure(with viewData: BasketballMatchDetailHeaderViewData) {
+    func configure(with viewData: SoccerMatchDetailHeaderViewData) {
         homeScoreLabel.text = viewData.homeScoreText
         awayScoreLabel.text = viewData.awayScoreText
         homeTeamView.configure(
@@ -94,14 +94,23 @@ final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
     }
 
     private func setupView() {
-        backgroundColor = .clear
-        contentView.backgroundColor = .clear
-        contentView.layer.cornerRadius = LayoutMetric.cardCornerRadius
-        contentView.layer.masksToBounds = true
+        backgroundColor = .systemBackground
 
-        contentView.addSubview(homeTeamView)
-        contentView.addSubview(scoreStackView)
-        contentView.addSubview(awayTeamView)
+        homeScoreLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        awayScoreLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        scoreDividerLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        homeTeamView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        awayTeamView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        addSubview(homeTeamView)
+        addSubview(scoreStackView)
+        addSubview(awayTeamView)
+
+        homeScoreLabel.snp.makeConstraints { make in
+            make.width.equalTo(awayScoreLabel)
+            make.width.greaterThanOrEqualTo(LayoutMetric.minimumScoreLabelWidth)
+        }
 
         homeTeamView.snp.makeConstraints { make in
             make.top.leading.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
@@ -110,7 +119,7 @@ final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
         scoreStackView.snp.makeConstraints { make in
             make.leading.equalTo(homeTeamView.snp.trailing).offset(LayoutMetric.teamSpacing)
             make.centerY.equalTo(homeTeamView)
-            make.width.equalTo(LayoutMetric.scoreWidth)
+            make.width.greaterThanOrEqualTo(LayoutMetric.minimumScoreWidth)
         }
 
         awayTeamView.snp.makeConstraints { make in
@@ -118,78 +127,6 @@ final class BasketballMatchScoreHeaderCell: UICollectionViewCell {
             make.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
             make.top.bottom.equalTo(homeTeamView)
             make.width.equalTo(homeTeamView)
-        }
-    }
-}
-
-private final class BasketballMatchScoreHeaderTeamView: UIView {
-
-    private enum LayoutMetric {
-        static let spacing: CGFloat = 8
-        static let logoSize: CGFloat = 40
-    }
-
-    private let logoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.isHidden = true
-        return imageView
-    }()
-
-    private let teamNameLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
-        label.textColor = .primaryLabel
-        label.textAlignment = .center
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 2
-        return label
-    }()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    func prepareForReuse() {
-        logoImageView.sd_cancelCurrentImageLoad()
-        logoImageView.image = nil
-        logoImageView.isHidden = true
-        teamNameLabel.text = nil
-    }
-
-    func configure(teamName: String, logoURL: URL?) {
-        teamNameLabel.text = teamName
-
-        if let logoURL {
-            logoImageView.sd_setImage(with: logoURL)
-            logoImageView.isHidden = false
-        } else {
-            logoImageView.sd_cancelCurrentImageLoad()
-            logoImageView.image = nil
-            logoImageView.isHidden = true
-        }
-    }
-
-    private func setupView() {
-        let stackView = UIStackView(arrangedSubviews: [logoImageView, teamNameLabel])
-        stackView.axis = .vertical
-        stackView.alignment = .center
-        stackView.spacing = LayoutMetric.spacing
-
-        addSubview(stackView)
-
-        logoImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(LayoutMetric.logoSize)
-        }
-
-        stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
         }
     }
 }

@@ -68,11 +68,13 @@ final class BasketballMatchDetailViewModel {
     }
 
     private func makePresentation(from detail: BasketballMatchDetail) -> BasketballMatchDetailPresentation {
-        BasketballMatchDetailPresentation(
+        let sections: [BasketballMatchDetailSectionViewData] = [
+            .header(makeHeaderViewData(from: detail.fixture))
+        ]
+
+        return BasketballMatchDetailPresentation(
             title: detail.fixture.leagueName,
-            sections: [
-                .header(makeHeaderViewData(from: detail.fixture))
-            ]
+            sections: sections
         )
     }
 
@@ -91,7 +93,8 @@ final class BasketballMatchDetailViewModel {
             awayTeamName: fixture.awayTeam.name,
             awayTeamLogoURL: fixture.awayTeam.logoURL,
             homeScoreText: fixture.score.home.map(String.init) ?? "-",
-            awayScoreText: fixture.score.away.map(String.init) ?? "-"
+            awayScoreText: fixture.score.away.map(String.init) ?? "-",
+            venue: makeVenueSection(from: fixture)
         )
     }
 
@@ -145,6 +148,14 @@ final class BasketballMatchDetailViewModel {
             || status.contains("ht")
             || status.contains("live")
             || status.contains("half")
+    }
+
+    private func makeVenueSection(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailVenueViewData {
+        let venueName = fixture.venueName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return BasketballMatchDetailVenueViewData(
+            title: "Venue",
+            venueText: venueName?.isEmpty == false ? venueName ?? "TBD" : "TBD"
+        )
     }
 
     private func makeTimeText(from date: Date?, fallback: String) -> String {

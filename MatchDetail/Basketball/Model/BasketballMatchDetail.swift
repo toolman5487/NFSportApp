@@ -21,6 +21,7 @@ nonisolated struct BasketballMatchFixtureDetail: Equatable, Sendable {
     let id: Int
     let leagueName: String
     let leagueLogoURL: URL?
+    let venueName: String?
     let scheduledStartDate: Date?
     let scheduledStartText: String?
     let statusLong: String?

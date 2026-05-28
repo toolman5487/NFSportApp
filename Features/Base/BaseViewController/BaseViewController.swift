@@ -83,7 +83,9 @@ class BaseViewController: UIViewController {
 
     // MARK: - Override Points
 
-    func setupNavigation() {}
+    func setupNavigation() {
+        navigationItem.backButtonDisplayMode = .minimal
+    }
 
     func setupView() {}
 

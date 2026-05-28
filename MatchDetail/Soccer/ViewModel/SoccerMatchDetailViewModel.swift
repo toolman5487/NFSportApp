@@ -126,7 +126,8 @@ final class SoccerMatchDetailViewModel {
             awayTeamName: fixture.awayTeam.name,
             awayTeamLogoURL: fixture.awayTeam.logoURL,
             homeScoreText: fixture.score.home.map(String.init) ?? "-",
-            awayScoreText: fixture.score.away.map(String.init) ?? "-"
+            awayScoreText: fixture.score.away.map(String.init) ?? "-",
+            venue: makeVenueSection(from: fixture)
         )
     }
 
@@ -250,6 +251,19 @@ final class SoccerMatchDetailViewModel {
             coachName: lineup.coachName,
             starters: lineup.startXI.map(\.name),
             substitutes: lineup.substitutes.map(\.name)
+        )
+    }
+
+    private func makeVenueSection(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailVenueViewData {
+        let venueParts = [fixture.venueName, fixture.venueCity]
+            .compactMap { value in
+                let trimmedValue = value?.trimmingCharacters(in: .whitespacesAndNewlines)
+                return trimmedValue?.isEmpty == false ? trimmedValue : nil
+            }
+
+        return SoccerMatchDetailVenueViewData(
+            title: "Venue",
+            venueText: venueParts.isEmpty ? "TBD" : venueParts.joined(separator: ", ")
         )
     }
 
