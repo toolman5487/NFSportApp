@@ -119,7 +119,8 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
         addSubview(awayTeamView)
 
         homeTeamView.snp.makeConstraints { make in
-            make.top.leading.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.top.bottom.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.leading.equalToSuperview()
         }
 
         scoreStackView.snp.makeConstraints { make in
@@ -130,7 +131,7 @@ final class SoccerMatchScoreHeaderView: UICollectionReusableView {
 
         awayTeamView.snp.makeConstraints { make in
             make.leading.equalTo(scoreStackView.snp.trailing).offset(LayoutMetric.teamSpacing)
-            make.trailing.equalToSuperview().inset(LayoutMetric.contentInset)
+            make.trailing.equalToSuperview()
             make.top.bottom.equalTo(homeTeamView)
             make.width.equalTo(homeTeamView)
         }
