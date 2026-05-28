@@ -52,8 +52,9 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
             withReuseIdentifier: BasketballMatchScoreHeaderView.reuseIdentifier
         )
         collectionView.register(
-            BasketballMatchDetailVenueCell.self,
-            forCellWithReuseIdentifier: BasketballMatchDetailVenueCell.reuseIdentifier
+            BasketballMatchDetailVenueFooterView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: BasketballMatchDetailVenueFooterView.reuseIdentifier
         )
     }
 
@@ -79,8 +80,8 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch sectionViewData(at: section) {
-        case .some(.header(let viewData)):
-            return viewData.venue == nil ? 0 : 1
+        case .some(.header):
+            return 0
 
         case .none:
             return 0
@@ -107,7 +108,21 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            section.boundarySupplementaryItems = [header]
+            var boundaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [header]
+            if case .some(.header(let viewData)) = sectionViewData(at: sectionIndex),
+               viewData.venue != nil {
+                let footerSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .estimated(LayoutMetric.estimatedVenueHeight)
+                )
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: footerSize,
+                    elementKind: UICollectionView.elementKindSectionFooter,
+                    alignment: .bottom
+                )
+                boundaryItems.append(footer)
+            }
+            section.boundarySupplementaryItems = boundaryItems
             return section
 
         case .none:
@@ -120,16 +135,8 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         switch sectionViewData(at: indexPath.section) {
-        case .some(.header(let viewData)):
-            guard let venue = viewData.venue,
-                  let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: BasketballMatchDetailVenueCell.reuseIdentifier,
-                    for: indexPath
-                  ) as? BasketballMatchDetailVenueCell else {
-                return UICollectionViewCell()
-            }
-            cell.configure(with: venue)
-            return cell
+        case .some(.header):
+            return UICollectionViewCell()
 
         case .none:
             return UICollectionViewCell()
@@ -143,12 +150,26 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
         viewForSupplementaryElementOfKind kind: String,
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader else {
+        guard kind == UICollectionView.elementKindSectionHeader
+                || kind == UICollectionView.elementKindSectionFooter else {
             return UICollectionReusableView()
         }
 
         switch sectionViewData(at: indexPath.section) {
         case .some(.header(let viewData)):
+            if kind == UICollectionView.elementKindSectionFooter {
+                guard let venue = viewData.venue,
+                      let footerView = collectionView.dequeueReusableSupplementaryView(
+                        ofKind: kind,
+                        withReuseIdentifier: BasketballMatchDetailVenueFooterView.reuseIdentifier,
+                        for: indexPath
+                      ) as? BasketballMatchDetailVenueFooterView else {
+                    return UICollectionReusableView()
+                }
+                footerView.configure(with: venue)
+                return footerView
+            }
+
             guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: BasketballMatchScoreHeaderView.reuseIdentifier,

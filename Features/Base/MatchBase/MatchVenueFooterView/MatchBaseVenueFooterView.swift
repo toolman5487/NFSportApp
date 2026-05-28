@@ -8,7 +8,7 @@
 import SnapKit
 import UIKit
 
-class MatchBaseVenueCell: UICollectionViewCell {
+class MatchBaseVenueFooterView: UICollectionReusableView {
 
     private enum LayoutMetric {
         static let contentInset: CGFloat = 16
@@ -17,10 +17,10 @@ class MatchBaseVenueCell: UICollectionViewCell {
         static let verticalInset: CGFloat = 16
         static let cornerRadius: CGFloat = 12
     }
-
+    
     private let iconImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "map.fill"))
-        imageView.tintColor = .secondaryLabelColor
+        let imageView = UIImageView(image: UIImage(systemName: "mappin.and.ellipse"))
+        imageView.tintColor = .systemRed
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -61,11 +61,9 @@ class MatchBaseVenueCell: UICollectionViewCell {
     }
 
     private func setupView() {
-        contentView.backgroundColor = .secondarySystemBackground
-        contentView.layer.cornerRadius = LayoutMetric.cornerRadius
-        contentView.layer.masksToBounds = true
+        backgroundColor = .systemBackground
 
-        contentView.addSubview(contentStackView)
+        addSubview(contentStackView)
 
         iconImageView.snp.makeConstraints { make in
             make.width.height.equalTo(LayoutMetric.iconSize)

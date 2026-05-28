@@ -64,7 +64,7 @@
 		159090752FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */; };
 		159090762FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */; };
 		159090782FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090812FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift */; };
-		159090792FC6B4A100C7D0D6 /* SoccerMatchDetailVenueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueCell.swift */; };
+		159090792FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift */; };
 		15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A100112FC5600000BEEF00 /* ContentStateView.swift */; };
 		15A1EE4E2FC6D9BE001F9FBC /* BasketballMatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE4D2FC6D9BE001F9FBC /* BasketballMatchDetailViewController.swift */; };
 		15A1EE502FC6DA10001F9FBC /* BasketballMatchDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE4F2FC6DA10001F9FBC /* BasketballMatchDetail.swift */; };
@@ -73,7 +73,7 @@
 		15A1EE582FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE572FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift */; };
 		15A1EE5A2FC6DA20001F9FBC /* BasketballMatchDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE592FC6DA20001F9FBC /* BasketballMatchDetailService.swift */; };
 		15A1EE5C2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE5D2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift */; };
-		15A1EE5E2FC6DA40001F9FBC /* BasketballMatchDetailVenueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueCell.swift */; };
+		15A1EE5E2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift */; };
 		15C927DE2FC43D7B000820EE /* MainSoccerHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */; };
 		15C928312FC46000000820EE /* MainSoccerHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */; };
 		15C928332FC46000000820EE /* MainSoccerHomeEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */; };
@@ -92,13 +92,12 @@
 		15C9C8682FC3F797000820EE /* MainMatchesGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */; };
 		15C9C86A2FC3F797000820EE /* MainMatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */; };
 		15EBBC3C2FC80DEB00F3083A /* BaseballMatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC3B2FC80DEB00F3083A /* BaseballMatchDetailViewController.swift */; };
-		15EBBC3E2FC80E7D00F3083A /* MatchBaseVenueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC3D2FC80E7D00F3083A /* MatchBaseVenueCell.swift */; };
 		15EBBC412FC8200000F3083A /* BaseballMatchDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC442FC8200000F3083A /* BaseballMatchDetail.swift */; };
 		15EBBC422FC8200000F3083A /* BaseballMatchDetailPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC452FC8200000F3083A /* BaseballMatchDetailPresentation.swift */; };
 		15EBBC432FC8200000F3083A /* BaseballMatchDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC462FC8200000F3083A /* BaseballMatchDetailViewModel.swift */; };
 		15EBBC492FC8210000F3083A /* BaseballMatchScoreHeaderTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC4C2FC8210000F3083A /* BaseballMatchScoreHeaderTeamView.swift */; };
 		15EBBC4A2FC8210000F3083A /* BaseballMatchScoreHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC4D2FC8210000F3083A /* BaseballMatchScoreHeaderView.swift */; };
-		15EBBC4B2FC8210000F3083A /* BaseballMatchDetailVenueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueCell.swift */; };
+		15EBBC4B2FC8210000F3083A /* BaseballMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueFooterView.swift */; };
 		15EBBC522FC8220000F3083A /* BaseballMatchDetailEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC552FC8220000F3083A /* BaseballMatchDetailEndpoint.swift */; };
 		15EBBC532FC8220000F3083A /* BaseballMatchDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC562FC8220000F3083A /* BaseballMatchDetailService.swift */; };
 		15EBBC7D2FC82C2700F3083A /* HockeyMatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC7C2FC82C2700F3083A /* HockeyMatchDetailViewController.swift */; };
@@ -109,7 +108,8 @@
 		15EBBC8F2FC8300100F3083A /* HockeyMatchDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC852FC8300100F3083A /* HockeyMatchDetailService.swift */; };
 		15EBBC902FC8300100F3083A /* HockeyMatchScoreHeaderTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC862FC8300100F3083A /* HockeyMatchScoreHeaderTeamView.swift */; };
 		15EBBC912FC8300100F3083A /* HockeyMatchScoreHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC872FC8300100F3083A /* HockeyMatchScoreHeaderView.swift */; };
-		15EBBC922FC8300100F3083A /* HockeyMatchDetailVenueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueCell.swift */; };
+		15EBBC922FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift */; };
+		15EBBC932FC8480100F3083A /* MatchBaseVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC922FC8480100F3083A /* MatchBaseVenueFooterView.swift */; };
 		15EBDF1C2FC7EFDD00F3083A /* SoccerMatchScoreHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBDF1B2FC7EFDD00F3083A /* SoccerMatchScoreHeaderView.swift */; };
 		15EBDF312FC7F13A00F3083A /* BasketballMatchScoreHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBDF302FC7F13A00F3083A /* BasketballMatchScoreHeaderView.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
@@ -178,7 +178,7 @@
 		1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailPresentation.swift; sourceTree = "<group>"; };
 		1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailViewModel.swift; sourceTree = "<group>"; };
 		159090812FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchScoreHeaderTeamView.swift; sourceTree = "<group>"; };
-		159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailVenueCell.swift; sourceTree = "<group>"; };
+		159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
 		15A100112FC5600000BEEF00 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
 		15A1EE4D2FC6D9BE001F9FBC /* BasketballMatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetailViewController.swift; sourceTree = "<group>"; };
 		15A1EE4F2FC6DA10001F9FBC /* BasketballMatchDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetail.swift; sourceTree = "<group>"; };
@@ -187,7 +187,7 @@
 		15A1EE572FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetailEndpoint.swift; sourceTree = "<group>"; };
 		15A1EE592FC6DA20001F9FBC /* BasketballMatchDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetailService.swift; sourceTree = "<group>"; };
 		15A1EE5D2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchScoreHeaderTeamView.swift; sourceTree = "<group>"; };
-		15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetailVenueCell.swift; sourceTree = "<group>"; };
+		15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
 		15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeViewController.swift; sourceTree = "<group>"; };
 		15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeDashboard.swift; sourceTree = "<group>"; };
 		15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeEndpoint.swift; sourceTree = "<group>"; };
@@ -206,13 +206,12 @@
 		15C9C8782FC3F797000820EE /* MainMatchesGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesGameCell.swift; sourceTree = "<group>"; };
 		15C9C87A2FC3F797000820EE /* MainMatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMatchesViewController.swift; sourceTree = "<group>"; };
 		15EBBC3B2FC80DEB00F3083A /* BaseballMatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailViewController.swift; sourceTree = "<group>"; };
-		15EBBC3D2FC80E7D00F3083A /* MatchBaseVenueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchBaseVenueCell.swift; sourceTree = "<group>"; };
 		15EBBC442FC8200000F3083A /* BaseballMatchDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetail.swift; sourceTree = "<group>"; };
 		15EBBC452FC8200000F3083A /* BaseballMatchDetailPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailPresentation.swift; sourceTree = "<group>"; };
 		15EBBC462FC8200000F3083A /* BaseballMatchDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailViewModel.swift; sourceTree = "<group>"; };
 		15EBBC4C2FC8210000F3083A /* BaseballMatchScoreHeaderTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchScoreHeaderTeamView.swift; sourceTree = "<group>"; };
 		15EBBC4D2FC8210000F3083A /* BaseballMatchScoreHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchScoreHeaderView.swift; sourceTree = "<group>"; };
-		15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailVenueCell.swift; sourceTree = "<group>"; };
+		15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
 		15EBBC552FC8220000F3083A /* BaseballMatchDetailEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailEndpoint.swift; sourceTree = "<group>"; };
 		15EBBC562FC8220000F3083A /* BaseballMatchDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchDetailService.swift; sourceTree = "<group>"; };
 		15EBBC7C2FC82C2700F3083A /* HockeyMatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchDetailViewController.swift; sourceTree = "<group>"; };
@@ -223,7 +222,8 @@
 		15EBBC852FC8300100F3083A /* HockeyMatchDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchDetailService.swift; sourceTree = "<group>"; };
 		15EBBC862FC8300100F3083A /* HockeyMatchScoreHeaderTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchScoreHeaderTeamView.swift; sourceTree = "<group>"; };
 		15EBBC872FC8300100F3083A /* HockeyMatchScoreHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchScoreHeaderView.swift; sourceTree = "<group>"; };
-		15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchDetailVenueCell.swift; sourceTree = "<group>"; };
+		15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
+		15EBBC922FC8480100F3083A /* MatchBaseVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchBaseVenueFooterView.swift; sourceTree = "<group>"; };
 		15EBDF1B2FC7EFDD00F3083A /* SoccerMatchScoreHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchScoreHeaderView.swift; sourceTree = "<group>"; };
 		15EBDF302FC7F13A00F3083A /* BasketballMatchScoreHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchScoreHeaderView.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
@@ -709,7 +709,7 @@
 			isa = PBXGroup;
 			children = (
 				15EBDF332FC7F19800F3083A /* HeaderTeamView */,
-				15EBBC402FC80EBF00F3083A /* VenueCell */,
+				15EBBC402FC80EBF00F3083A /* Venue */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -770,7 +770,7 @@
 			isa = PBXGroup;
 			children = (
 				15EBDF322FC7F18F00F3083A /* HeaderTeamView */,
-				15EBBC3F2FC80EB500F3083A /* VenueCell */,
+				15EBBC3F2FC80EB500F3083A /* Venue */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -938,18 +938,10 @@
 		15EBBC352FC80C9900F3083A /* MatchBase */ = {
 			isa = PBXGroup;
 			children = (
-				15EBBC362FC80CAA00F3083A /* MatchVenueCell */,
 				1590906A2FC5A5D800C7D0D6 /* MatchBaseViewController */,
+				15EBBC912FC847E600F3083A /* MatchVenueFooterView */,
 			);
 			path = MatchBase;
-			sourceTree = "<group>";
-		};
-		15EBBC362FC80CAA00F3083A /* MatchVenueCell */ = {
-			isa = PBXGroup;
-			children = (
-				15EBBC3D2FC80E7D00F3083A /* MatchBaseVenueCell.swift */,
-			);
-			path = MatchVenueCell;
 			sourceTree = "<group>";
 		};
 		15EBBC392FC80DBC00F3083A /* Baseball */ = {
@@ -972,20 +964,20 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
-		15EBBC3F2FC80EB500F3083A /* VenueCell */ = {
+		15EBBC3F2FC80EB500F3083A /* Venue */ = {
 			isa = PBXGroup;
 			children = (
-				15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueCell.swift */,
+				15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift */,
 			);
-			path = VenueCell;
+			path = Venue;
 			sourceTree = "<group>";
 		};
-		15EBBC402FC80EBF00F3083A /* VenueCell */ = {
+		15EBBC402FC80EBF00F3083A /* Venue */ = {
 			isa = PBXGroup;
 			children = (
-				159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueCell.swift */,
+				159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift */,
 			);
-			path = VenueCell;
+			path = Venue;
 			sourceTree = "<group>";
 		};
 		15EBBC472FC8200000F3083A /* Model */ = {
@@ -1009,7 +1001,7 @@
 			isa = PBXGroup;
 			children = (
 				15EBBC502FC8210000F3083A /* HeaderTeamView */,
-				15EBBC512FC8210000F3083A /* VenueCell */,
+				15EBBC512FC8210000F3083A /* Venue */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1023,12 +1015,12 @@
 			path = HeaderTeamView;
 			sourceTree = "<group>";
 		};
-		15EBBC512FC8210000F3083A /* VenueCell */ = {
+		15EBBC512FC8210000F3083A /* Venue */ = {
 			isa = PBXGroup;
 			children = (
-				15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueCell.swift */,
+				15EBBC4E2FC8210000F3083A /* BaseballMatchDetailVenueFooterView.swift */,
 			);
-			path = VenueCell;
+			path = Venue;
 			sourceTree = "<group>";
 		};
 		15EBBC572FC8220000F3083A /* Service */ = {
@@ -1060,6 +1052,14 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
+		15EBBC912FC847E600F3083A /* MatchVenueFooterView */ = {
+			isa = PBXGroup;
+			children = (
+				15EBBC922FC8480100F3083A /* MatchBaseVenueFooterView.swift */,
+			);
+			path = MatchVenueFooterView;
+			sourceTree = "<group>";
+		};
 		15EBBC932FC8300100F3083A /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -1081,7 +1081,7 @@
 			isa = PBXGroup;
 			children = (
 				15EBBC972FC8300100F3083A /* HeaderTeamView */,
-				15EBBC982FC8300100F3083A /* VenueCell */,
+				15EBBC982FC8300100F3083A /* Venue */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1104,12 +1104,12 @@
 			path = HeaderTeamView;
 			sourceTree = "<group>";
 		};
-		15EBBC982FC8300100F3083A /* VenueCell */ = {
+		15EBBC982FC8300100F3083A /* Venue */ = {
 			isa = PBXGroup;
 			children = (
-				15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueCell.swift */,
+				15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift */,
 			);
-			path = VenueCell;
+			path = Venue;
 			sourceTree = "<group>";
 		};
 		15EBDF322FC7F18F00F3083A /* HeaderTeamView */ = {
@@ -1291,7 +1291,7 @@
 				15A1EE522FC6DA10001F9FBC /* BasketballMatchDetailPresentation.swift in Sources */,
 				15A1EE542FC6DA10001F9FBC /* BasketballMatchDetailViewModel.swift in Sources */,
 				15A1EE5C2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift in Sources */,
-				15A1EE5E2FC6DA40001F9FBC /* BasketballMatchDetailVenueCell.swift in Sources */,
+				15A1EE5E2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift in Sources */,
 				15A1EE582FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift in Sources */,
 				15A1EE5A2FC6DA20001F9FBC /* BasketballMatchDetailService.swift in Sources */,
 				154000022FC20000008C60D9 /* MainHomeEndpoint.swift in Sources */,
@@ -1305,13 +1305,14 @@
 				15EBBC8B2FC8300100F3083A /* HockeyMatchDetail.swift in Sources */,
 				15EBBC8C2FC8300100F3083A /* HockeyMatchDetailPresentation.swift in Sources */,
 				15EBBC8D2FC8300100F3083A /* HockeyMatchDetailViewModel.swift in Sources */,
+				15EBBC932FC8480100F3083A /* MatchBaseVenueFooterView.swift in Sources */,
 				15EBBC8E2FC8300100F3083A /* HockeyMatchDetailEndpoint.swift in Sources */,
 				15EBBC8F2FC8300100F3083A /* HockeyMatchDetailService.swift in Sources */,
 				15EBBC902FC8300100F3083A /* HockeyMatchScoreHeaderTeamView.swift in Sources */,
 				15EBBC912FC8300100F3083A /* HockeyMatchScoreHeaderView.swift in Sources */,
-				15EBBC922FC8300100F3083A /* HockeyMatchDetailVenueCell.swift in Sources */,
+				15EBBC922FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift in Sources */,
 				159090782FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift in Sources */,
-				159090792FC6B4A100C7D0D6 /* SoccerMatchDetailVenueCell.swift in Sources */,
+				159090792FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift in Sources */,
 				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
 				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
 				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
@@ -1342,7 +1343,7 @@
 				15EBBC432FC8200000F3083A /* BaseballMatchDetailViewModel.swift in Sources */,
 				15EBBC492FC8210000F3083A /* BaseballMatchScoreHeaderTeamView.swift in Sources */,
 				15EBBC4A2FC8210000F3083A /* BaseballMatchScoreHeaderView.swift in Sources */,
-				15EBBC4B2FC8210000F3083A /* BaseballMatchDetailVenueCell.swift in Sources */,
+				15EBBC4B2FC8210000F3083A /* BaseballMatchDetailVenueFooterView.swift in Sources */,
 				15EBBC522FC8220000F3083A /* BaseballMatchDetailEndpoint.swift in Sources */,
 				15EBBC532FC8220000F3083A /* BaseballMatchDetailService.swift in Sources */,
 				15C9C8662FC3F797000820EE /* MainMatchesDatePickerCell.swift in Sources */,
@@ -1355,7 +1356,6 @@
 				159053332FC5584400C7D0D6 /* MainSearchTeam.swift in Sources */,
 				159053342FC5584500C7D0D6 /* MainSearchEndpoint.swift in Sources */,
 				159053352FC5584600C7D0D6 /* MainSearchService.swift in Sources */,
-				15EBBC3E2FC80E7D00F3083A /* MatchBaseVenueCell.swift in Sources */,
 				159053362FC5584700C7D0D6 /* MainSearchPresentation.swift in Sources */,
 				159053372FC5584800C7D0D6 /* MainSearchViewModel.swift in Sources */,
 				159053382FC5584900C7D0D6 /* MainSearchTeamCell.swift in Sources */,

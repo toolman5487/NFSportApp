@@ -15,6 +15,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
     private enum LayoutMetric {
         static let estimatedHeaderHeight: CGFloat = 360
+        static let estimatedVenueHeight: CGFloat = 96
     }
 
     // MARK: - Properties
@@ -46,8 +47,9 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
     override func registerReusableViews() {
         collectionView.register(
-            SoccerMatchDetailVenueCell.self,
-            forCellWithReuseIdentifier: SoccerMatchDetailVenueCell.reuseIdentifier
+            SoccerMatchDetailVenueFooterView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: SoccerMatchDetailVenueFooterView.reuseIdentifier
         )
         collectionView.register(
             SoccerMatchScoreHeaderView.self,
@@ -78,8 +80,8 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch sectionViewData(at: section) {
-        case .some(.header(let viewData)):
-            return viewData.venue == nil ? 0 : 1
+        case .some(.header):
+            return 0
 
         case .some(.statistics), .some(.events), .some(.lineups), .none:
             return 0
@@ -95,7 +97,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         switch sectionViewData(at: sectionIndex) {
         case .some(.header):
             let section = makeListSectionLayout(
-                itemHeight: .estimated(88),
+                itemHeight: .estimated(LayoutMetric.estimatedVenueHeight),
                 contentInsets: NSDirectionalEdgeInsets(
                     top: 0,
                     leading: 16,
@@ -113,7 +115,21 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            section.boundarySupplementaryItems = [header]
+            var boundaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [header]
+            if case .some(.header(let viewData)) = sectionViewData(at: sectionIndex),
+               viewData.venue != nil {
+                let footerSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .estimated(LayoutMetric.estimatedVenueHeight)
+                )
+                let footer = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: footerSize,
+                    elementKind: UICollectionView.elementKindSectionFooter,
+                    alignment: .bottom
+                )
+                boundaryItems.append(footer)
+            }
+            section.boundarySupplementaryItems = boundaryItems
             return section
 
         case .some(.statistics), .some(.events), .some(.lineups), .none:
@@ -126,17 +142,8 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         switch sectionViewData(at: indexPath.section) {
-        case .some(.header(let viewData)):
-            guard let venue = viewData.venue,
-                  let cell = collectionView.dequeueReusableCell(
-                      withReuseIdentifier: SoccerMatchDetailVenueCell.reuseIdentifier,
-                      for: indexPath
-                  ) as? SoccerMatchDetailVenueCell else {
-                return UICollectionViewCell()
-            }
-
-            cell.configure(with: venue)
-            return cell
+        case .some(.header):
+            return UICollectionViewCell()
 
         case .some(.statistics), .some(.events), .some(.lineups), .none:
             return UICollectionViewCell()
@@ -150,12 +157,26 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         viewForSupplementaryElementOfKind kind: String,
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader else {
+        guard kind == UICollectionView.elementKindSectionHeader
+                || kind == UICollectionView.elementKindSectionFooter else {
             return UICollectionReusableView()
         }
 
         switch sectionViewData(at: indexPath.section) {
         case .some(.header(let viewData)):
+            if kind == UICollectionView.elementKindSectionFooter {
+                guard let venue = viewData.venue,
+                      let footerView = collectionView.dequeueReusableSupplementaryView(
+                        ofKind: kind,
+                        withReuseIdentifier: SoccerMatchDetailVenueFooterView.reuseIdentifier,
+                        for: indexPath
+                      ) as? SoccerMatchDetailVenueFooterView else {
+                    return UICollectionReusableView()
+                }
+                footerView.configure(with: venue)
+                return footerView
+            }
+
             guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier,
