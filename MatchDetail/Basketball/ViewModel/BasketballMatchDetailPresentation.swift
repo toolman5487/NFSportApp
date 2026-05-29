@@ -65,6 +65,8 @@ nonisolated struct BasketballMatchDetailStatsViewData: Equatable, Sendable {
 
     let homeTeamName: String
     let awayTeamName: String
+    let displayState: MatchDetailStatsDisplayState
+    let showsFilter: Bool
     let comparisonRows: [BasketballMatchStatsComparisonRowViewData]
     let homeRows: [BasketballMatchStatsValueRowViewData]
     let awayRows: [BasketballMatchStatsValueRowViewData]

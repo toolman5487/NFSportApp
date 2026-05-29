@@ -24,11 +24,6 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         static let estimatedLineupRowHeight: CGFloat = 220
     }
 
-    private enum StatsEmptyContent {
-        static let title = "No Stats Available"
-        static let subtitle = "Match statistics are not available for this game."
-    }
-
     // MARK: - Properties
 
     private let viewModel: SoccerMatchDetailViewModel
@@ -136,12 +131,24 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
     }
 
     private func statsItemCount(for viewData: SoccerMatchDetailStatsViewData) -> Int {
-        let rowCount = statsRowCount(for: viewData)
-        return rowCount > 0 ? rowCount : 1
+        switch viewData.displayState {
+        case .empty:
+            return 1
+
+        case .content:
+            let rowCount = statsRowCount(for: viewData)
+            return rowCount > 0 ? rowCount : 1
+        }
     }
 
     private func statsHasContent(for viewData: SoccerMatchDetailStatsViewData) -> Bool {
-        statsRowCount(for: viewData) > 0
+        switch viewData.displayState {
+        case .empty:
+            return false
+
+        case .content:
+            return statsRowCount(for: viewData) > 0
+        }
     }
 
     private func statsRowCount(for viewData: SoccerMatchDetailStatsViewData) -> Int {
@@ -189,18 +196,20 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
                 ? .estimated(LayoutMetric.estimatedStatsRowHeight)
                 : .estimated(LayoutMetric.estimatedStatsEmptyHeight)
             let section = makeListSectionLayout(itemHeight: itemHeight)
-            let filterHeaderSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1),
-                heightDimension: .estimated(LayoutMetric.estimatedFilterHeaderHeight)
-            )
-            let filterHeader = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: filterHeaderSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
-            )
-            filterHeader.pinToVisibleBounds = true
-            filterHeader.zIndex = 2
-            section.boundarySupplementaryItems = [filterHeader]
+            if viewData.showsFilter {
+                let filterHeaderSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .estimated(LayoutMetric.estimatedFilterHeaderHeight)
+                )
+                let filterHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: filterHeaderSize,
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top
+                )
+                filterHeader.pinToVisibleBounds = true
+                filterHeader.zIndex = 2
+                section.boundarySupplementaryItems = [filterHeader]
+            }
             return appendVenueFooterIfNeeded(
                 to: section,
                 sectionIndex: sectionIndex,
@@ -275,7 +284,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         at indexPath: IndexPath
     ) -> UICollectionViewCell {
         guard statsHasContent(for: viewData) else {
-            return makeStatsEmptyCell(at: indexPath)
+            return makeStatsEmptyCell(for: viewData, at: indexPath)
         }
 
         guard let cell = collectionView.dequeueReusableCell(
@@ -340,7 +349,10 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         return cell
     }
 
-    private func makeStatsEmptyCell(at indexPath: IndexPath) -> UICollectionViewCell {
+    private func makeStatsEmptyCell(
+        for viewData: SoccerMatchDetailStatsViewData,
+        at indexPath: IndexPath
+    ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SoccerMatchStatsEmptyCell.reuseIdentifier,
             for: indexPath
@@ -348,10 +360,17 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
         }
 
-        cell.configure(
-            title: StatsEmptyContent.title,
-            subtitle: StatsEmptyContent.subtitle
-        )
+        switch viewData.displayState {
+        case .empty(let title, let subtitle):
+            cell.configure(title: title, subtitle: subtitle)
+
+        case .content:
+            cell.configure(
+                title: "No Stats Available",
+                subtitle: "Match statistics are not available for this game."
+            )
+        }
+
         return cell
     }
 
@@ -384,12 +403,13 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         }
 
         switch sectionViewData(at: indexPath.section) {
-        case .some(.stats):
-            guard let filterView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: SoccerMatchFilterView.reuseIdentifier,
-                for: indexPath
-            ) as? SoccerMatchFilterView else {
+        case .some(.stats(let viewData)):
+            guard viewData.showsFilter,
+                  let filterView = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: SoccerMatchFilterView.reuseIdentifier,
+                    for: indexPath
+                  ) as? SoccerMatchFilterView else {
                 return UICollectionReusableView()
             }
 

@@ -76,11 +76,16 @@ final class BaseballMatchDetailViewModel {
     // MARK: - Presentation Builders
 
     private func makePresentation(from detail: BaseballMatchDetail) -> BaseballMatchDetailPresentation {
+        let phase = makePhase(from: detail.fixture)
+        let displayPolicy = phase.displayPolicy(for: .baseball)
+
         var sections: [BaseballMatchDetailSectionViewData] = [
-            .header(makeHeaderViewData(from: detail.fixture))
+            .header(makeHeaderViewData(from: detail.fixture, phase: phase))
         ]
 
-        sections.append(.stats(makeStatsViewData(from: detail)))
+        if displayPolicy.showsStatsSection {
+            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
+        }
 
         return BaseballMatchDetailPresentation(
             title: detail.fixture.leagueName,
@@ -88,9 +93,28 @@ final class BaseballMatchDetailViewModel {
         )
     }
 
-    private func makeHeaderViewData(from fixture: BaseballMatchFixtureDetail) -> BaseballMatchDetailHeaderViewData {
-        let statusStyle = makeStatusStyle(from: fixture)
-        let statusText = makeStatusText(from: fixture)
+    private func makePhase(from fixture: BaseballMatchFixtureDetail) -> MatchFixturePhase {
+        MatchFixturePhase(
+            sport: .baseball,
+            snapshot: MatchFixtureStatusSnapshot.make(
+                statusShort: fixture.statusShort,
+                statusLong: fixture.statusLong
+            )
+        )
+    }
+
+    private func makeHeaderViewData(
+        from fixture: BaseballMatchFixtureDetail,
+        phase: MatchFixturePhase
+    ) -> BaseballMatchDetailHeaderViewData {
+        let statusStyle = BaseballMatchDetailHeaderStatusStyle(
+            matchNavigationStyle: phase.navigationStatusStyle
+        )
+        let statusText = phase.statusText(
+            fallbackStatusLong: fixture.statusLong,
+            fallbackStatusShort: fixture.statusShort
+        )
+        let showsScore = phase.displayPolicy(for: .baseball).showsHeaderScore
 
         return BaseballMatchDetailHeaderViewData(
             leagueName: fixture.leagueName,
@@ -109,8 +133,8 @@ final class BaseballMatchDetailViewModel {
             homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
             awayTeamLogoURL: fixture.awayTeam.logoURL,
-            homeScoreText: fixture.score.home.runs.map(String.init) ?? "-",
-            awayScoreText: fixture.score.away.runs.map(String.init) ?? "-",
+            homeScoreText: showsScore ? formatOptionalCount(fixture.score.home.runs) : "-",
+            awayScoreText: showsScore ? formatOptionalCount(fixture.score.away.runs) : "-",
             venue: makeVenueSection(from: fixture)
         )
     }
@@ -142,94 +166,6 @@ final class BaseballMatchDetailViewModel {
         )
     }
 
-    // MARK: - Status Mapping
-
-    private func makeStatusText(from fixture: BaseballMatchFixtureDetail) -> String {
-        let statusShort = fixture.statusShort?.lowercased()
-        let statusLong = fixture.statusLong?.lowercased()
-        let normalizedStatus = statusShort ?? statusLong
-
-        if let normalizedStatus,
-           isLiveStatus(normalizedStatus) {
-            return "Live"
-        }
-
-        guard let normalizedStatus else {
-            return "Scheduled"
-        }
-
-        switch normalizedStatus {
-        case "ns", "not started":
-            return "Scheduled"
-        case "tbd", "time to be defined":
-            return "TBD"
-        case "ht", "half time":
-            return "Half Time"
-        case "et", "extra time":
-            return "Extra Time"
-        case "bt", "break time":
-            return "Break"
-        case "p", "pen", "penalty in progress":
-            return "Penalties"
-        case "ft", "aet", "aft", "aot", "after overtime", "final", "match finished":
-            return "Final"
-        case "pst", "postponed":
-            return "Postponed"
-        case "canc", "cancelled", "abandoned", "abd":
-            return "Cancelled"
-        case "int", "interrupted", "susp", "suspended":
-            return "Suspended"
-        default:
-            if let statusLong,
-               !statusLong.isEmpty {
-                return fixture.statusLong ?? "Scheduled"
-            }
-
-            return fixture.statusShort ?? "Scheduled"
-        }
-    }
-
-    private func makeStatusStyle(from fixture: BaseballMatchFixtureDetail) -> BaseballMatchDetailHeaderStatusStyle {
-        let normalizedStatus = fixture.statusShort?.lowercased() ?? fixture.statusLong?.lowercased()
-
-        guard let normalizedStatus else {
-            return .neutral
-        }
-
-        if isLiveStatus(normalizedStatus) {
-            return .live
-        }
-
-        switch normalizedStatus {
-        case let status where status.contains("ft")
-            || status.contains("finish")
-            || status.contains("final")
-            || status.contains("ended")
-            || status.contains("after"):
-            return .final
-
-        case let status where status.contains("ns")
-            || status.contains("scheduled")
-            || status.contains("not started")
-            || status.contains("tbd"):
-            return .upcoming
-
-        default:
-            return .neutral
-        }
-    }
-
-    // MARK: - Helpers
-
-    private func isLiveStatus(_ status: String) -> Bool {
-        status.contains("live")
-            || status.contains("in progress")
-            || status.contains("inning")
-            || status.contains("top")
-            || status.contains("bottom")
-            || status.contains("half")
-    }
-
     private func makeVenueSection(from fixture: BaseballMatchFixtureDetail) -> BaseballMatchDetailVenueViewData? {
         guard let venueName = fixture.venueName?.trimmingCharacters(in: .whitespacesAndNewlines),
               !venueName.isEmpty else {
@@ -254,10 +190,15 @@ final class BaseballMatchDetailViewModel {
 
     // MARK: - Stats Aggregation
 
-    private func makeStatsViewData(from detail: BaseballMatchDetail) -> BaseballMatchDetailStatsViewData {
+    private func makeStatsViewData(
+        from detail: BaseballMatchDetail,
+        phase: MatchFixturePhase
+    ) -> BaseballMatchDetailStatsViewData {
         let fixture = detail.fixture
+        let displayPolicy = phase.displayPolicy(for: .baseball)
 
-        if let homePlayers = findTeamPlayers(for: fixture.homeTeam, in: detail.playersByTeam),
+        if displayPolicy.showsDetailedStatistics,
+           let homePlayers = findTeamPlayers(for: fixture.homeTeam, in: detail.playersByTeam),
            let awayPlayers = findTeamPlayers(for: fixture.awayTeam, in: detail.playersByTeam, excluding: homePlayers),
            !homePlayers.players.isEmpty || !awayPlayers.players.isEmpty {
             let homeTotals = aggregate(players: homePlayers.players)
@@ -265,40 +206,53 @@ final class BaseballMatchDetailViewModel {
             let comparisonRows = makeComparisonRows(home: homeTotals, away: awayTotals)
 
             if !comparisonRows.isEmpty {
-                return appendInningPeriods(
-                    to: BaseballMatchDetailStatsViewData(
-                        homeTeamName: fixture.homeTeam.name,
-                        awayTeamName: fixture.awayTeam.name,
-                        comparisonRows: comparisonRows,
-                        homeRows: makeValueRows(from: homeTotals),
-                        awayRows: makeValueRows(from: awayTotals)
-                    ),
-                    score: fixture.score
+                return finalizeStatsViewData(
+                    fixture: fixture,
+                    phase: phase,
+                    viewData: appendInningPeriods(
+                        to: BaseballMatchDetailStatsViewData(
+                            homeTeamName: fixture.homeTeam.name,
+                            awayTeamName: fixture.awayTeam.name,
+                            displayState: .content,
+                            showsFilter: true,
+                            comparisonRows: comparisonRows,
+                            homeRows: makeValueRows(from: homeTotals),
+                            awayRows: makeValueRows(from: awayTotals)
+                        ),
+                        score: fixture.score
+                    )
                 )
             }
         }
 
-        if let lineScoreStats = makeLineScoreStatsViewData(from: fixture) {
+        if let lineScoreStats = makeLineScoreStatsViewData(from: fixture, phase: phase) {
             return lineScoreStats
         }
 
-        return makeEmptyStatsViewData(from: fixture)
+        return makeEmptyStatsViewData(from: fixture, phase: phase)
     }
 
     private func makeLineScoreStatsViewData(
-        from fixture: BaseballMatchFixtureDetail
+        from fixture: BaseballMatchFixtureDetail,
+        phase: MatchFixturePhase
     ) -> BaseballMatchDetailStatsViewData? {
         let comparisonRows = makeLineScoreComparisonRows(from: fixture.score)
         guard !comparisonRows.isEmpty else {
             return nil
         }
 
-        return BaseballMatchDetailStatsViewData(
-            homeTeamName: fixture.homeTeam.name,
-            awayTeamName: fixture.awayTeam.name,
-            comparisonRows: comparisonRows,
-            homeRows: makeLineScoreValueRows(from: fixture.score.home),
-            awayRows: makeLineScoreValueRows(from: fixture.score.away)
+        return finalizeStatsViewData(
+            fixture: fixture,
+            phase: phase,
+            viewData: BaseballMatchDetailStatsViewData(
+                homeTeamName: fixture.homeTeam.name,
+                awayTeamName: fixture.awayTeam.name,
+                displayState: .content,
+                showsFilter: true,
+                comparisonRows: comparisonRows,
+                homeRows: makeLineScoreValueRows(from: fixture.score.home),
+                awayRows: makeLineScoreValueRows(from: fixture.score.away)
+            )
         )
     }
 
@@ -379,9 +333,32 @@ final class BaseballMatchDetailViewModel {
         return BaseballMatchDetailStatsViewData(
             homeTeamName: viewData.homeTeamName,
             awayTeamName: viewData.awayTeamName,
+            displayState: viewData.displayState,
+            showsFilter: viewData.showsFilter,
             comparisonRows: viewData.comparisonRows + inningComparisonRows,
             homeRows: viewData.homeRows + makeInningValueRows(from: score.home.innings),
             awayRows: viewData.awayRows + makeInningValueRows(from: score.away.innings)
+        )
+    }
+
+    private func finalizeStatsViewData(
+        fixture: BaseballMatchFixtureDetail,
+        phase: MatchFixturePhase,
+        viewData: BaseballMatchDetailStatsViewData
+    ) -> BaseballMatchDetailStatsViewData {
+        let metadata = phase.statsViewMetadata(
+            hasRows: !viewData.comparisonRows.isEmpty,
+            sport: .baseball
+        )
+
+        return BaseballMatchDetailStatsViewData(
+            homeTeamName: fixture.homeTeam.name,
+            awayTeamName: fixture.awayTeam.name,
+            displayState: metadata.displayState,
+            showsFilter: metadata.showsFilter,
+            comparisonRows: viewData.comparisonRows,
+            homeRows: viewData.homeRows,
+            awayRows: viewData.awayRows
         )
     }
 
@@ -458,13 +435,22 @@ final class BaseballMatchDetailViewModel {
         return Self.formatCount(Double(value))
     }
 
-    private func makeEmptyStatsViewData(from fixture: BaseballMatchFixtureDetail) -> BaseballMatchDetailStatsViewData {
-        BaseballMatchDetailStatsViewData(
-            homeTeamName: fixture.homeTeam.name,
-            awayTeamName: fixture.awayTeam.name,
-            comparisonRows: [],
-            homeRows: [],
-            awayRows: []
+    private func makeEmptyStatsViewData(
+        from fixture: BaseballMatchFixtureDetail,
+        phase: MatchFixturePhase
+    ) -> BaseballMatchDetailStatsViewData {
+        finalizeStatsViewData(
+            fixture: fixture,
+            phase: phase,
+            viewData: BaseballMatchDetailStatsViewData(
+                homeTeamName: fixture.homeTeam.name,
+                awayTeamName: fixture.awayTeam.name,
+                displayState: .content,
+                showsFilter: false,
+                comparisonRows: [],
+                homeRows: [],
+                awayRows: []
+            )
         )
     }
 

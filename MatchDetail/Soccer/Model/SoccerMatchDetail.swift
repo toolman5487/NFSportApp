@@ -52,6 +52,20 @@ nonisolated struct SoccerMatchScore: Equatable, Sendable {
 
     let home: Int?
     let away: Int?
+    let halftime: SoccerMatchScoreLine?
+    let fulltime: SoccerMatchScoreLine?
+    let extratime: SoccerMatchScoreLine?
+    let penalty: SoccerMatchScoreLine?
+}
+
+nonisolated struct SoccerMatchScoreLine: Equatable, Sendable {
+
+    let home: Int?
+    let away: Int?
+
+    var hasValue: Bool {
+        home != nil || away != nil
+    }
 }
 
 // MARK: - Statistics

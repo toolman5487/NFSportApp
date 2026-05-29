@@ -22,63 +22,6 @@ nonisolated enum BasketballMatchDetailViewState: Equatable, Sendable {
 @MainActor
 final class BasketballMatchDetailViewModel {
 
-    // MARK: - Types
-
-    private enum MatchStatus: Equatable {
-        case live(quarterText: String?)
-        case scheduled
-        case tbd
-        case halfTime
-        case overtime
-        case breakTime
-        case final
-        case postponed
-        case cancelled
-        case unknown
-
-        var displayText: String {
-            switch self {
-            case .live(let quarterText):
-                return quarterText ?? "Live"
-            case .scheduled:
-                return "Scheduled"
-            case .tbd:
-                return "TBD"
-            case .halfTime:
-                return "Half Time"
-            case .overtime:
-                return "Overtime"
-            case .breakTime:
-                return "Break"
-            case .final:
-                return "Final"
-            case .postponed:
-                return "Postponed"
-            case .cancelled:
-                return "Cancelled"
-            case .unknown:
-                return "Scheduled"
-            }
-        }
-
-        var style: BasketballMatchDetailHeaderStatusStyle {
-            switch self {
-            case .live:
-                return .live
-            case .final:
-                return .final
-            case .scheduled, .tbd:
-                return .upcoming
-            case .postponed:
-                return .postponed
-            case .cancelled:
-                return .cancelled
-            case .halfTime, .overtime, .breakTime, .unknown:
-                return .neutral
-            }
-        }
-    }
-
     // MARK: - Properties
 
     private(set) var state: BasketballMatchDetailViewState = .idle {
@@ -133,10 +76,16 @@ final class BasketballMatchDetailViewModel {
     // MARK: - Presentation Builders
 
     private func makePresentation(from detail: BasketballMatchDetail) -> BasketballMatchDetailPresentation {
-        let sections: [BasketballMatchDetailSectionViewData] = [
-            .header(makeHeaderViewData(from: detail.fixture)),
-            .stats(makeStatsViewData(from: detail))
+        let phase = makePhase(from: detail.fixture)
+        let displayPolicy = phase.displayPolicy(for: .basketball)
+
+        var sections: [BasketballMatchDetailSectionViewData] = [
+            .header(makeHeaderViewData(from: detail.fixture, phase: phase))
         ]
+
+        if displayPolicy.showsStatsSection {
+            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
+        }
 
         return BasketballMatchDetailPresentation(
             title: detail.fixture.leagueName,
@@ -144,9 +93,28 @@ final class BasketballMatchDetailViewModel {
         )
     }
 
-    private func makeHeaderViewData(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailHeaderViewData {
-        let statusStyle = makeStatusStyle(from: fixture)
-        let statusText = makeStatusText(from: fixture)
+    private func makePhase(from fixture: BasketballMatchFixtureDetail) -> MatchFixturePhase {
+        MatchFixturePhase(
+            sport: .basketball,
+            snapshot: MatchFixtureStatusSnapshot.make(
+                statusShort: fixture.statusShort,
+                statusLong: fixture.statusLong
+            )
+        )
+    }
+
+    private func makeHeaderViewData(
+        from fixture: BasketballMatchFixtureDetail,
+        phase: MatchFixturePhase
+    ) -> BasketballMatchDetailHeaderViewData {
+        let statusStyle = BasketballMatchDetailHeaderStatusStyle(
+            matchNavigationStyle: phase.navigationStatusStyle
+        )
+        let statusText = phase.statusText(
+            fallbackStatusLong: fixture.statusLong,
+            fallbackStatusShort: fixture.statusShort
+        )
+        let showsScore = phase.displayPolicy(for: .basketball).showsHeaderScore
 
         return BasketballMatchDetailHeaderViewData(
             leagueName: fixture.leagueName,
@@ -165,30 +133,10 @@ final class BasketballMatchDetailViewModel {
             homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
             awayTeamLogoURL: fixture.awayTeam.logoURL,
-            homeScoreText: fixture.score.home.total.map(String.init) ?? "-",
-            awayScoreText: fixture.score.away.total.map(String.init) ?? "-",
+            homeScoreText: showsScore ? formatOptionalCount(fixture.score.home.total) : "-",
+            awayScoreText: showsScore ? formatOptionalCount(fixture.score.away.total) : "-",
             venue: makeVenueSection(from: fixture)
         )
-    }
-
-    // MARK: - Status Mapping
-
-    private func makeStatusText(from fixture: BasketballMatchFixtureDetail) -> String {
-        let matchStatus = makeMatchStatus(from: fixture)
-        if case .unknown = matchStatus {
-            if let statusLong = fixture.statusLong,
-               !statusLong.isEmpty {
-                return statusLong
-            }
-
-            return fixture.statusShort ?? "Scheduled"
-        }
-
-        return matchStatus.displayText
-    }
-
-    private func makeStatusStyle(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailHeaderStatusStyle {
-        makeMatchStatus(from: fixture).style
     }
 
     // MARK: - Navigation Badge
@@ -222,70 +170,6 @@ final class BasketballMatchDetailViewModel {
         }
     }
 
-    // MARK: - Match Status Parsing
-
-    private func makeMatchStatus(from fixture: BasketballMatchFixtureDetail) -> MatchStatus {
-        guard let normalizedStatus = fixture.statusShort?.lowercased() ?? fixture.statusLong?.lowercased() else {
-            return .unknown
-        }
-
-        if isLiveStatus(normalizedStatus) {
-            return .live(quarterText: makeQuarterText(from: normalizedStatus))
-        }
-
-        switch normalizedStatus {
-        case "ns", "not started":
-            return .scheduled
-        case "tbd":
-            return .tbd
-        case "ht", "half time":
-            return .halfTime
-        case "ot", "overtime":
-            return .overtime
-        case "bt", "break time":
-            return .breakTime
-        case "ft", "aot", "after overtime", "final":
-            return .final
-        case "pst", "postponed":
-            return .postponed
-        case "canc", "cancelled", "abd", "abandoned", "susp", "suspended":
-            return .cancelled
-        default:
-            return .unknown
-        }
-    }
-
-    // MARK: - Helpers
-
-    private func isLiveStatus(_ status: String) -> Bool {
-        status.contains("q1")
-            || status.contains("q2")
-            || status.contains("q3")
-            || status.contains("q4")
-            || status.contains("ot")
-            || status.contains("bt")
-            || status.contains("ht")
-            || status.contains("live")
-            || status.contains("half")
-    }
-
-    private func makeQuarterText(from status: String) -> String? {
-        switch status {
-        case let value where value.contains("q1"):
-            return "Q1"
-        case let value where value.contains("q2"):
-            return "Q2"
-        case let value where value.contains("q3"):
-            return "Q3"
-        case let value where value.contains("q4"):
-            return "Q4"
-        case let value where value.contains("ot"):
-            return "OT"
-        default:
-            return nil
-        }
-    }
-
     private func makeVenueSection(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailVenueViewData? {
         guard let venueName = fixture.venueName?.trimmingCharacters(in: .whitespacesAndNewlines),
               !venueName.isEmpty else {
@@ -310,10 +194,15 @@ final class BasketballMatchDetailViewModel {
 
     // MARK: - Stats Aggregation
 
-    private func makeStatsViewData(from detail: BasketballMatchDetail) -> BasketballMatchDetailStatsViewData {
+    private func makeStatsViewData(
+        from detail: BasketballMatchDetail,
+        phase: MatchFixturePhase
+    ) -> BasketballMatchDetailStatsViewData {
         let fixture = detail.fixture
+        let displayPolicy = phase.displayPolicy(for: .basketball)
 
-        if let homePlayers = findTeamPlayers(for: fixture.homeTeam, in: detail.playersByTeam),
+        if displayPolicy.showsDetailedStatistics,
+           let homePlayers = findTeamPlayers(for: fixture.homeTeam, in: detail.playersByTeam),
            let awayPlayers = findTeamPlayers(for: fixture.awayTeam, in: detail.playersByTeam, excluding: homePlayers),
            !homePlayers.players.isEmpty || !awayPlayers.players.isEmpty {
             let homeTotals = aggregate(players: homePlayers.players)
@@ -321,28 +210,35 @@ final class BasketballMatchDetailViewModel {
             let comparisonRows = makeComparisonRows(home: homeTotals, away: awayTotals)
 
             if !comparisonRows.isEmpty {
-                return appendQuarterPeriods(
-                    to: BasketballMatchDetailStatsViewData(
-                        homeTeamName: fixture.homeTeam.name,
-                        awayTeamName: fixture.awayTeam.name,
-                        comparisonRows: comparisonRows,
-                        homeRows: makeValueRows(from: homeTotals),
-                        awayRows: makeValueRows(from: awayTotals)
-                    ),
-                    score: fixture.score
+                return finalizeStatsViewData(
+                    fixture: fixture,
+                    phase: phase,
+                    viewData: appendQuarterPeriods(
+                        to: BasketballMatchDetailStatsViewData(
+                            homeTeamName: fixture.homeTeam.name,
+                            awayTeamName: fixture.awayTeam.name,
+                            displayState: .content,
+                            showsFilter: true,
+                            comparisonRows: comparisonRows,
+                            homeRows: makeValueRows(from: homeTotals),
+                            awayRows: makeValueRows(from: awayTotals)
+                        ),
+                        score: fixture.score
+                    )
                 )
             }
         }
 
-        if let scoreStats = makeGameScoreStatsViewData(from: fixture) {
+        if let scoreStats = makeGameScoreStatsViewData(from: fixture, phase: phase) {
             return scoreStats
         }
 
-        return makeEmptyStatsViewData(from: fixture)
+        return makeEmptyStatsViewData(from: fixture, phase: phase)
     }
 
     private func makeGameScoreStatsViewData(
-        from fixture: BasketballMatchFixtureDetail
+        from fixture: BasketballMatchFixtureDetail,
+        phase: MatchFixturePhase
     ) -> BasketballMatchDetailStatsViewData? {
         let homeScore = fixture.score.home
         let awayScore = fixture.score.away
@@ -370,12 +266,18 @@ final class BasketballMatchDetailViewModel {
             return nil
         }
 
-        return BasketballMatchDetailStatsViewData(
-            homeTeamName: fixture.homeTeam.name,
-            awayTeamName: fixture.awayTeam.name,
-            comparisonRows: comparisonRows,
-            homeRows: makeGameScoreValueRows(from: homeScore),
-            awayRows: makeGameScoreValueRows(from: awayScore)
+        return finalizeStatsViewData(
+            fixture: fixture,
+            phase: phase,
+            viewData: BasketballMatchDetailStatsViewData(
+                homeTeamName: fixture.homeTeam.name,
+                awayTeamName: fixture.awayTeam.name,
+                displayState: .content,
+                showsFilter: true,
+                comparisonRows: comparisonRows,
+                homeRows: makeGameScoreValueRows(from: homeScore),
+                awayRows: makeGameScoreValueRows(from: awayScore)
+            )
         )
     }
 
@@ -468,9 +370,32 @@ final class BasketballMatchDetailViewModel {
         return BasketballMatchDetailStatsViewData(
             homeTeamName: viewData.homeTeamName,
             awayTeamName: viewData.awayTeamName,
+            displayState: viewData.displayState,
+            showsFilter: viewData.showsFilter,
             comparisonRows: viewData.comparisonRows + quarterComparisonRows,
             homeRows: viewData.homeRows + makeQuarterValueRows(from: score.home.periods),
             awayRows: viewData.awayRows + makeQuarterValueRows(from: score.away.periods)
+        )
+    }
+
+    private func finalizeStatsViewData(
+        fixture: BasketballMatchFixtureDetail,
+        phase: MatchFixturePhase,
+        viewData: BasketballMatchDetailStatsViewData
+    ) -> BasketballMatchDetailStatsViewData {
+        let metadata = phase.statsViewMetadata(
+            hasRows: !viewData.comparisonRows.isEmpty,
+            sport: .basketball
+        )
+
+        return BasketballMatchDetailStatsViewData(
+            homeTeamName: fixture.homeTeam.name,
+            awayTeamName: fixture.awayTeam.name,
+            displayState: metadata.displayState,
+            showsFilter: metadata.showsFilter,
+            comparisonRows: viewData.comparisonRows,
+            homeRows: viewData.homeRows,
+            awayRows: viewData.awayRows
         )
     }
 
@@ -493,13 +418,22 @@ final class BasketballMatchDetailViewModel {
         return Self.formatCount(Double(value))
     }
 
-    private func makeEmptyStatsViewData(from fixture: BasketballMatchFixtureDetail) -> BasketballMatchDetailStatsViewData {
-        BasketballMatchDetailStatsViewData(
-            homeTeamName: fixture.homeTeam.name,
-            awayTeamName: fixture.awayTeam.name,
-            comparisonRows: [],
-            homeRows: [],
-            awayRows: []
+    private func makeEmptyStatsViewData(
+        from fixture: BasketballMatchFixtureDetail,
+        phase: MatchFixturePhase
+    ) -> BasketballMatchDetailStatsViewData {
+        finalizeStatsViewData(
+            fixture: fixture,
+            phase: phase,
+            viewData: BasketballMatchDetailStatsViewData(
+                homeTeamName: fixture.homeTeam.name,
+                awayTeamName: fixture.awayTeam.name,
+                displayState: .content,
+                showsFilter: false,
+                comparisonRows: [],
+                homeRows: [],
+                awayRows: []
+            )
         )
     }
 

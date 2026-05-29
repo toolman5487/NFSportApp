@@ -99,17 +99,24 @@ final class SoccerMatchDetailViewModel {
     // MARK: - Presentation Builders
 
     private func makePresentation(from detail: SoccerMatchDetail) -> SoccerMatchDetailPresentation {
+        let phase = makePhase(from: detail.fixture)
+        let displayPolicy = phase.displayPolicy(for: .soccer)
+
         var sections: [SoccerMatchDetailSectionViewData] = [
-            .header(makeHeaderViewData(from: detail.fixture))
+            .header(makeHeaderViewData(from: detail.fixture, phase: phase))
         ]
 
-        sections.append(.stats(makeStatsViewData(from: detail)))
+        if displayPolicy.showsStatsSection {
+            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
+        }
 
-        if let eventsSection = makeEventsSection(from: detail.events) {
+        if displayPolicy.showsEventsSection,
+           let eventsSection = makeEventsSection(from: detail.events) {
             sections.append(.events(eventsSection))
         }
 
-        if let lineupsSection = makeLineupsSection(from: detail) {
+        if displayPolicy.showsLineupsSection,
+           let lineupsSection = makeLineupsSection(from: detail) {
             sections.append(.lineups(lineupsSection))
         }
 
@@ -119,9 +126,29 @@ final class SoccerMatchDetailViewModel {
         )
     }
 
-    private func makeHeaderViewData(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailHeaderViewData {
-        let statusStyle = makeStatusStyle(from: fixture)
-        let statusText = makeStatusText(from: fixture)
+    private func makePhase(from fixture: SoccerMatchFixtureDetail) -> MatchFixturePhase {
+        MatchFixturePhase(
+            sport: .soccer,
+            snapshot: MatchFixtureStatusSnapshot.make(
+                statusShort: fixture.statusShort,
+                statusLong: fixture.statusLong,
+                elapsedMinute: fixture.elapsedMinute
+            )
+        )
+    }
+
+    private func makeHeaderViewData(
+        from fixture: SoccerMatchFixtureDetail,
+        phase: MatchFixturePhase
+    ) -> SoccerMatchDetailHeaderViewData {
+        let statusStyle = SoccerMatchDetailHeaderStatusStyle(
+            matchNavigationStyle: phase.navigationStatusStyle
+        )
+        let statusText = phase.statusText(
+            fallbackStatusLong: fixture.statusLong,
+            fallbackStatusShort: fixture.statusShort
+        )
+        let showsScore = phase.displayPolicy(for: .soccer).showsHeaderScore
 
         return SoccerMatchDetailHeaderViewData(
             leagueName: fixture.leagueName,
@@ -140,8 +167,8 @@ final class SoccerMatchDetailViewModel {
             homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
             awayTeamLogoURL: fixture.awayTeam.logoURL,
-            homeScoreText: fixture.score.home.map(String.init) ?? "-",
-            awayScoreText: fixture.score.away.map(String.init) ?? "-",
+            homeScoreText: showsScore ? formatOptionalCount(fixture.score.home) : "-",
+            awayScoreText: showsScore ? formatOptionalCount(fixture.score.away) : "-",
             venue: makeVenueSection(from: fixture)
         )
     }
@@ -283,12 +310,18 @@ final class SoccerMatchDetailViewModel {
     }
 
     private func makeLineupViewData(from lineup: SoccerMatchLineup) -> SoccerMatchDetailLineupViewData {
-        SoccerMatchDetailLineupViewData(
+        let substitutes = lineup.substitutes.map(formatLineupPlayer)
+        let layoutState: SoccerMatchLineupLayoutState = substitutes.isEmpty
+            ? .startersOnly
+            : .withSubstitutes
+
+        return SoccerMatchDetailLineupViewData(
             teamName: lineup.team.name,
             formationText: lineup.formation,
             coachName: lineup.coachName,
+            layoutState: layoutState,
             starters: lineup.startXI.map(formatLineupPlayer),
-            substitutes: lineup.substitutes.map(formatLineupPlayer)
+            substitutes: substitutes
         )
     }
 
@@ -302,126 +335,243 @@ final class SoccerMatchDetailViewModel {
 
     // MARK: - Stats Aggregation
 
-    private func makeStatsViewData(from detail: SoccerMatchDetail) -> SoccerMatchDetailStatsViewData {
-        let fixture = detail.fixture
-
-        guard let homeStatistics = detail.statistics.first(where: { matchesTeam($0.team, fixture.homeTeam) }),
-              let awayStatistics = detail.statistics.first(where: { matchesTeam($0.team, fixture.awayTeam) }) else {
-            return makeScoreOnlyStatsViewData(from: fixture)
-        }
-
-        let homeValuesByType = Dictionary(uniqueKeysWithValues: homeStatistics.statistics.map { ($0.type, $0.value) })
-        let awayValuesByType = Dictionary(uniqueKeysWithValues: awayStatistics.statistics.map { ($0.type, $0.value) })
-        let allTypes = Array(Set(homeValuesByType.keys).union(awayValuesByType.keys))
-        let orderedTypes = allTypes.sorted(by: compareStatisticType)
-
-        var comparisonRows: [SoccerMatchStatsComparisonRowViewData] = []
-        var homeRows: [SoccerMatchStatsValueRowViewData] = []
-        var awayRows: [SoccerMatchStatsValueRowViewData] = []
-
-        appendGoalsRows(
-            from: fixture.score,
-            comparisonRows: &comparisonRows,
-            homeRows: &homeRows,
-            awayRows: &awayRows
-        )
-
-        for type in orderedTypes {
-            let homeValue = homeValuesByType[type] ?? nil
-            let awayValue = awayValuesByType[type] ?? nil
-
-            guard homeValue != nil || awayValue != nil else {
-                continue
-            }
-
-            comparisonRows.append(
-                makeStatisticComparisonRow(
-                    title: type,
-                    homeValue: homeValue,
-                    awayValue: awayValue
-                )
-            )
-
-            homeRows.append(
-                SoccerMatchStatsValueRowViewData(
-                    title: type,
-                    value: homeValue ?? "-"
-                )
-            )
-            awayRows.append(
-                SoccerMatchStatsValueRowViewData(
-                    title: type,
-                    value: awayValue ?? "-"
-                )
-            )
-        }
-
-        return SoccerMatchDetailStatsViewData(
-            homeTeamName: fixture.homeTeam.name,
-            awayTeamName: fixture.awayTeam.name,
-            comparisonRows: comparisonRows,
-            homeRows: homeRows,
-            awayRows: awayRows
-        )
-    }
-
-    private func makeScoreOnlyStatsViewData(
-        from fixture: SoccerMatchFixtureDetail
+    private func makeStatsViewData(
+        from detail: SoccerMatchDetail,
+        phase: MatchFixturePhase
     ) -> SoccerMatchDetailStatsViewData {
+        let fixture = detail.fixture
+        let displayPolicy = phase.displayPolicy(for: .soccer)
+
         var comparisonRows: [SoccerMatchStatsComparisonRowViewData] = []
         var homeRows: [SoccerMatchStatsValueRowViewData] = []
         var awayRows: [SoccerMatchStatsValueRowViewData] = []
 
-        appendGoalsRows(
-            from: fixture.score,
-            comparisonRows: &comparisonRows,
-            homeRows: &homeRows,
-            awayRows: &awayRows
-        )
+        if displayPolicy.showsScoreBreakdownInStats {
+            appendScoreRows(
+                from: fixture.score,
+                style: phase.scoreBreakdownStyle,
+                comparisonRows: &comparisonRows,
+                homeRows: &homeRows,
+                awayRows: &awayRows
+            )
+        }
 
-        return SoccerMatchDetailStatsViewData(
-            homeTeamName: fixture.homeTeam.name,
-            awayTeamName: fixture.awayTeam.name,
+        if displayPolicy.showsDetailedStatistics,
+           let (homeStatistics, awayStatistics) = resolveTeamStatistics(
+               from: detail.statistics,
+               fixture: fixture
+           ) {
+            let homeValuesByType = Dictionary(uniqueKeysWithValues: homeStatistics.statistics.map { ($0.type, $0.value) })
+            let awayValuesByType = Dictionary(uniqueKeysWithValues: awayStatistics.statistics.map { ($0.type, $0.value) })
+            let allTypes = Array(Set(homeValuesByType.keys).union(awayValuesByType.keys))
+            let orderedTypes = allTypes.sorted(by: compareStatisticType)
+
+            for type in orderedTypes {
+                let homeValue = homeValuesByType[type] ?? nil
+                let awayValue = awayValuesByType[type] ?? nil
+
+                guard homeValue != nil || awayValue != nil else {
+                    continue
+                }
+
+                comparisonRows.append(
+                    makeStatisticComparisonRow(
+                        title: type,
+                        homeValue: homeValue,
+                        awayValue: awayValue
+                    )
+                )
+
+                homeRows.append(
+                    SoccerMatchStatsValueRowViewData(
+                        title: type,
+                        value: homeValue ?? "-"
+                    )
+                )
+                awayRows.append(
+                    SoccerMatchStatsValueRowViewData(
+                        title: type,
+                        value: awayValue ?? "-"
+                    )
+                )
+            }
+        }
+
+        return finalizeStatsViewData(
+            fixture: fixture,
+            phase: phase,
             comparisonRows: comparisonRows,
             homeRows: homeRows,
             awayRows: awayRows
         )
     }
 
-    private func appendGoalsRows(
+    private func finalizeStatsViewData(
+        fixture: SoccerMatchFixtureDetail,
+        phase: MatchFixturePhase,
+        comparisonRows: [SoccerMatchStatsComparisonRowViewData],
+        homeRows: [SoccerMatchStatsValueRowViewData],
+        awayRows: [SoccerMatchStatsValueRowViewData]
+    ) -> SoccerMatchDetailStatsViewData {
+        let metadata = phase.statsViewMetadata(
+            hasRows: !comparisonRows.isEmpty,
+            sport: .soccer
+        )
+
+        return SoccerMatchDetailStatsViewData(
+            homeTeamName: fixture.homeTeam.name,
+            awayTeamName: fixture.awayTeam.name,
+            displayState: metadata.displayState,
+            showsFilter: metadata.showsFilter,
+            comparisonRows: comparisonRows,
+            homeRows: homeRows,
+            awayRows: awayRows
+        )
+    }
+
+    private func appendScoreRows(
         from score: SoccerMatchScore,
+        style: MatchFixturePhase.ScoreBreakdownStyle,
         comparisonRows: inout [SoccerMatchStatsComparisonRowViewData],
         homeRows: inout [SoccerMatchStatsValueRowViewData],
         awayRows: inout [SoccerMatchStatsValueRowViewData]
     ) {
-        guard score.home != nil || score.away != nil else {
+        switch style {
+        case .none:
             return
-        }
 
-        let homeGoals = Double(score.home ?? 0)
-        let awayGoals = Double(score.away ?? 0)
+        case .live:
+            if let halftime = score.halftime, halftime.hasValue {
+                appendScoreLineRow(
+                    title: "Half-time",
+                    line: halftime,
+                    comparisonRows: &comparisonRows,
+                    homeRows: &homeRows,
+                    awayRows: &awayRows
+                )
+            }
+
+            let liveScoreLine = SoccerMatchScoreLine(home: score.home, away: score.away)
+            if liveScoreLine.hasValue {
+                appendScoreLineRow(
+                    title: "Score",
+                    line: liveScoreLine,
+                    comparisonRows: &comparisonRows,
+                    homeRows: &homeRows,
+                    awayRows: &awayRows
+                )
+            }
+
+        case .finished:
+            if let halftime = score.halftime, halftime.hasValue {
+                appendScoreLineRow(
+                    title: "Half-time",
+                    line: halftime,
+                    comparisonRows: &comparisonRows,
+                    homeRows: &homeRows,
+                    awayRows: &awayRows
+                )
+            }
+
+            let fulltimeLine = score.fulltime ?? SoccerMatchScoreLine(home: score.home, away: score.away)
+            if fulltimeLine.hasValue {
+                appendScoreLineRow(
+                    title: "Full-time",
+                    line: fulltimeLine,
+                    comparisonRows: &comparisonRows,
+                    homeRows: &homeRows,
+                    awayRows: &awayRows
+                )
+            }
+
+            if let extratime = score.extratime, extratime.hasValue {
+                appendScoreLineRow(
+                    title: "Extra Time",
+                    line: extratime,
+                    comparisonRows: &comparisonRows,
+                    homeRows: &homeRows,
+                    awayRows: &awayRows
+                )
+            }
+
+            if let penalty = score.penalty, penalty.hasValue {
+                appendScoreLineRow(
+                    title: "Penalties",
+                    line: penalty,
+                    comparisonRows: &comparisonRows,
+                    homeRows: &homeRows,
+                    awayRows: &awayRows
+                )
+            }
+        }
+    }
+
+    private func appendScoreLineRow(
+        title: String,
+        line: SoccerMatchScoreLine,
+        comparisonRows: inout [SoccerMatchStatsComparisonRowViewData],
+        homeRows: inout [SoccerMatchStatsValueRowViewData],
+        awayRows: inout [SoccerMatchStatsValueRowViewData]
+    ) {
+        let homeValue = Double(line.home ?? 0)
+        let awayValue = Double(line.away ?? 0)
 
         comparisonRows.append(
             makeRatioComparisonRow(
-                title: "Goals",
-                home: homeGoals,
-                away: awayGoals,
-                homeDisplay: formatOptionalCount(score.home),
-                awayDisplay: formatOptionalCount(score.away)
+                title: title,
+                home: homeValue,
+                away: awayValue,
+                homeDisplay: formatOptionalCount(line.home),
+                awayDisplay: formatOptionalCount(line.away)
             )
         )
         homeRows.append(
             SoccerMatchStatsValueRowViewData(
-                title: "Goals",
-                value: formatOptionalCount(score.home)
+                title: title,
+                value: formatOptionalCount(line.home)
             )
         )
         awayRows.append(
             SoccerMatchStatsValueRowViewData(
-                title: "Goals",
-                value: formatOptionalCount(score.away)
+                title: title,
+                value: formatOptionalCount(line.away)
             )
         )
+    }
+
+    private func resolveTeamStatistics(
+        from statistics: [SoccerMatchTeamStatistics],
+        fixture: SoccerMatchFixtureDetail
+    ) -> (home: SoccerMatchTeamStatistics, away: SoccerMatchTeamStatistics)? {
+        guard !statistics.isEmpty else {
+            return nil
+        }
+
+        if let homeStatistics = statistics.first(where: { matchesTeam($0.team, fixture.homeTeam) }),
+           let awayStatistics = statistics.first(where: { matchesTeam($0.team, fixture.awayTeam) }),
+           !homeStatistics.statistics.isEmpty || !awayStatistics.statistics.isEmpty {
+            return (homeStatistics, awayStatistics)
+        }
+
+        guard statistics.count == 2 else {
+            return nil
+        }
+
+        let first = statistics[0]
+        let second = statistics[1]
+        guard !first.statistics.isEmpty || !second.statistics.isEmpty else {
+            return nil
+        }
+
+        if matchesTeam(first.team, fixture.homeTeam) {
+            return (first, second)
+        }
+
+        if matchesTeam(first.team, fixture.awayTeam) {
+            return (second, first)
+        }
+
+        return (first, second)
     }
 
     private func makeStatisticComparisonRow(
@@ -531,111 +681,7 @@ final class SoccerMatchDetailViewModel {
             return lhsID == rhsID
         }
 
-        return lhs.name == rhs.name
-    }
-
-    // MARK: - Status Mapping
-
-    private func makeStatusText(from fixture: SoccerMatchFixtureDetail) -> String {
-        let statusShort = fixture.statusShort?.lowercased()
-        let statusLong = fixture.statusLong?.lowercased()
-        let normalizedStatus = statusShort ?? statusLong
-
-        if let elapsedMinute = fixture.elapsedMinute,
-           let normalizedStatus,
-           normalizedStatus == "1h"
-            || normalizedStatus == "2h"
-            || normalizedStatus == "et"
-            || normalizedStatus == "bt"
-            || normalizedStatus == "live" {
-            return "\(elapsedMinute)'"
-        }
-
-        guard let normalizedStatus else {
-            return "Scheduled"
-        }
-
-        switch normalizedStatus {
-        case "ns", "not started":
-            return "Scheduled"
-        case "tbd", "time to be defined":
-            return "TBD"
-        case "1h", "2h", "live":
-            return "Live"
-        case "ht", "half time":
-            return "Half Time"
-        case "et", "extra time":
-            return "Extra Time"
-        case "bt", "break time":
-            return "Break"
-        case "p", "pen", "penalty in progress":
-            return "Penalties"
-        case "ft", "aet", "aft", "final", "match finished":
-            return "Final"
-        case "pst", "postponed":
-            return "Postponed"
-        case "canc", "cancelled", "abandoned", "abd":
-            return "Cancelled"
-        case "int", "interrupted", "susp", "suspended":
-            return "Suspended"
-        default:
-            if let statusLong,
-               !statusLong.isEmpty {
-                return fixture.statusLong ?? "Scheduled"
-            }
-
-            return fixture.statusShort ?? "Scheduled"
-        }
-    }
-
-    private func makeStatusStyle(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailHeaderStatusStyle {
-        let normalizedStatus = fixture.statusShort?.lowercased() ?? fixture.statusLong?.lowercased()
-
-        guard let normalizedStatus else {
-            return .neutral
-        }
-
-        switch normalizedStatus {
-        case let status where status.contains("1h")
-            || status.contains("2h")
-            || status.contains("half")
-            || status.contains("live")
-            || status.contains("et")
-            || status.contains("bt")
-            || status.contains("p"):
-            return .live
-
-        case let status where status.contains("ft")
-            || status.contains("aet")
-            || status.contains("pen")
-            || status.contains("finish")
-            || status.contains("final")
-            || status.contains("ended"):
-            return .final
-
-        case let status where status.contains("ns")
-            || status.contains("scheduled")
-            || status.contains("not started")
-            || status.contains("time to be defined"):
-            return .upcoming
-
-        case let status where status.contains("postponed")
-            || status == "pst":
-            return .postponed
-
-        case let status where status.contains("cancel")
-            || status.contains("abandoned")
-            || status.contains("suspended")
-            || status.contains("interrupted")
-            || status == "abd"
-            || status == "int"
-            || status == "canc"
-            || status == "susp":
-            return .cancelled
-
-        default:
-            return .neutral
-        }
+        return lhs.name.caseInsensitiveCompare(rhs.name) == .orderedSame
     }
 
     // MARK: - Helpers

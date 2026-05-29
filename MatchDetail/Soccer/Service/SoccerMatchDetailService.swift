@@ -25,25 +25,30 @@ nonisolated struct SoccerMatchDetailService: SoccerMatchDetailServicing {
     }
 
     func fetchMatchDetail(fixtureID: Int) async throws -> SoccerMatchDetail {
-        async let fixture = fetchFixture(from: .fixture(id: fixtureID))
+        async let fixturePayload = fetchFixturePayload(from: .fixture(id: fixtureID))
         async let statistics = fetchStatistics(from: .statistics(fixtureID: fixtureID))
         async let events = fetchEvents(from: .events(fixtureID: fixtureID))
         async let lineups = fetchLineups(from: .lineups(fixtureID: fixtureID))
 
-        let resolvedFixture = try await fixture
-        let resolvedStatistics = (try? await statistics) ?? []
+        let resolvedFixturePayload = try await fixturePayload
+        let dedicatedStatistics = (try? await statistics) ?? []
+        let resolvedStatistics = dedicatedStatistics.isEmpty
+            ? resolvedFixturePayload.embeddedStatistics
+            : dedicatedStatistics
         let resolvedEvents = (try? await events) ?? []
         let resolvedLineups = (try? await lineups) ?? []
 
         return SoccerMatchDetail(
-            fixture: resolvedFixture,
+            fixture: resolvedFixturePayload.fixture,
             statistics: resolvedStatistics,
             events: resolvedEvents,
             lineups: resolvedLineups
         )
     }
 
-    private func fetchFixture(from endpoint: SoccerMatchDetailEndpoint) async throws -> SoccerMatchFixtureDetail {
+    private func fetchFixturePayload(
+        from endpoint: SoccerMatchDetailEndpoint
+    ) async throws -> APISoccerFixturePayload {
         let response = try await networkClient.get(
             endpoint.path,
             queryItems: endpoint.queryItems,
@@ -51,11 +56,11 @@ nonisolated struct SoccerMatchDetailService: SoccerMatchDetailServicing {
             as: APISoccerMatchDetailResponse<[APISoccerMatchFixtureResponse]>.self
         )
 
-        guard let fixture = response.response.compactMap(\.domainFixture).first else {
+        guard let payload = response.response.compactMap(\.domainPayload).first else {
             throw NetworkError.invalidResponse
         }
 
-        return fixture
+        return payload
     }
 
     private func fetchStatistics(from endpoint: SoccerMatchDetailEndpoint) async throws -> [SoccerMatchTeamStatistics] {
@@ -99,6 +104,14 @@ private nonisolated struct APISoccerMatchDetailResponse<Response: Decodable & Se
     let response: Response
 }
 
+// MARK: - Fixture Payload
+
+private nonisolated struct APISoccerFixturePayload: Sendable {
+
+    let fixture: SoccerMatchFixtureDetail
+    let embeddedStatistics: [SoccerMatchTeamStatistics]
+}
+
 // MARK: - Fixture Response
 
 private nonisolated struct APISoccerMatchFixtureResponse: Decodable, Sendable {
@@ -107,32 +120,45 @@ private nonisolated struct APISoccerMatchFixtureResponse: Decodable, Sendable {
     let league: APISoccerMatchLeagueResponse?
     let teams: APISoccerMatchTeamsResponse?
     let goals: APISoccerMatchGoalsResponse?
+    let score: APISoccerMatchScoreBreakdownResponse?
+    let statistics: [APISoccerMatchStatisticsResponse]?
 
-    var domainFixture: SoccerMatchFixtureDetail? {
+    var domainPayload: APISoccerFixturePayload? {
         guard let fixtureID = fixture?.id,
               let homeTeam = teams?.home.domainTeam,
               let awayTeam = teams?.away.domainTeam else {
             return nil
         }
 
-        return SoccerMatchFixtureDetail(
-            id: fixtureID,
-            leagueName: league?.name ?? "Other League",
-            leagueLogoURL: league?.logoURL,
-            referee: fixture?.referee,
-            venueName: fixture?.venue?.name,
-            venueCity: fixture?.venue?.city,
-            scheduledStartDate: fixture?.date.flatMap(Self.makeDate(from:)),
-            scheduledStartText: fixture?.date,
-            statusLong: fixture?.status?.long,
-            statusShort: fixture?.status?.short,
-            elapsedMinute: fixture?.status?.elapsed,
-            homeTeam: homeTeam,
-            awayTeam: awayTeam,
-            score: SoccerMatchScore(
-                home: goals?.home,
-                away: goals?.away
-            )
+        let fulltime = score?.fulltime?.domainScoreLine
+        let primaryHome = goals?.home ?? fulltime?.home
+        let primaryAway = goals?.away ?? fulltime?.away
+
+        return APISoccerFixturePayload(
+            fixture: SoccerMatchFixtureDetail(
+                id: fixtureID,
+                leagueName: league?.name ?? "Other League",
+                leagueLogoURL: league?.logoURL,
+                referee: fixture?.referee,
+                venueName: fixture?.venue?.name,
+                venueCity: fixture?.venue?.city,
+                scheduledStartDate: fixture?.date.flatMap(Self.makeDate(from:)),
+                scheduledStartText: fixture?.date,
+                statusLong: fixture?.status?.long,
+                statusShort: fixture?.status?.short,
+                elapsedMinute: fixture?.status?.elapsed,
+                homeTeam: homeTeam,
+                awayTeam: awayTeam,
+                score: SoccerMatchScore(
+                    home: primaryHome,
+                    away: primaryAway,
+                    halftime: score?.halftime?.domainScoreLine,
+                    fulltime: fulltime,
+                    extratime: score?.extratime?.domainScoreLine,
+                    penalty: score?.penalty?.domainScoreLine
+                )
+            ),
+            embeddedStatistics: statistics?.compactMap(\.domainStatistics) ?? []
         )
     }
 
@@ -225,6 +251,18 @@ private nonisolated struct APISoccerMatchGoalsResponse: Decodable, Sendable {
 
     let home: Int?
     let away: Int?
+
+    var domainScoreLine: SoccerMatchScoreLine {
+        SoccerMatchScoreLine(home: home, away: away)
+    }
+}
+
+private nonisolated struct APISoccerMatchScoreBreakdownResponse: Decodable, Sendable {
+
+    let halftime: APISoccerMatchGoalsResponse?
+    let fulltime: APISoccerMatchGoalsResponse?
+    let extratime: APISoccerMatchGoalsResponse?
+    let penalty: APISoccerMatchGoalsResponse?
 }
 
 // MARK: - Statistics Response
@@ -241,18 +279,22 @@ private nonisolated struct APISoccerMatchStatisticsResponse: Decodable, Sendable
 
         return SoccerMatchTeamStatistics(
             team: team,
-            statistics: statistics?.map(\.domainStatistic) ?? []
+            statistics: statistics?.compactMap(\.domainStatistic) ?? []
         )
     }
 }
 
 private nonisolated struct APISoccerMatchStatisticResponse: Decodable, Sendable {
 
-    let type: String
+    let type: String?
     let value: APISoccerMatchFlexibleValueResponse?
 
-    var domainStatistic: SoccerMatchStatistic {
-        SoccerMatchStatistic(
+    var domainStatistic: SoccerMatchStatistic? {
+        guard let type, !type.isEmpty else {
+            return nil
+        }
+
+        return SoccerMatchStatistic(
             type: type,
             value: value?.displayText
         )

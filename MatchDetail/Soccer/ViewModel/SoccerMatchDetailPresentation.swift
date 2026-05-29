@@ -67,6 +67,8 @@ nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
 
     let homeTeamName: String
     let awayTeamName: String
+    let displayState: MatchDetailStatsDisplayState
+    let showsFilter: Bool
     let comparisonRows: [SoccerMatchStatsComparisonRowViewData]
     let homeRows: [SoccerMatchStatsValueRowViewData]
     let awayRows: [SoccerMatchStatsValueRowViewData]
@@ -115,6 +117,12 @@ nonisolated struct SoccerMatchDetailLineupsSectionViewData: Equatable, Sendable 
     let teams: [SoccerMatchDetailLineupViewData]
 }
 
+nonisolated enum SoccerMatchLineupLayoutState: Equatable, Sendable {
+
+    case startersOnly
+    case withSubstitutes
+}
+
 nonisolated struct SoccerMatchDetailLineupViewData: Equatable, Identifiable, Sendable {
 
     var id: String { teamName }
@@ -122,6 +130,7 @@ nonisolated struct SoccerMatchDetailLineupViewData: Equatable, Identifiable, Sen
     let teamName: String
     let formationText: String?
     let coachName: String?
+    let layoutState: SoccerMatchLineupLayoutState
     let starters: [String]
     let substitutes: [String]
 }

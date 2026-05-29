@@ -122,28 +122,21 @@ final class SoccerMatchLineupTeamCell: UICollectionViewCell {
             metaLabel.isHidden = false
         }
 
-        startersTitleLabel.snp.remakeConstraints { make in
-            make.leading.trailing.equalTo(teamNameLabel)
-            if metaLabel.isHidden {
-                make.top.equalTo(teamNameLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
-            } else {
-                make.top.equalTo(metaLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
-            }
-        }
-
         startersLabel.text = formatPlayers(viewData.starters)
 
-        if viewData.substitutes.isEmpty {
+        switch viewData.layoutState {
+        case .startersOnly:
             substitutesTitleLabel.isHidden = true
             substitutesLabel.isHidden = true
-            startersLabel.snp.makeConstraints { make in
-                make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
-            }
-        } else {
+            substitutesLabel.text = nil
+
+        case .withSubstitutes:
             substitutesTitleLabel.isHidden = false
             substitutesLabel.isHidden = false
             substitutesLabel.text = formatPlayers(viewData.substitutes)
         }
+
+        updateLineupConstraints(for: viewData.layoutState)
     }
 
     // MARK: - Setup
@@ -168,24 +161,50 @@ final class SoccerMatchLineupTeamCell: UICollectionViewCell {
             make.leading.trailing.equalTo(teamNameLabel)
         }
 
-        startersTitleLabel.snp.makeConstraints { make in
+    }
+
+    private func updateLineupConstraints(for layoutState: SoccerMatchLineupLayoutState) {
+        let startersTopAnchor = metaLabel.isHidden
+            ? teamNameLabel.snp.bottom
+            : metaLabel.snp.bottom
+
+        startersTitleLabel.snp.remakeConstraints { make in
+            make.top.equalTo(startersTopAnchor).offset(LayoutMetric.rowSpacing)
             make.leading.trailing.equalTo(teamNameLabel)
         }
 
-        startersLabel.snp.makeConstraints { make in
-            make.top.equalTo(startersTitleLabel.snp.bottom).offset(4)
-            make.leading.trailing.equalTo(teamNameLabel)
-        }
+        switch layoutState {
+        case .startersOnly:
+            startersLabel.snp.remakeConstraints { make in
+                make.top.equalTo(startersTitleLabel.snp.bottom).offset(4)
+                make.leading.trailing.equalTo(teamNameLabel)
+                make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
+            }
 
-        substitutesTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(startersLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
-            make.leading.trailing.equalTo(teamNameLabel)
-        }
+            substitutesTitleLabel.snp.remakeConstraints { make in
+                make.leading.trailing.equalTo(teamNameLabel)
+            }
 
-        substitutesLabel.snp.makeConstraints { make in
-            make.top.equalTo(substitutesTitleLabel.snp.bottom).offset(4)
-            make.leading.trailing.equalTo(teamNameLabel)
-            make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
+            substitutesLabel.snp.remakeConstraints { make in
+                make.leading.trailing.equalTo(teamNameLabel)
+            }
+
+        case .withSubstitutes:
+            startersLabel.snp.remakeConstraints { make in
+                make.top.equalTo(startersTitleLabel.snp.bottom).offset(4)
+                make.leading.trailing.equalTo(teamNameLabel)
+            }
+
+            substitutesTitleLabel.snp.remakeConstraints { make in
+                make.top.equalTo(startersLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
+                make.leading.trailing.equalTo(teamNameLabel)
+            }
+
+            substitutesLabel.snp.remakeConstraints { make in
+                make.top.equalTo(substitutesTitleLabel.snp.bottom).offset(4)
+                make.leading.trailing.equalTo(teamNameLabel)
+                make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
+            }
         }
     }
 
