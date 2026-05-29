@@ -34,42 +34,42 @@ extension SportType {
             id: "football",
             title: "Football",
             subtitle: "Games, schedules, and standings",
-            systemImageName: "football",
+            systemImageName: "football.fill",
             apiHost: "v1.american-football.api-sports.io"
         ),
         SportType(
             id: "soccer",
             title: "Soccer",
             subtitle: "Fixtures, scores, and leagues",
-            systemImageName: "soccerball",
+            systemImageName: "soccerball.inverse",
             apiHost: "v3.football.api-sports.io"
         ),
         SportType(
             id: "basketball",
             title: "Basketball",
             subtitle: "Games, schedules, and standings",
-            systemImageName: "basketball",
+            systemImageName: "basketball.fill",
             apiHost: "v1.basketball.api-sports.io"
         ),
         SportType(
             id: "baseball",
             title: "Baseball",
             subtitle: "Games, schedules, and standings",
-            systemImageName: "baseball",
+            systemImageName: "baseball.fill",
             apiHost: "v1.baseball.api-sports.io"
         ),
         SportType(
             id: "hockey",
             title: "Hockey",
             subtitle: "Games, schedules, and standings",
-            systemImageName: "hockey.puck",
+            systemImageName: "hockey.puck.fill",
             apiHost: "v1.hockey.api-sports.io"
         ),
         SportType(
             id: "volleyball",
             title: "Volleyball",
             subtitle: "Games, schedules, and standings",
-            systemImageName: "figure.volleyball",
+            systemImageName: "volleyball.fill",
             apiHost: "v1.volleyball.api-sports.io"
         ),
         SportType(

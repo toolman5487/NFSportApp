@@ -20,6 +20,7 @@ nonisolated struct BasketballMatchDetailPresentation: Equatable, Sendable {
 nonisolated enum BasketballMatchDetailSectionViewData: Equatable, Sendable {
 
     case header(BasketballMatchDetailHeaderViewData)
+    case stats(BasketballMatchDetailStatsViewData)
 }
 
 // MARK: - Header
@@ -56,4 +57,34 @@ nonisolated enum BasketballMatchDetailHeaderStatusStyle: Equatable, Sendable {
 nonisolated struct BasketballMatchDetailVenueViewData: Equatable, Sendable {
 
     let venueText: String
+}
+
+// MARK: - Stats
+
+nonisolated struct BasketballMatchDetailStatsViewData: Equatable, Sendable {
+
+    let homeTeamName: String
+    let awayTeamName: String
+    let comparisonRows: [BasketballMatchStatsComparisonRowViewData]
+    let homeRows: [BasketballMatchStatsValueRowViewData]
+    let awayRows: [BasketballMatchStatsValueRowViewData]
+}
+
+nonisolated struct BasketballMatchStatsComparisonRowViewData: Equatable, Identifiable, Sendable {
+
+    var id: String { title }
+
+    let title: String
+    let homeValue: String
+    let awayValue: String
+    let homeRatio: Double
+    let awayRatio: Double
+}
+
+nonisolated struct BasketballMatchStatsValueRowViewData: Equatable, Identifiable, Sendable {
+
+    var id: String { title }
+
+    let title: String
+    let value: String
 }

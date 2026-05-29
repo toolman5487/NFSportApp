@@ -20,7 +20,7 @@ nonisolated struct SoccerMatchDetailPresentation: Equatable, Sendable {
 nonisolated enum SoccerMatchDetailSectionViewData: Equatable, Sendable {
 
     case header(SoccerMatchDetailHeaderViewData)
-    case statistics(SoccerMatchDetailStatisticsSectionViewData)
+    case stats(SoccerMatchDetailStatsViewData)
     case events(SoccerMatchDetailEventsSectionViewData)
     case lineups(SoccerMatchDetailLineupsSectionViewData)
 }
@@ -54,23 +54,41 @@ nonisolated enum SoccerMatchDetailHeaderStatusStyle: Equatable, Sendable {
     case neutral
 }
 
-// MARK: - Statistics
+// MARK: - Venue
 
-nonisolated struct SoccerMatchDetailStatisticsSectionViewData: Equatable, Sendable {
+nonisolated struct SoccerMatchDetailVenueViewData: Equatable, Sendable {
 
-    let title: String
-    let rows: [SoccerMatchDetailStatisticRowViewData]
+    let venueText: String
 }
 
-nonisolated struct SoccerMatchDetailStatisticRowViewData: Equatable, Identifiable, Sendable {
+// MARK: - Stats
 
-    var id: String {
-        title
-    }
+nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
+
+    let homeTeamName: String
+    let awayTeamName: String
+    let comparisonRows: [SoccerMatchStatsComparisonRowViewData]
+    let homeRows: [SoccerMatchStatsValueRowViewData]
+    let awayRows: [SoccerMatchStatsValueRowViewData]
+}
+
+nonisolated struct SoccerMatchStatsComparisonRowViewData: Equatable, Identifiable, Sendable {
+
+    var id: String { title }
 
     let title: String
-    let homeValueText: String
-    let awayValueText: String
+    let homeValue: String
+    let awayValue: String
+    let homeRatio: Double
+    let awayRatio: Double
+}
+
+nonisolated struct SoccerMatchStatsValueRowViewData: Equatable, Identifiable, Sendable {
+
+    var id: String { title }
+
+    let title: String
+    let value: String
 }
 
 // MARK: - Events
@@ -85,7 +103,6 @@ nonisolated struct SoccerMatchDetailEventViewData: Equatable, Identifiable, Send
 
     let id: String
     let timeText: String
-    let teamName: String?
     let title: String
     let subtitle: String?
 }
@@ -95,22 +112,16 @@ nonisolated struct SoccerMatchDetailEventViewData: Equatable, Identifiable, Send
 nonisolated struct SoccerMatchDetailLineupsSectionViewData: Equatable, Sendable {
 
     let title: String
-    let home: SoccerMatchDetailLineupViewData?
-    let away: SoccerMatchDetailLineupViewData?
+    let teams: [SoccerMatchDetailLineupViewData]
 }
 
-nonisolated struct SoccerMatchDetailLineupViewData: Equatable, Sendable {
+nonisolated struct SoccerMatchDetailLineupViewData: Equatable, Identifiable, Sendable {
+
+    var id: String { teamName }
 
     let teamName: String
     let formationText: String?
     let coachName: String?
     let starters: [String]
     let substitutes: [String]
-}
-
-// MARK: - Venue
-
-nonisolated struct SoccerMatchDetailVenueViewData: Equatable, Sendable {
-
-    let venueText: String
 }

@@ -1,16 +1,16 @@
 //
-//  BaseballMatchFilterView.swift
+//  SoccerMatchFilterView.swift
 //  NFSportApp
 //
-//  Created by Willy Hsu on 2026/5/28.
+//  Created by Willy Hsu on 2026/5/29.
 //
 
 import SnapKit
 import UIKit
 
-// MARK: - BaseballMatchFilterOption
+// MARK: - SoccerMatchFilterOption
 
-enum BaseballMatchFilterOption: Int, CaseIterable {
+enum SoccerMatchFilterOption: Int, CaseIterable {
     case total
     case home
     case away
@@ -27,13 +27,13 @@ enum BaseballMatchFilterOption: Int, CaseIterable {
     }
 }
 
-// MARK: - BaseballMatchFilterView
+// MARK: - SoccerMatchFilterView
 
-final class BaseballMatchFilterView: UICollectionReusableView {
+final class SoccerMatchFilterView: UICollectionReusableView {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "BaseballMatchFilterView"
+    static let reuseIdentifier = "SoccerMatchFilterView"
 
     // MARK: - Layout Metrics
 
@@ -50,10 +50,10 @@ final class BaseballMatchFilterView: UICollectionReusableView {
 
     // MARK: - Properties
 
-    var onFilterChanged: ((BaseballMatchFilterOption) -> Void)?
+    var onFilterChanged: ((SoccerMatchFilterOption) -> Void)?
 
-    private let options = BaseballMatchFilterOption.allCases
-    private var selectedOption: BaseballMatchFilterOption = .total
+    private let options = SoccerMatchFilterOption.allCases
+    private var selectedOption: SoccerMatchFilterOption = .total
 
     // MARK: - UI Components
 
@@ -77,8 +77,8 @@ final class BaseballMatchFilterView: UICollectionReusableView {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(
-            BaseballMatchFilterOptionCell.self,
-            forCellWithReuseIdentifier: BaseballMatchFilterOptionCell.reuseIdentifier
+            SoccerMatchFilterOptionCell.self,
+            forCellWithReuseIdentifier: SoccerMatchFilterOptionCell.reuseIdentifier
         )
         return collectionView
     }()
@@ -109,7 +109,7 @@ final class BaseballMatchFilterView: UICollectionReusableView {
         selectedOption = .total
     }
 
-    func configure(selectedOption: BaseballMatchFilterOption) {
+    func configure(selectedOption: SoccerMatchFilterOption) {
         self.selectedOption = selectedOption
         collectionView.reloadData()
     }
@@ -131,7 +131,7 @@ final class BaseballMatchFilterView: UICollectionReusableView {
 
 // MARK: - UICollectionViewDataSource
 
-extension BaseballMatchFilterView: UICollectionViewDataSource {
+extension SoccerMatchFilterView: UICollectionViewDataSource {
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -145,9 +145,9 @@ extension BaseballMatchFilterView: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: BaseballMatchFilterOptionCell.reuseIdentifier,
+            withReuseIdentifier: SoccerMatchFilterOptionCell.reuseIdentifier,
             for: indexPath
-        ) as? BaseballMatchFilterOptionCell else {
+        ) as? SoccerMatchFilterOptionCell else {
             return UICollectionViewCell()
         }
 
@@ -162,7 +162,7 @@ extension BaseballMatchFilterView: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDelegate
 
-extension BaseballMatchFilterView: UICollectionViewDelegate {
+extension SoccerMatchFilterView: UICollectionViewDelegate {
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -181,7 +181,7 @@ extension BaseballMatchFilterView: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension BaseballMatchFilterView: UICollectionViewDelegateFlowLayout {
+extension SoccerMatchFilterView: UICollectionViewDelegateFlowLayout {
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -199,13 +199,13 @@ extension BaseballMatchFilterView: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - BaseballMatchFilterOptionCell
+// MARK: - SoccerMatchFilterOptionCell
 
-private final class BaseballMatchFilterOptionCell: UICollectionViewCell {
+private final class SoccerMatchFilterOptionCell: UICollectionViewCell {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "BaseballMatchFilterOptionCell"
+    static let reuseIdentifier = "SoccerMatchFilterOptionCell"
 
     // MARK: - Layout Metrics
 

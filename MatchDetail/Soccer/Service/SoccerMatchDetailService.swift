@@ -31,9 +31,9 @@ nonisolated struct SoccerMatchDetailService: SoccerMatchDetailServicing {
         async let lineups = fetchLineups(from: .lineups(fixtureID: fixtureID))
 
         let resolvedFixture = try await fixture
-        let resolvedStatistics = try await statistics
-        let resolvedEvents = try await events
-        let resolvedLineups = try await lineups
+        let resolvedStatistics = (try? await statistics) ?? []
+        let resolvedEvents = (try? await events) ?? []
+        let resolvedLineups = (try? await lineups) ?? []
 
         return SoccerMatchDetail(
             fixture: resolvedFixture,

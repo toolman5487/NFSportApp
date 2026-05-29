@@ -189,7 +189,7 @@ final class MainSoccerSearchViewModel {
             name: team.name,
             subtitle: makeSubtitle(from: team),
             logoURL: team.logoURL,
-            fallbackSystemImageName: "soccerball"
+            fallbackSystemImageName: "soccerball.circle.fill"
         )
     }
 

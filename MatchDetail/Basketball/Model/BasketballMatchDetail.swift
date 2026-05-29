@@ -12,6 +12,7 @@ import Foundation
 nonisolated struct BasketballMatchDetail: Equatable, Sendable {
 
     let fixture: BasketballMatchFixtureDetail
+    let playersByTeam: [BasketballMatchTeamPlayers]
 }
 
 // MARK: - Fixture
@@ -43,8 +44,60 @@ nonisolated struct BasketballMatchTeam: Equatable, Identifiable, Sendable {
     let logoURL: URL?
 }
 
+nonisolated struct BasketballMatchPeriodScore: Equatable, Sendable {
+
+    let label: String
+    let points: Int?
+}
+
+nonisolated struct BasketballMatchTeamScore: Equatable, Sendable {
+
+    let total: Int?
+    let periods: [BasketballMatchPeriodScore]
+}
+
 nonisolated struct BasketballMatchScore: Equatable, Sendable {
 
-    let home: Int?
-    let away: Int?
+    let home: BasketballMatchTeamScore
+    let away: BasketballMatchTeamScore
+}
+
+// MARK: - Players
+
+nonisolated struct BasketballMatchTeamPlayers: Equatable, Sendable {
+
+    let team: BasketballMatchTeam
+    let players: [BasketballMatchPlayer]
+}
+
+nonisolated struct BasketballMatchPlayer: Equatable, Identifiable, Sendable {
+
+    var id: String {
+        "\(playerID ?? -1)-\(name)"
+    }
+
+    let playerID: Int?
+    let name: String
+    let photoURL: URL?
+    let number: Int?
+    let position: String?
+    let statistics: [BasketballMatchPlayerStatistics]
+}
+
+// MARK: - Player Statistics
+
+nonisolated struct BasketballMatchPlayerStatistics: Equatable, Sendable {
+
+    let points: Double?
+    let fieldGoalsMade: Double?
+    let fieldGoalsAttempted: Double?
+    let threePointsMade: Double?
+    let threePointsAttempted: Double?
+    let freeThrowsMade: Double?
+    let freeThrowsAttempted: Double?
+    let rebounds: Double?
+    let assists: Double?
+    let steals: Double?
+    let blocks: Double?
+    let turnovers: Double?
 }

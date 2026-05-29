@@ -473,7 +473,7 @@ private final class MainSoccerHomeNavigationTitleView: UIView {
 
     private func makeFallbackImage(systemImageName: String) -> UIImage? {
         let image = UIImage(systemName: systemImageName)
-            ?? UIImage(systemName: "soccerball")
+            ?? UIImage(systemName: "soccerball.circle.fill")
             ?? UIImage(systemName: "sportscourt")
         return image?.withRenderingMode(.alwaysTemplate)
     }

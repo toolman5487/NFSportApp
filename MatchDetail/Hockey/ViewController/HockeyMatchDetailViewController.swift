@@ -95,10 +95,8 @@ final class HockeyMatchDetailViewController: MatchBaseViewController {
         environment: NSCollectionLayoutEnvironment
     ) -> NSCollectionLayoutSection {
         switch sectionViewData(at: sectionIndex) {
-        case .some(.header(let viewData)):
-            let section = makeListSectionLayout(
-                itemHeight: .estimated(LayoutMetric.estimatedVenueHeight)
-            )
+        case .some(.header):
+            let section = makeListSectionLayout()
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
                 heightDimension: .estimated(LayoutMetric.estimatedHeaderHeight)
@@ -108,21 +106,14 @@ final class HockeyMatchDetailViewController: MatchBaseViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            var boundaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [header]
-            if viewData.venue != nil {
-                let footerSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
-                    heightDimension: .estimated(LayoutMetric.estimatedVenueHeight)
-                )
-                let footer = NSCollectionLayoutBoundarySupplementaryItem(
-                    layoutSize: footerSize,
-                    elementKind: UICollectionView.elementKindSectionFooter,
-                    alignment: .bottom
-                )
-                boundaryItems.append(footer)
-            }
-            section.boundarySupplementaryItems = boundaryItems
-            return section
+            section.boundarySupplementaryItems = [header]
+            return appendVenueFooterIfNeeded(
+                to: section,
+                sectionIndex: sectionIndex,
+                numberOfSections: sections.count,
+                hasVenue: headerViewData?.venue != nil,
+                estimatedHeight: LayoutMetric.estimatedVenueHeight
+            )
 
         case .none:
             return makeListSectionLayout()
@@ -156,24 +147,28 @@ final class HockeyMatchDetailViewController: MatchBaseViewController {
 
         switch sectionViewData(at: indexPath.section) {
         case .some(.header(let viewData)):
-            if kind == UICollectionView.elementKindSectionFooter {
-                guard let venue = viewData.venue,
-                      let footerView = collectionView.dequeueReusableSupplementaryView(
-                        ofKind: kind,
-                        withReuseIdentifier: HockeyMatchDetailVenueFooterView.reuseIdentifier,
-                        for: indexPath
-                      ) as? HockeyMatchDetailVenueFooterView else {
-                    return UICollectionReusableView()
-                }
+            if kind == UICollectionView.elementKindSectionFooter,
+               shouldShowVenueFooter(
+                   at: indexPath.section,
+                   numberOfSections: sections.count,
+                   hasVenue: headerViewData?.venue != nil
+               ),
+               let venue = headerViewData?.venue,
+               let footerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: HockeyMatchDetailVenueFooterView.reuseIdentifier,
+                for: indexPath
+               ) as? HockeyMatchDetailVenueFooterView {
                 footerView.configure(with: venue)
                 return footerView
             }
 
-            guard let headerView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: HockeyMatchScoreHeaderView.reuseIdentifier,
-                for: indexPath
-            ) as? HockeyMatchScoreHeaderView else {
+            guard kind == UICollectionView.elementKindSectionHeader,
+                  let headerView = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: HockeyMatchScoreHeaderView.reuseIdentifier,
+                    for: indexPath
+                  ) as? HockeyMatchScoreHeaderView else {
                 return UICollectionReusableView()
             }
 

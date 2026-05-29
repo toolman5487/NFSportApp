@@ -16,6 +16,17 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
     private enum LayoutMetric {
         static let estimatedHeaderHeight: CGFloat = 360
         static let estimatedVenueHeight: CGFloat = 96
+        static let estimatedFilterHeaderHeight: CGFloat = SoccerMatchFilterView.preferredHeight
+        static let estimatedSectionHeaderHeight: CGFloat = SoccerMatchDetailSectionHeaderView.preferredHeight
+        static let estimatedStatsRowHeight: CGFloat = 56
+        static let estimatedStatsEmptyHeight: CGFloat = 200
+        static let estimatedEventRowHeight: CGFloat = 72
+        static let estimatedLineupRowHeight: CGFloat = 220
+    }
+
+    private enum StatsEmptyContent {
+        static let title = "No Stats Available"
+        static let subtitle = "Match statistics are not available for this game."
     }
 
     // MARK: - Properties
@@ -25,6 +36,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
     private let navigationTitleView = MatchDetailNavigationTitleView()
     private var headerViewData: SoccerMatchDetailHeaderViewData?
     private var sections: [SoccerMatchDetailSectionViewData] = []
+    private var selectedStatsFilter: SoccerMatchFilterOption = .total
 
     // MARK: - Initialization
 
@@ -56,6 +68,32 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier
         )
+        collectionView.register(
+            SoccerMatchFilterView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: SoccerMatchFilterView.reuseIdentifier
+        )
+        collectionView.register(
+            SoccerMatchDetailSectionHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: SoccerMatchDetailSectionHeaderView.reuseIdentifier
+        )
+        collectionView.register(
+            SoccerMatchStatsRowCell.self,
+            forCellWithReuseIdentifier: SoccerMatchStatsRowCell.reuseIdentifier
+        )
+        collectionView.register(
+            SoccerMatchStatsEmptyCell.self,
+            forCellWithReuseIdentifier: SoccerMatchStatsEmptyCell.reuseIdentifier
+        )
+        collectionView.register(
+            SoccerMatchEventRowCell.self,
+            forCellWithReuseIdentifier: SoccerMatchEventRowCell.reuseIdentifier
+        )
+        collectionView.register(
+            SoccerMatchLineupTeamCell.self,
+            forCellWithReuseIdentifier: SoccerMatchLineupTeamCell.reuseIdentifier
+        )
     }
 
     override func bindViewModel() {
@@ -83,8 +121,37 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.header):
             return 0
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .some(.stats(let viewData)):
+            return statsItemCount(for: viewData)
+
+        case .some(.events(let viewData)):
+            return viewData.items.count
+
+        case .some(.lineups(let viewData)):
+            return viewData.teams.count
+
+        case .none:
             return 0
+        }
+    }
+
+    private func statsItemCount(for viewData: SoccerMatchDetailStatsViewData) -> Int {
+        let rowCount = statsRowCount(for: viewData)
+        return rowCount > 0 ? rowCount : 1
+    }
+
+    private func statsHasContent(for viewData: SoccerMatchDetailStatsViewData) -> Bool {
+        statsRowCount(for: viewData) > 0
+    }
+
+    private func statsRowCount(for viewData: SoccerMatchDetailStatsViewData) -> Int {
+        switch selectedStatsFilter {
+        case .total:
+            return viewData.comparisonRows.count
+        case .home:
+            return viewData.homeRows.count
+        case .away:
+            return viewData.awayRows.count
         }
     }
 
@@ -97,7 +164,6 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         switch sectionViewData(at: sectionIndex) {
         case .some(.header):
             let section = makeListSectionLayout(
-                itemHeight: .estimated(LayoutMetric.estimatedVenueHeight),
                 contentInsets: NSDirectionalEdgeInsets(
                     top: 0,
                     leading: 16,
@@ -115,26 +181,71 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            var boundaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [header]
-            if case .some(.header(let viewData)) = sectionViewData(at: sectionIndex),
-               viewData.venue != nil {
-                let footerSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
-                    heightDimension: .estimated(LayoutMetric.estimatedVenueHeight)
-                )
-                let footer = NSCollectionLayoutBoundarySupplementaryItem(
-                    layoutSize: footerSize,
-                    elementKind: UICollectionView.elementKindSectionFooter,
-                    alignment: .bottom
-                )
-                boundaryItems.append(footer)
-            }
-            section.boundarySupplementaryItems = boundaryItems
+            section.boundarySupplementaryItems = [header]
             return section
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .some(.stats(let viewData)):
+            let itemHeight: NSCollectionLayoutDimension = statsHasContent(for: viewData)
+                ? .estimated(LayoutMetric.estimatedStatsRowHeight)
+                : .estimated(LayoutMetric.estimatedStatsEmptyHeight)
+            let section = makeListSectionLayout(itemHeight: itemHeight)
+            let filterHeaderSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .estimated(LayoutMetric.estimatedFilterHeaderHeight)
+            )
+            let filterHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: filterHeaderSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            filterHeader.pinToVisibleBounds = true
+            filterHeader.zIndex = 2
+            section.boundarySupplementaryItems = [filterHeader]
+            return appendVenueFooterIfNeeded(
+                to: section,
+                sectionIndex: sectionIndex,
+                numberOfSections: sections.count,
+                hasVenue: headerViewData?.venue != nil,
+                estimatedHeight: LayoutMetric.estimatedVenueHeight
+            )
+
+        case .some(.events):
+            let section = makeListSectionLayout(itemHeight: .estimated(LayoutMetric.estimatedEventRowHeight))
+            section.boundarySupplementaryItems = [makeSectionTitleHeaderItem()]
+            return appendVenueFooterIfNeeded(
+                to: section,
+                sectionIndex: sectionIndex,
+                numberOfSections: sections.count,
+                hasVenue: headerViewData?.venue != nil,
+                estimatedHeight: LayoutMetric.estimatedVenueHeight
+            )
+
+        case .some(.lineups):
+            let section = makeListSectionLayout(itemHeight: .estimated(LayoutMetric.estimatedLineupRowHeight))
+            section.boundarySupplementaryItems = [makeSectionTitleHeaderItem()]
+            return appendVenueFooterIfNeeded(
+                to: section,
+                sectionIndex: sectionIndex,
+                numberOfSections: sections.count,
+                hasVenue: headerViewData?.venue != nil,
+                estimatedHeight: LayoutMetric.estimatedVenueHeight
+            )
+
+        case .none:
             return makeListSectionLayout()
         }
+    }
+
+    private func makeSectionTitleHeaderItem() -> NSCollectionLayoutBoundarySupplementaryItem {
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1),
+            heightDimension: .estimated(LayoutMetric.estimatedSectionHeaderHeight)
+        )
+        return NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
     }
 
     override func collectionView(
@@ -145,9 +256,103 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.header):
             return UICollectionViewCell()
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .some(.stats(let viewData)):
+            return makeStatsCell(for: viewData, at: indexPath)
+
+        case .some(.events(let viewData)):
+            return makeEventCell(for: viewData, at: indexPath)
+
+        case .some(.lineups(let viewData)):
+            return makeLineupCell(for: viewData, at: indexPath)
+
+        case .none:
             return UICollectionViewCell()
         }
+    }
+
+    private func makeStatsCell(
+        for viewData: SoccerMatchDetailStatsViewData,
+        at indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        guard statsHasContent(for: viewData) else {
+            return makeStatsEmptyCell(at: indexPath)
+        }
+
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SoccerMatchStatsRowCell.reuseIdentifier,
+            for: indexPath
+        ) as? SoccerMatchStatsRowCell else {
+            return UICollectionViewCell()
+        }
+
+        switch selectedStatsFilter {
+        case .total:
+            guard viewData.comparisonRows.indices.contains(indexPath.item) else {
+                return cell
+            }
+            cell.configure(with: viewData.comparisonRows[indexPath.item])
+
+        case .home:
+            guard viewData.homeRows.indices.contains(indexPath.item) else {
+                return cell
+            }
+            cell.configure(with: viewData.homeRows[indexPath.item])
+
+        case .away:
+            guard viewData.awayRows.indices.contains(indexPath.item) else {
+                return cell
+            }
+            cell.configure(with: viewData.awayRows[indexPath.item])
+        }
+
+        return cell
+    }
+
+    private func makeEventCell(
+        for viewData: SoccerMatchDetailEventsSectionViewData,
+        at indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SoccerMatchEventRowCell.reuseIdentifier,
+            for: indexPath
+        ) as? SoccerMatchEventRowCell,
+              viewData.items.indices.contains(indexPath.item) else {
+            return UICollectionViewCell()
+        }
+
+        cell.configure(with: viewData.items[indexPath.item])
+        return cell
+    }
+
+    private func makeLineupCell(
+        for viewData: SoccerMatchDetailLineupsSectionViewData,
+        at indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SoccerMatchLineupTeamCell.reuseIdentifier,
+            for: indexPath
+        ) as? SoccerMatchLineupTeamCell,
+              viewData.teams.indices.contains(indexPath.item) else {
+            return UICollectionViewCell()
+        }
+
+        cell.configure(with: viewData.teams[indexPath.item])
+        return cell
+    }
+
+    private func makeStatsEmptyCell(at indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SoccerMatchStatsEmptyCell.reuseIdentifier,
+            for: indexPath
+        ) as? SoccerMatchStatsEmptyCell else {
+            return UICollectionViewCell()
+        }
+
+        cell.configure(
+            title: StatsEmptyContent.title,
+            subtitle: StatsEmptyContent.subtitle
+        )
+        return cell
     }
 
     // MARK: - Supplementary Views
@@ -162,21 +367,60 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             return UICollectionReusableView()
         }
 
+        if kind == UICollectionView.elementKindSectionFooter,
+           shouldShowVenueFooter(
+               at: indexPath.section,
+               numberOfSections: sections.count,
+               hasVenue: headerViewData?.venue != nil
+           ),
+           let venue = headerViewData?.venue,
+           let footerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: SoccerMatchDetailVenueFooterView.reuseIdentifier,
+            for: indexPath
+           ) as? SoccerMatchDetailVenueFooterView {
+            footerView.configure(with: venue)
+            return footerView
+        }
+
         switch sectionViewData(at: indexPath.section) {
-        case .some(.header(let viewData)):
-            if kind == UICollectionView.elementKindSectionFooter {
-                guard let venue = viewData.venue,
-                      let footerView = collectionView.dequeueReusableSupplementaryView(
-                        ofKind: kind,
-                        withReuseIdentifier: SoccerMatchDetailVenueFooterView.reuseIdentifier,
-                        for: indexPath
-                      ) as? SoccerMatchDetailVenueFooterView else {
-                    return UICollectionReusableView()
-                }
-                footerView.configure(with: venue)
-                return footerView
+        case .some(.stats):
+            guard let filterView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: SoccerMatchFilterView.reuseIdentifier,
+                for: indexPath
+            ) as? SoccerMatchFilterView else {
+                return UICollectionReusableView()
             }
 
+            filterView.configure(selectedOption: selectedStatsFilter)
+            filterView.onFilterChanged = { [weak self] option in
+                guard let self, self.selectedStatsFilter != option else {
+                    return
+                }
+
+                self.selectedStatsFilter = option
+                self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
+            }
+            return filterView
+
+        case .some(.events(let viewData)):
+            return dequeueSectionTitleHeader(
+                collectionView: collectionView,
+                kind: kind,
+                indexPath: indexPath,
+                title: viewData.title
+            )
+
+        case .some(.lineups(let viewData)):
+            return dequeueSectionTitleHeader(
+                collectionView: collectionView,
+                kind: kind,
+                indexPath: indexPath,
+                title: viewData.title
+            )
+
+        case .some(.header(let viewData)):
             guard let headerView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier,
@@ -188,9 +432,27 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             headerView.configure(with: viewData)
             return headerView
 
-        case .some(.statistics), .some(.events), .some(.lineups), .none:
+        case .none:
             return UICollectionReusableView()
         }
+    }
+
+    private func dequeueSectionTitleHeader(
+        collectionView: UICollectionView,
+        kind: String,
+        indexPath: IndexPath,
+        title: String
+    ) -> UICollectionReusableView {
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: SoccerMatchDetailSectionHeaderView.reuseIdentifier,
+            for: indexPath
+        ) as? SoccerMatchDetailSectionHeaderView else {
+            return UICollectionReusableView()
+        }
+
+        headerView.configure(title: title)
+        return headerView
     }
 
     // MARK: - Rendering

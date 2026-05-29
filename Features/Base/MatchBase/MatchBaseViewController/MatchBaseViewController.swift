@@ -17,8 +17,8 @@ class MatchBaseViewController: BaseViewController, UICollectionViewDataSource, U
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
-        static let sectionInset: CGFloat = 16
-        static let interGroupSpacing: CGFloat = 12
+        static let sectionInset: CGFloat = 8
+        static let interGroupSpacing: CGFloat = 8
         static let estimatedItemHeight: CGFloat = 56
     }
 
@@ -110,6 +110,53 @@ class MatchBaseViewController: BaseViewController, UICollectionViewDataSource, U
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets = contentInsets
         section.interGroupSpacing = interGroupSpacing
+        return section
+    }
+
+    func isLastSection(_ sectionIndex: Int, numberOfSections: Int) -> Bool {
+        numberOfSections > 0 && sectionIndex == numberOfSections - 1
+    }
+
+    func shouldShowVenueFooter(
+        at sectionIndex: Int,
+        numberOfSections: Int,
+        hasVenue: Bool
+    ) -> Bool {
+        isLastSection(sectionIndex, numberOfSections: numberOfSections) && hasVenue
+    }
+
+    func makeVenueFooterBoundaryItem(
+        estimatedHeight: CGFloat
+    ) -> NSCollectionLayoutBoundarySupplementaryItem {
+        let footerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1),
+            heightDimension: .estimated(estimatedHeight)
+        )
+        return NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: footerSize,
+            elementKind: UICollectionView.elementKindSectionFooter,
+            alignment: .bottom
+        )
+    }
+
+    func appendVenueFooterIfNeeded(
+        to section: NSCollectionLayoutSection,
+        sectionIndex: Int,
+        numberOfSections: Int,
+        hasVenue: Bool,
+        estimatedHeight: CGFloat
+    ) -> NSCollectionLayoutSection {
+        guard shouldShowVenueFooter(
+            at: sectionIndex,
+            numberOfSections: numberOfSections,
+            hasVenue: hasVenue
+        ) else {
+            return section
+        }
+
+        var boundaryItems = section.boundarySupplementaryItems
+        boundaryItems.append(makeVenueFooterBoundaryItem(estimatedHeight: estimatedHeight))
+        section.boundarySupplementaryItems = boundaryItems
         return section
     }
 

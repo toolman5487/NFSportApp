@@ -103,9 +103,7 @@ final class SoccerMatchDetailViewModel {
             .header(makeHeaderViewData(from: detail.fixture))
         ]
 
-        if let statisticsSection = makeStatisticsSection(from: detail) {
-            sections.append(.statistics(statisticsSection))
-        }
+        sections.append(.stats(makeStatsViewData(from: detail)))
 
         if let eventsSection = makeEventsSection(from: detail.events) {
             sections.append(.events(eventsSection))
@@ -179,54 +177,7 @@ final class SoccerMatchDetailViewModel {
         )
     }
 
-    // MARK: - Section Builders
-
-    private func makeStatisticsSection(from detail: SoccerMatchDetail) -> SoccerMatchDetailStatisticsSectionViewData? {
-        guard let homeStatistics = detail.statistics.first(where: { matchesTeam($0.team, detail.fixture.homeTeam) }),
-              let awayStatistics = detail.statistics.first(where: { matchesTeam($0.team, detail.fixture.awayTeam) }) else {
-            return nil
-        }
-
-        let homeValuesByType = Dictionary(uniqueKeysWithValues: homeStatistics.statistics.map { ($0.type, $0.value) })
-        let awayValuesByType = Dictionary(uniqueKeysWithValues: awayStatistics.statistics.map { ($0.type, $0.value) })
-        let allTypes = Array(Set(homeValuesByType.keys).union(awayValuesByType.keys))
-        let orderedTypes = allTypes.sorted(by: compareStatisticType)
-
-        let rows: [SoccerMatchDetailStatisticRowViewData] = orderedTypes.compactMap { type -> SoccerMatchDetailStatisticRowViewData? in
-            let homeValue = homeValuesByType[type] ?? nil
-            let awayValue = awayValuesByType[type] ?? nil
-
-            guard homeValue != nil || awayValue != nil else {
-                return nil
-            }
-
-            return SoccerMatchDetailStatisticRowViewData(
-                title: type,
-                homeValueText: homeValue ?? "-",
-                awayValueText: awayValue ?? "-"
-            )
-        }
-
-        guard !rows.isEmpty else {
-            return nil
-        }
-
-        return SoccerMatchDetailStatisticsSectionViewData(
-            title: "Statistics",
-            rows: rows
-        )
-    }
-
-    private func compareStatisticType(lhs: String, rhs: String) -> Bool {
-        let lhsIndex = Constant.preferredStatisticOrder.firstIndex(of: lhs) ?? Int.max
-        let rhsIndex = Constant.preferredStatisticOrder.firstIndex(of: rhs) ?? Int.max
-
-        if lhsIndex != rhsIndex {
-            return lhsIndex < rhsIndex
-        }
-
-        return lhs.localizedStandardCompare(rhs) == .orderedAscending
-    }
+    // MARK: - Events & Lineups
 
     private func makeEventsSection(from events: [SoccerMatchEvent]) -> SoccerMatchDetailEventsSectionViewData? {
         guard !events.isEmpty else {
@@ -239,12 +190,22 @@ final class SoccerMatchDetailViewModel {
                 SoccerMatchDetailEventViewData(
                     id: event.id,
                     timeText: makeEventTimeText(from: event),
-                    teamName: event.team?.name,
-                    title: event.detail ?? event.type,
+                    title: makeEventTitle(from: event),
                     subtitle: makeEventSubtitle(from: event)
                 )
             }
         )
+    }
+
+    private func makeEventTitle(from event: SoccerMatchEvent) -> String {
+        let detail = event.detail?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let type = event.type.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let detail, !detail.isEmpty {
+            return detail
+        }
+
+        return type.isEmpty ? "Event" : type
     }
 
     private func makeEventTimeText(from event: SoccerMatchEvent) -> String {
@@ -261,36 +222,63 @@ final class SoccerMatchDetailViewModel {
     }
 
     private func makeEventSubtitle(from event: SoccerMatchEvent) -> String? {
-        let primaryText = event.playerName?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let assistText = event.assistName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        var parts: [String] = []
 
-        switch (primaryText?.isEmpty == false ? primaryText : nil, assistText?.isEmpty == false ? assistText : nil) {
-        case (.some(let playerName), .some(let assistName)):
-            return "\(playerName) · Assist: \(assistName)"
+        if let teamName = event.team?.name.trimmingCharacters(in: .whitespacesAndNewlines),
+           !teamName.isEmpty {
+            parts.append(teamName)
+        }
 
-        case (.some(let playerName), .none):
-            return playerName
+        let playerName = event.playerName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let assistName = event.assistName?.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        case (.none, .some(let assistName)):
-            return "Assist: \(assistName)"
+        switch (playerName?.isEmpty == false ? playerName : nil, assistName?.isEmpty == false ? assistName : nil) {
+        case (.some(let player), .some(let assist)):
+            parts.append("\(player) · Assist: \(assist)")
+
+        case (.some(let player), .none):
+            parts.append(player)
+
+        case (.none, .some(let assist)):
+            parts.append("Assist: \(assist)")
 
         case (.none, .none):
-            return event.comments
+            break
         }
+
+        if let comments = event.comments?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !comments.isEmpty {
+            parts.append(comments)
+        }
+
+        guard !parts.isEmpty else {
+            return nil
+        }
+
+        return parts.joined(separator: "\n")
     }
 
     private func makeLineupsSection(from detail: SoccerMatchDetail) -> SoccerMatchDetailLineupsSectionViewData? {
         let homeLineup = detail.lineups.first { matchesTeam($0.team, detail.fixture.homeTeam) }
         let awayLineup = detail.lineups.first { matchesTeam($0.team, detail.fixture.awayTeam) }
 
-        guard homeLineup != nil || awayLineup != nil else {
+        var teams: [SoccerMatchDetailLineupViewData] = []
+
+        if let homeLineup {
+            teams.append(makeLineupViewData(from: homeLineup))
+        }
+
+        if let awayLineup {
+            teams.append(makeLineupViewData(from: awayLineup))
+        }
+
+        guard !teams.isEmpty else {
             return nil
         }
 
         return SoccerMatchDetailLineupsSectionViewData(
             title: "Lineups",
-            home: homeLineup.map(makeLineupViewData),
-            away: awayLineup.map(makeLineupViewData)
+            teams: teams
         )
     }
 
@@ -299,9 +287,224 @@ final class SoccerMatchDetailViewModel {
             teamName: lineup.team.name,
             formationText: lineup.formation,
             coachName: lineup.coachName,
-            starters: lineup.startXI.map(\.name),
-            substitutes: lineup.substitutes.map(\.name)
+            starters: lineup.startXI.map(formatLineupPlayer),
+            substitutes: lineup.substitutes.map(formatLineupPlayer)
         )
+    }
+
+    private func formatLineupPlayer(_ player: SoccerMatchLineupPlayer) -> String {
+        if let number = player.number {
+            return "#\(number) \(player.name)"
+        }
+
+        return player.name
+    }
+
+    // MARK: - Stats Aggregation
+
+    private func makeStatsViewData(from detail: SoccerMatchDetail) -> SoccerMatchDetailStatsViewData {
+        let fixture = detail.fixture
+
+        guard let homeStatistics = detail.statistics.first(where: { matchesTeam($0.team, fixture.homeTeam) }),
+              let awayStatistics = detail.statistics.first(where: { matchesTeam($0.team, fixture.awayTeam) }) else {
+            return makeScoreOnlyStatsViewData(from: fixture)
+        }
+
+        let homeValuesByType = Dictionary(uniqueKeysWithValues: homeStatistics.statistics.map { ($0.type, $0.value) })
+        let awayValuesByType = Dictionary(uniqueKeysWithValues: awayStatistics.statistics.map { ($0.type, $0.value) })
+        let allTypes = Array(Set(homeValuesByType.keys).union(awayValuesByType.keys))
+        let orderedTypes = allTypes.sorted(by: compareStatisticType)
+
+        var comparisonRows: [SoccerMatchStatsComparisonRowViewData] = []
+        var homeRows: [SoccerMatchStatsValueRowViewData] = []
+        var awayRows: [SoccerMatchStatsValueRowViewData] = []
+
+        appendGoalsRows(
+            from: fixture.score,
+            comparisonRows: &comparisonRows,
+            homeRows: &homeRows,
+            awayRows: &awayRows
+        )
+
+        for type in orderedTypes {
+            let homeValue = homeValuesByType[type] ?? nil
+            let awayValue = awayValuesByType[type] ?? nil
+
+            guard homeValue != nil || awayValue != nil else {
+                continue
+            }
+
+            comparisonRows.append(
+                makeStatisticComparisonRow(
+                    title: type,
+                    homeValue: homeValue,
+                    awayValue: awayValue
+                )
+            )
+
+            homeRows.append(
+                SoccerMatchStatsValueRowViewData(
+                    title: type,
+                    value: homeValue ?? "-"
+                )
+            )
+            awayRows.append(
+                SoccerMatchStatsValueRowViewData(
+                    title: type,
+                    value: awayValue ?? "-"
+                )
+            )
+        }
+
+        return SoccerMatchDetailStatsViewData(
+            homeTeamName: fixture.homeTeam.name,
+            awayTeamName: fixture.awayTeam.name,
+            comparisonRows: comparisonRows,
+            homeRows: homeRows,
+            awayRows: awayRows
+        )
+    }
+
+    private func makeScoreOnlyStatsViewData(
+        from fixture: SoccerMatchFixtureDetail
+    ) -> SoccerMatchDetailStatsViewData {
+        var comparisonRows: [SoccerMatchStatsComparisonRowViewData] = []
+        var homeRows: [SoccerMatchStatsValueRowViewData] = []
+        var awayRows: [SoccerMatchStatsValueRowViewData] = []
+
+        appendGoalsRows(
+            from: fixture.score,
+            comparisonRows: &comparisonRows,
+            homeRows: &homeRows,
+            awayRows: &awayRows
+        )
+
+        return SoccerMatchDetailStatsViewData(
+            homeTeamName: fixture.homeTeam.name,
+            awayTeamName: fixture.awayTeam.name,
+            comparisonRows: comparisonRows,
+            homeRows: homeRows,
+            awayRows: awayRows
+        )
+    }
+
+    private func appendGoalsRows(
+        from score: SoccerMatchScore,
+        comparisonRows: inout [SoccerMatchStatsComparisonRowViewData],
+        homeRows: inout [SoccerMatchStatsValueRowViewData],
+        awayRows: inout [SoccerMatchStatsValueRowViewData]
+    ) {
+        guard score.home != nil || score.away != nil else {
+            return
+        }
+
+        let homeGoals = Double(score.home ?? 0)
+        let awayGoals = Double(score.away ?? 0)
+
+        comparisonRows.append(
+            makeRatioComparisonRow(
+                title: "Goals",
+                home: homeGoals,
+                away: awayGoals,
+                homeDisplay: formatOptionalCount(score.home),
+                awayDisplay: formatOptionalCount(score.away)
+            )
+        )
+        homeRows.append(
+            SoccerMatchStatsValueRowViewData(
+                title: "Goals",
+                value: formatOptionalCount(score.home)
+            )
+        )
+        awayRows.append(
+            SoccerMatchStatsValueRowViewData(
+                title: "Goals",
+                value: formatOptionalCount(score.away)
+            )
+        )
+    }
+
+    private func makeStatisticComparisonRow(
+        title: String,
+        homeValue: String?,
+        awayValue: String?
+    ) -> SoccerMatchStatsComparisonRowViewData {
+        let homeNumeric = parseStatNumber(homeValue)
+        let awayNumeric = parseStatNumber(awayValue)
+        let home = homeNumeric ?? 0
+        let away = awayNumeric ?? 0
+
+        return makeRatioComparisonRow(
+            title: title,
+            home: home,
+            away: away,
+            homeDisplay: homeValue ?? "-",
+            awayDisplay: awayValue ?? "-"
+        )
+    }
+
+    private func makeRatioComparisonRow(
+        title: String,
+        home: Double,
+        away: Double,
+        homeDisplay: String? = nil,
+        awayDisplay: String? = nil
+    ) -> SoccerMatchStatsComparisonRowViewData {
+        let total = home + away
+        let homeRatio = total > 0 ? home / total : 0.5
+        let awayRatio = total > 0 ? away / total : 0.5
+
+        return SoccerMatchStatsComparisonRowViewData(
+            title: title,
+            homeValue: homeDisplay ?? formatCount(home),
+            awayValue: awayDisplay ?? formatCount(away),
+            homeRatio: homeRatio,
+            awayRatio: awayRatio
+        )
+    }
+
+    private func parseStatNumber(_ value: String?) -> Double? {
+        guard let value else {
+            return nil
+        }
+
+        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedValue.isEmpty else {
+            return nil
+        }
+
+        let normalizedValue = trimmedValue
+            .replacingOccurrences(of: "%", with: "")
+            .replacingOccurrences(of: ",", with: "")
+
+        return Double(normalizedValue)
+    }
+
+    private func formatCount(_ value: Double) -> String {
+        if value.rounded() == value {
+            return String(Int(value.rounded()))
+        }
+
+        return String(format: "%.1f", value)
+    }
+
+    private func formatOptionalCount(_ value: Int?) -> String {
+        guard let value else {
+            return "-"
+        }
+
+        return String(value)
+    }
+
+    private func compareStatisticType(lhs: String, rhs: String) -> Bool {
+        let lhsIndex = Constant.preferredStatisticOrder.firstIndex(of: lhs) ?? Int.max
+        let rhsIndex = Constant.preferredStatisticOrder.firstIndex(of: rhs) ?? Int.max
+
+        if lhsIndex != rhsIndex {
+            return lhsIndex < rhsIndex
+        }
+
+        return lhs.localizedStandardCompare(rhs) == .orderedAscending
     }
 
     private func makeVenueSection(from fixture: SoccerMatchFixtureDetail) -> SoccerMatchDetailVenueViewData? {
@@ -449,5 +652,4 @@ final class SoccerMatchDetailViewModel {
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }
-
 }
