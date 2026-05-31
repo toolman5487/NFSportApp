@@ -98,7 +98,8 @@ final class BaseballMatchDetailViewModel {
             sport: .baseball,
             snapshot: MatchFixtureStatusSnapshot.make(
                 statusShort: fixture.statusShort,
-                statusLong: fixture.statusLong
+                statusLong: fixture.statusLong,
+                elapsedMinute: fixture.elapsedMinute
             )
         )
     }
@@ -586,4 +587,3 @@ private struct BaseballTeamTotals {
         inningsPitched > 0 ? (earnedRuns * 9) / inningsPitched : 0
     }
 }
-

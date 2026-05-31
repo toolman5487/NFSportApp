@@ -12,6 +12,7 @@ import Foundation
 nonisolated struct BasketballMatchDetail: Equatable, Sendable {
 
     let fixture: BasketballMatchFixtureDetail
+    let teamStatisticsByTeam: [BasketballMatchTeamStatistics]
     let playersByTeam: [BasketballMatchTeamPlayers]
 }
 
@@ -60,6 +61,30 @@ nonisolated struct BasketballMatchScore: Equatable, Sendable {
 
     let home: BasketballMatchTeamScore
     let away: BasketballMatchTeamScore
+}
+
+// MARK: - Team Statistics
+
+nonisolated struct BasketballMatchTeamStatistics: Equatable, Sendable {
+
+    let teamID: Int?
+    let fieldGoalsMade: Double?
+    let fieldGoalsAttempted: Double?
+    let fieldGoalPercentage: Double?
+    let threePointsMade: Double?
+    let threePointsAttempted: Double?
+    let threePointPercentage: Double?
+    let freeThrowsMade: Double?
+    let freeThrowsAttempted: Double?
+    let freeThrowPercentage: Double?
+    let rebounds: Double?
+    let offensiveRebounds: Double?
+    let defensiveRebounds: Double?
+    let assists: Double?
+    let steals: Double?
+    let blocks: Double?
+    let turnovers: Double?
+    let personalFouls: Double?
 }
 
 // MARK: - Players

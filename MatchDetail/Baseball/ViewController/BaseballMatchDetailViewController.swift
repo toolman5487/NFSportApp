@@ -25,10 +25,11 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
 
     private let viewModel: BaseballMatchDetailViewModel
     private let navigationTitleView = MatchDetailNavigationTitleView()
+    private let leagueNavigationTitleView = MatchDetailLeagueNavigationTitleView()
     private var screenTitle: String
     private var headerViewData: BaseballMatchDetailHeaderViewData?
     private var sections: [BaseballMatchDetailSectionViewData] = []
-    private var selectedStatsFilter: BaseballMatchFilterOption = .total
+    private var selectedStatsFilter: BaseballMatchFilterOption = .home
 
     // MARK: - Initialization
 
@@ -101,42 +102,10 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             return 0
 
         case .some(.stats(let viewData)):
-            return statsItemCount(for: viewData)
+            return viewData.itemCount(for: selectedStatsFilter)
 
         case .none:
             return 0
-        }
-    }
-
-    private func statsItemCount(for viewData: BaseballMatchDetailStatsViewData) -> Int {
-        switch viewData.displayState {
-        case .empty:
-            return 1
-
-        case .content:
-            let rowCount = statsRowCount(for: viewData)
-            return rowCount > 0 ? rowCount : 1
-        }
-    }
-
-    private func statsHasContent(for viewData: BaseballMatchDetailStatsViewData) -> Bool {
-        switch viewData.displayState {
-        case .empty:
-            return false
-
-        case .content:
-            return statsRowCount(for: viewData) > 0
-        }
-    }
-
-    private func statsRowCount(for viewData: BaseballMatchDetailStatsViewData) -> Int {
-        switch selectedStatsFilter {
-        case .total:
-            return viewData.comparisonRows.count
-        case .home:
-            return viewData.homeRows.count
-        case .away:
-            return viewData.awayRows.count
         }
     }
 
@@ -168,7 +137,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             )
 
         case .some(.stats(let viewData)):
-            let itemHeight: NSCollectionLayoutDimension = statsHasContent(for: viewData)
+            let itemHeight: NSCollectionLayoutDimension = viewData.hasContent(for: selectedStatsFilter)
                 ? .estimated(LayoutMetric.estimatedStatsRowHeight)
                 : .estimated(LayoutMetric.estimatedStatsEmptyHeight)
             let section = makeListSectionLayout(itemHeight: itemHeight)
@@ -219,7 +188,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         for viewData: BaseballMatchDetailStatsViewData,
         at indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard statsHasContent(for: viewData) else {
+        guard viewData.hasContent(for: selectedStatsFilter) else {
             return makeStatsEmptyCell(for: viewData, at: indexPath)
         }
 
@@ -230,24 +199,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
         }
 
-        switch selectedStatsFilter {
-        case .total:
-            guard viewData.comparisonRows.indices.contains(indexPath.item) else {
-                return cell
-            }
-            cell.configure(with: viewData.comparisonRows[indexPath.item])
-
-        case .home:
-            guard viewData.homeRows.indices.contains(indexPath.item) else {
-                return cell
-            }
-            cell.configure(with: viewData.homeRows[indexPath.item])
-
-        case .away:
-            guard viewData.awayRows.indices.contains(indexPath.item) else {
-                return cell
-            }
-            cell.configure(with: viewData.awayRows[indexPath.item])
+        if let row = viewData.rowContent(at: indexPath.item, filter: selectedStatsFilter) {
+            cell.configure(with: row)
         }
 
         return cell
@@ -264,16 +217,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
         }
 
-        switch viewData.displayState {
-        case .empty(let title, let subtitle):
-            cell.configure(title: title, subtitle: subtitle)
-
-        case .content:
-            cell.configure(
-                title: "No Stats Available",
-                subtitle: "Player statistics are not available for this game."
-            )
-        }
+        let emptyCellText = viewData.emptyCellText
+        cell.configure(title: emptyCellText.title, subtitle: emptyCellText.subtitle)
 
         return cell
     }
@@ -318,7 +263,11 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
                 return UICollectionReusableView()
             }
 
-            filterView.configure(selectedOption: selectedStatsFilter)
+            filterView.configure(
+                selectedOption: selectedStatsFilter,
+                homeTeamName: viewData.homeTeamName,
+                awayTeamName: viewData.awayTeamName
+            )
             filterView.onFilterChanged = { [weak self] option in
                 guard let self, self.selectedStatsFilter != option else {
                     return
@@ -364,13 +313,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         case .loaded(let presentation):
             screenTitle = presentation.title
             title = presentation.title
-            headerViewData = presentation.sections.compactMap { section -> BaseballMatchDetailHeaderViewData? in
-                guard case .header(let viewData) = section else {
-                    return nil
-                }
-
-                return viewData
-            }.first
+            headerViewData = presentation.headerViewData
             sections = presentation.sections
             collectionView.reloadData()
             updateNavigationTitle()
@@ -388,10 +331,19 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
     // MARK: - Navigation Title
 
     private func updateNavigationTitle() {
-        guard isScrolledAwayFromTop,
-              let headerViewData else {
+        guard let headerViewData else {
             navigationItem.titleView = nil
             navigationItem.title = screenTitle
+            return
+        }
+
+        guard isScrolledAwayFromTop else {
+            leagueNavigationTitleView.configure(
+                title: screenTitle,
+                logoURL: headerViewData.leagueLogoURL
+            )
+            navigationItem.title = nil
+            navigationItem.titleView = leagueNavigationTitleView
             return
         }
 

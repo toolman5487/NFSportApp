@@ -106,13 +106,13 @@ final class SoccerMatchDetailViewModel {
             .header(makeHeaderViewData(from: detail.fixture, phase: phase))
         ]
 
-        if displayPolicy.showsStatsSection {
-            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
+        if displayPolicy.showsEventsSection,
+           let eventsSection = makeEventsSection(from: detail.events, fixture: detail.fixture) {
+            sections.append(.events(eventsSection))
         }
 
-        if displayPolicy.showsEventsSection,
-           let eventsSection = makeEventsSection(from: detail.events) {
-            sections.append(.events(eventsSection))
+        if displayPolicy.showsStatsSection {
+            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
         }
 
         if displayPolicy.showsLineupsSection,
@@ -206,7 +206,10 @@ final class SoccerMatchDetailViewModel {
 
     // MARK: - Events & Lineups
 
-    private func makeEventsSection(from events: [SoccerMatchEvent]) -> SoccerMatchDetailEventsSectionViewData? {
+    private func makeEventsSection(
+        from events: [SoccerMatchEvent],
+        fixture: SoccerMatchFixtureDetail
+    ) -> SoccerMatchDetailEventsSectionViewData? {
         guard !events.isEmpty else {
             return nil
         }
@@ -216,12 +219,56 @@ final class SoccerMatchDetailViewModel {
             items: events.map { event in
                 SoccerMatchDetailEventViewData(
                     id: event.id,
+                    side: makeEventSide(from: event, fixture: fixture),
+                    iconSystemName: makeEventIconSystemName(from: event),
                     timeText: makeEventTimeText(from: event),
                     title: makeEventTitle(from: event),
                     subtitle: makeEventSubtitle(from: event)
                 )
             }
         )
+    }
+
+    private func makeEventSide(
+        from event: SoccerMatchEvent,
+        fixture: SoccerMatchFixtureDetail
+    ) -> SoccerMatchDetailEventSide {
+        guard let eventTeam = event.team else {
+            return .neutral
+        }
+
+        if matchesTeam(eventTeam, fixture.homeTeam) {
+            return .home
+        }
+
+        if matchesTeam(eventTeam, fixture.awayTeam) {
+            return .away
+        }
+
+        return .neutral
+    }
+
+    private func makeEventIconSystemName(from event: SoccerMatchEvent) -> String {
+        let type = event.type.lowercased()
+        let detail = event.detail?.lowercased() ?? ""
+
+        if type.contains("goal") || detail.contains("goal") || detail.contains("penalty") {
+            return "soccerball"
+        }
+
+        if type.contains("card") || detail.contains("card") {
+            return detail.contains("red") ? "rectangle.fill" : "rectangle"
+        }
+
+        if type.contains("subst") || detail.contains("subst") {
+            return "arrow.left.arrow.right"
+        }
+
+        if type.contains("var") || detail.contains("var") {
+            return "video"
+        }
+
+        return "circle.fill"
     }
 
     private func makeEventTitle(from event: SoccerMatchEvent) -> String {
@@ -289,48 +336,120 @@ final class SoccerMatchDetailViewModel {
         let homeLineup = detail.lineups.first { matchesTeam($0.team, detail.fixture.homeTeam) }
         let awayLineup = detail.lineups.first { matchesTeam($0.team, detail.fixture.awayTeam) }
 
-        var teams: [SoccerMatchDetailLineupViewData] = []
+        let rows = makeLineupComparisonRows(
+            homePlayers: homeLineup?.startXI ?? [],
+            awayPlayers: awayLineup?.startXI ?? []
+        )
 
-        if let homeLineup {
-            teams.append(makeLineupViewData(from: homeLineup))
-        }
-
-        if let awayLineup {
-            teams.append(makeLineupViewData(from: awayLineup))
-        }
-
-        guard !teams.isEmpty else {
+        guard !rows.isEmpty else {
             return nil
         }
 
         return SoccerMatchDetailLineupsSectionViewData(
             title: "Lineups",
-            teams: teams
+            homeTeamName: detail.fixture.homeTeam.name,
+            awayTeamName: detail.fixture.awayTeam.name,
+            homeMetaText: makeLineupMetaText(from: homeLineup),
+            awayMetaText: makeLineupMetaText(from: awayLineup),
+            rows: rows
         )
     }
 
-    private func makeLineupViewData(from lineup: SoccerMatchLineup) -> SoccerMatchDetailLineupViewData {
-        let substitutes = lineup.substitutes.map(formatLineupPlayer)
-        let layoutState: SoccerMatchLineupLayoutState = substitutes.isEmpty
-            ? .startersOnly
-            : .withSubstitutes
-
-        return SoccerMatchDetailLineupViewData(
-            teamName: lineup.team.name,
-            formationText: lineup.formation,
-            coachName: lineup.coachName,
-            layoutState: layoutState,
-            starters: lineup.startXI.map(formatLineupPlayer),
-            substitutes: substitutes
-        )
-    }
-
-    private func formatLineupPlayer(_ player: SoccerMatchLineupPlayer) -> String {
-        if let number = player.number {
-            return "#\(number) \(player.name)"
+    private func makeLineupMetaText(from lineup: SoccerMatchLineup?) -> String? {
+        guard let lineup else {
+            return nil
         }
 
-        return player.name
+        var parts: [String] = []
+        if let formation = lineup.formation?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !formation.isEmpty {
+            parts.append(formation)
+        }
+        if let coachName = lineup.coachName?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !coachName.isEmpty {
+            parts.append("Coach: \(coachName)")
+        }
+
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
+    private func makeLineupComparisonRows(
+        homePlayers: [SoccerMatchLineupPlayer],
+        awayPlayers: [SoccerMatchLineupPlayer]
+    ) -> [SoccerMatchLineupComparisonRowViewData] {
+        SoccerMatchLineupPositionGroup.allCases.flatMap { group in
+            let homeGroupPlayers = sortedLineupPlayers(
+                homePlayers.filter { makePositionGroup(from: $0) == group }
+            )
+            let awayGroupPlayers = sortedLineupPlayers(
+                awayPlayers.filter { makePositionGroup(from: $0) == group }
+            )
+            let rowCount = max(homeGroupPlayers.count, awayGroupPlayers.count)
+
+            return (0..<rowCount).map { index in
+                SoccerMatchLineupComparisonRowViewData(
+                    positionTitle: index == 0 ? group.rawValue : nil,
+                    homePlayer: homeGroupPlayers.indices.contains(index)
+                        ? makeLineupPlayerViewData(from: homeGroupPlayers[index])
+                        : nil,
+                    awayPlayer: awayGroupPlayers.indices.contains(index)
+                        ? makeLineupPlayerViewData(from: awayGroupPlayers[index])
+                        : nil
+                )
+            }
+        }
+    }
+
+    private func makeLineupPlayerViewData(from player: SoccerMatchLineupPlayer) -> SoccerMatchLineupPlayerViewData {
+        SoccerMatchLineupPlayerViewData(
+            id: player.id,
+            displayName: player.name,
+            numberText: player.number.map { "#\($0)" },
+            photoURL: player.photoURL
+        )
+    }
+
+    private func makePositionGroup(from player: SoccerMatchLineupPlayer) -> SoccerMatchLineupPositionGroup {
+        switch player.position?.uppercased() {
+        case .some("G"):
+            return .goalkeeper
+        case .some("D"):
+            return .defender
+        case .some("M"):
+            return .midfielder
+        case .some("F"):
+            return .forward
+        default:
+            return .other
+        }
+    }
+
+    private func sortedLineupPlayers(_ players: [SoccerMatchLineupPlayer]) -> [SoccerMatchLineupPlayer] {
+        players.sorted { lhs, rhs in
+            switch (lineupGridOrder(lhs.grid), lineupGridOrder(rhs.grid)) {
+            case (.some(let lhsOrder), .some(let rhsOrder)):
+                return lhsOrder < rhsOrder
+            case (.some, .none):
+                return true
+            case (.none, .some):
+                return false
+            case (.none, .none):
+                return (lhs.number ?? Int.max) < (rhs.number ?? Int.max)
+            }
+        }
+    }
+
+    private func lineupGridOrder(_ grid: String?) -> Int? {
+        guard let grid else {
+            return nil
+        }
+
+        let parts = grid.split(separator: ":").compactMap { Int($0) }
+        guard parts.count == 2 else {
+            return nil
+        }
+
+        return parts[0] * 100 + parts[1]
     }
 
     // MARK: - Stats Aggregation

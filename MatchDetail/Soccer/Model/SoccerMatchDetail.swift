@@ -139,4 +139,5 @@ nonisolated struct SoccerMatchLineupPlayer: Equatable, Identifiable, Sendable {
     let number: Int?
     let position: String?
     let grid: String?
+    let photoURL: URL?
 }

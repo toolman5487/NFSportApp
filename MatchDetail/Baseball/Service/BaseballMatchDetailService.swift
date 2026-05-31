@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 // MARK: - BaseballMatchDetailServicing
 
@@ -35,7 +36,15 @@ nonisolated struct BaseballMatchDetailService: BaseballMatchDetailServicing {
         async let players = fetchPlayers(from: .players(gameID: gameID))
 
         let fixture = try await game
-        let playersByTeam = (try? await players) ?? []
+        let playersByTeam: [BaseballMatchTeamPlayers]
+        do {
+            playersByTeam = try await players
+        } catch {
+            AppLogger.network.warning(
+                "Baseball players detail unavailable | gameID=\(gameID, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+            )
+            playersByTeam = []
+        }
 
         return BaseballMatchDetail(
             fixture: fixture,
@@ -106,7 +115,7 @@ private nonisolated struct APIBaseballMatchGameResponse: Decodable, Sendable {
             scheduledStartText: Self.makeScheduledStartText(date: date, time: time),
             statusLong: status?.long,
             statusShort: status?.short,
-            elapsedMinute: nil,
+            elapsedMinute: status?.elapsedMinute,
             homeTeam: homeTeam,
             awayTeam: awayTeam,
             score: BaseballMatchScore(
@@ -150,6 +159,13 @@ private nonisolated struct APIBaseballMatchStatusResponse: Decodable, Sendable {
     let long: String?
     let short: String?
     let timer: String?
+
+    var elapsedMinute: Int? {
+        guard let timer else {
+            return nil
+        }
+        return Int(timer.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
 }
 
 private nonisolated struct APIBaseballMatchLeagueResponse: Decodable, Sendable {
@@ -443,4 +459,3 @@ private nonisolated enum APIBaseballFlexibleValue: Decodable, Sendable {
         }
     }
 }
-

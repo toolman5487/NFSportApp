@@ -13,6 +13,10 @@ nonisolated struct SoccerMatchDetailPresentation: Equatable, Sendable {
 
     let title: String
     let sections: [SoccerMatchDetailSectionViewData]
+
+    var headerViewData: SoccerMatchDetailHeaderViewData? {
+        sections.compactMap(\.headerViewData).first
+    }
 }
 
 // MARK: - Sections
@@ -23,6 +27,14 @@ nonisolated enum SoccerMatchDetailSectionViewData: Equatable, Sendable {
     case stats(SoccerMatchDetailStatsViewData)
     case events(SoccerMatchDetailEventsSectionViewData)
     case lineups(SoccerMatchDetailLineupsSectionViewData)
+
+    var headerViewData: SoccerMatchDetailHeaderViewData? {
+        guard case .header(let viewData) = self else {
+            return nil
+        }
+
+        return viewData
+    }
 }
 
 // MARK: - Header
@@ -63,6 +75,24 @@ nonisolated struct SoccerMatchDetailVenueViewData: Equatable, Sendable {
 
 // MARK: - Stats
 
+nonisolated enum SoccerMatchFilterOption: Int, CaseIterable, Equatable, Sendable {
+
+    case total
+    case home
+    case away
+
+    var title: String {
+        switch self {
+        case .total:
+            return "Game Total"
+        case .home:
+            return "Home"
+        case .away:
+            return "Away"
+        }
+    }
+}
+
 nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
 
     let homeTeamName: String
@@ -72,6 +102,85 @@ nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
     let comparisonRows: [SoccerMatchStatsComparisonRowViewData]
     let homeRows: [SoccerMatchStatsValueRowViewData]
     let awayRows: [SoccerMatchStatsValueRowViewData]
+
+    func itemCount(for filter: SoccerMatchFilterOption) -> Int {
+        switch displayState {
+        case .empty:
+            return 1
+
+        case .content:
+            let rowCount = rowCount(for: filter)
+            return rowCount > 0 ? rowCount : 1
+        }
+    }
+
+    func hasContent(for filter: SoccerMatchFilterOption) -> Bool {
+        switch displayState {
+        case .empty:
+            return false
+
+        case .content:
+            return rowCount(for: filter) > 0
+        }
+    }
+
+    func rowContent(
+        at index: Int,
+        filter: SoccerMatchFilterOption
+    ) -> SoccerMatchStatsRowContent? {
+        switch filter {
+        case .total:
+            guard comparisonRows.indices.contains(index) else {
+                return nil
+            }
+
+            return .comparison(comparisonRows[index])
+
+        case .home:
+            guard homeRows.indices.contains(index) else {
+                return nil
+            }
+
+            return .value(homeRows[index])
+
+        case .away:
+            guard awayRows.indices.contains(index) else {
+                return nil
+            }
+
+            return .value(awayRows[index])
+        }
+    }
+
+    var emptyCellText: (title: String, subtitle: String?) {
+        switch displayState {
+        case .empty(let title, let subtitle):
+            return (title, subtitle)
+
+        case .content:
+            return (
+                "No Stats Available",
+                "Match statistics are not available for this game."
+            )
+        }
+    }
+
+    private func rowCount(for filter: SoccerMatchFilterOption) -> Int {
+        switch filter {
+        case .total:
+            return comparisonRows.count
+        case .home:
+            return homeRows.count
+        case .away:
+            return awayRows.count
+        }
+    }
+}
+
+nonisolated enum SoccerMatchStatsRowContent: Equatable, Sendable {
+
+    case comparison(SoccerMatchStatsComparisonRowViewData)
+    case value(SoccerMatchStatsValueRowViewData)
 }
 
 nonisolated struct SoccerMatchStatsComparisonRowViewData: Equatable, Identifiable, Sendable {
@@ -104,9 +213,18 @@ nonisolated struct SoccerMatchDetailEventsSectionViewData: Equatable, Sendable {
 nonisolated struct SoccerMatchDetailEventViewData: Equatable, Identifiable, Sendable {
 
     let id: String
+    let side: SoccerMatchDetailEventSide
+    let iconSystemName: String
     let timeText: String
     let title: String
     let subtitle: String?
+}
+
+nonisolated enum SoccerMatchDetailEventSide: Equatable, Sendable {
+
+    case home
+    case away
+    case neutral
 }
 
 // MARK: - Lineups
@@ -114,23 +232,41 @@ nonisolated struct SoccerMatchDetailEventViewData: Equatable, Identifiable, Send
 nonisolated struct SoccerMatchDetailLineupsSectionViewData: Equatable, Sendable {
 
     let title: String
-    let teams: [SoccerMatchDetailLineupViewData]
+    let homeTeamName: String
+    let awayTeamName: String
+    let homeMetaText: String?
+    let awayMetaText: String?
+    let rows: [SoccerMatchLineupComparisonRowViewData]
 }
 
-nonisolated enum SoccerMatchLineupLayoutState: Equatable, Sendable {
+nonisolated struct SoccerMatchLineupComparisonRowViewData: Equatable, Identifiable, Sendable {
 
-    case startersOnly
-    case withSubstitutes
+    var id: String {
+        [
+            positionTitle ?? "",
+            homePlayer?.id ?? "empty-home",
+            awayPlayer?.id ?? "empty-away"
+        ].joined(separator: "|")
+    }
+
+    let positionTitle: String?
+    let homePlayer: SoccerMatchLineupPlayerViewData?
+    let awayPlayer: SoccerMatchLineupPlayerViewData?
 }
 
-nonisolated struct SoccerMatchDetailLineupViewData: Equatable, Identifiable, Sendable {
+nonisolated struct SoccerMatchLineupPlayerViewData: Equatable, Identifiable, Sendable {
 
-    var id: String { teamName }
+    let id: String
+    let displayName: String
+    let numberText: String?
+    let photoURL: URL?
+}
 
-    let teamName: String
-    let formationText: String?
-    let coachName: String?
-    let layoutState: SoccerMatchLineupLayoutState
-    let starters: [String]
-    let substitutes: [String]
+nonisolated enum SoccerMatchLineupPositionGroup: String, CaseIterable, Sendable {
+
+    case goalkeeper = "Goalkeeper"
+    case defender = "Defenders"
+    case midfielder = "Midfielders"
+    case forward = "Forwards"
+    case other = "Other"
 }

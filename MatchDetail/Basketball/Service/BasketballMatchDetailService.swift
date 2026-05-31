@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 // MARK: - BasketballMatchDetailServicing
 
@@ -32,13 +33,33 @@ nonisolated struct BasketballMatchDetailService: BasketballMatchDetailServicing 
 
     func fetchMatchDetail(gameID: Int) async throws -> BasketballMatchDetail {
         async let game = fetchGame(from: .game(id: gameID))
+        async let teamStatistics = fetchTeamStatistics(from: .teamStatistics(gameID: gameID))
         async let players = fetchPlayers(from: .players(gameID: gameID))
 
         let fixture = try await game
-        let playersByTeam = (try? await players) ?? []
+        let teamStatisticsByTeam: [BasketballMatchTeamStatistics]
+        do {
+            teamStatisticsByTeam = try await teamStatistics
+        } catch {
+            AppLogger.network.warning(
+                "Basketball team statistics unavailable | gameID=\(gameID, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+            )
+            teamStatisticsByTeam = []
+        }
+
+        let playersByTeam: [BasketballMatchTeamPlayers]
+        do {
+            playersByTeam = try await players
+        } catch {
+            AppLogger.network.warning(
+                "Basketball players detail unavailable | gameID=\(gameID, privacy: .public), error=\(error.localizedDescription, privacy: .public)"
+            )
+            playersByTeam = []
+        }
 
         return BasketballMatchDetail(
             fixture: fixture,
+            teamStatisticsByTeam: teamStatisticsByTeam,
             playersByTeam: playersByTeam
         )
     }
@@ -67,6 +88,17 @@ nonisolated struct BasketballMatchDetailService: BasketballMatchDetailServicing 
         )
 
         return response.response.compactMap(\.domainTeamPlayers)
+    }
+
+    private func fetchTeamStatistics(from endpoint: BasketballMatchDetailEndpoint) async throws -> [BasketballMatchTeamStatistics] {
+        let response = try await networkClient.get(
+            endpoint.path,
+            queryItems: endpoint.queryItems,
+            headers: [:],
+            as: APIBasketballMatchDetailResponse<[APIBasketballMatchTeamStatisticsResponse]>.self
+        )
+
+        return response.response.map(\.domainStatistics)
     }
 }
 
@@ -264,6 +296,58 @@ private nonisolated struct APIBasketballMatchTeamScoreResponse: Decodable, Senda
     }
 }
 
+// MARK: - Team Statistics Response
+
+private nonisolated struct APIBasketballMatchTeamStatisticsResponse: Decodable, Sendable {
+
+    let team: APIBasketballMatchTeamResponse?
+    let fieldGoals: APIBasketballGoalGroupResponse?
+    let threePointGoals: APIBasketballGoalGroupResponse?
+    let freeThrowGoals: APIBasketballGoalGroupResponse?
+    let rebounds: APIBasketballReboundsGroupResponse?
+    let assists: APIBasketballFlexibleValue?
+    let steals: APIBasketballFlexibleValue?
+    let blocks: APIBasketballFlexibleValue?
+    let turnovers: APIBasketballFlexibleValue?
+    let personalFouls: APIBasketballFlexibleValue?
+
+    private enum CodingKeys: String, CodingKey {
+        case team
+        case fieldGoals = "field_goals"
+        case threePointGoals = "threepoint_goals"
+        case freeThrowGoals = "freethrows_goals"
+        case rebounds
+        case assists
+        case steals
+        case blocks
+        case turnovers
+        case personalFouls = "personal_fouls"
+    }
+
+    var domainStatistics: BasketballMatchTeamStatistics {
+        BasketballMatchTeamStatistics(
+            teamID: team?.id,
+            fieldGoalsMade: basketballStatValue(fieldGoals?.made),
+            fieldGoalsAttempted: basketballStatValue(fieldGoals?.attempts),
+            fieldGoalPercentage: normalizedPercentage(fieldGoals?.percentage),
+            threePointsMade: basketballStatValue(threePointGoals?.made),
+            threePointsAttempted: basketballStatValue(threePointGoals?.attempts),
+            threePointPercentage: normalizedPercentage(threePointGoals?.percentage),
+            freeThrowsMade: basketballStatValue(freeThrowGoals?.made),
+            freeThrowsAttempted: basketballStatValue(freeThrowGoals?.attempts),
+            freeThrowPercentage: normalizedPercentage(freeThrowGoals?.percentage),
+            rebounds: basketballStatValue(rebounds?.total),
+            offensiveRebounds: basketballStatValue(rebounds?.offensive),
+            defensiveRebounds: basketballStatValue(rebounds?.defensive),
+            assists: basketballStatValue(assists),
+            steals: basketballStatValue(steals),
+            blocks: basketballStatValue(blocks),
+            turnovers: basketballStatValue(turnovers),
+            personalFouls: basketballStatValue(personalFouls)
+        )
+    }
+}
+
 // MARK: - Players Response
 
 private nonisolated struct APIBasketballMatchTeamPlayersResponse: Decodable, Sendable {
@@ -375,6 +459,7 @@ private nonisolated struct APIBasketballGoalGroupResponse: Decodable, Sendable {
 
     let total: APIBasketballFlexibleValue?
     let attempts: APIBasketballFlexibleValue?
+    let percentage: APIBasketballFlexibleValue?
 
     var made: APIBasketballFlexibleValue? { total }
 }
@@ -382,6 +467,22 @@ private nonisolated struct APIBasketballGoalGroupResponse: Decodable, Sendable {
 private nonisolated struct APIBasketballReboundsGroupResponse: Decodable, Sendable {
 
     let total: APIBasketballFlexibleValue?
+    let offensive: APIBasketballFlexibleValue?
+    let defensive: APIBasketballFlexibleValue?
+
+    private enum CodingKeys: String, CodingKey {
+        case total
+        case offensive = "offence"
+        case defensive = "defense"
+    }
+}
+
+private nonisolated func normalizedPercentage(_ value: APIBasketballFlexibleValue?) -> Double? {
+    guard let percentage = basketballStatValue(value) else {
+        return nil
+    }
+
+    return percentage > 1 ? percentage / 100 : percentage
 }
 
 // MARK: - Flexible Value

@@ -202,6 +202,11 @@ final class BasketballMatchDetailViewModel {
         let displayPolicy = phase.displayPolicy(for: .basketball)
 
         if displayPolicy.showsDetailedStatistics,
+           let teamStatisticsStats = makeTeamStatisticsStatsViewData(from: detail, phase: phase) {
+            return teamStatisticsStats
+        }
+
+        if displayPolicy.showsDetailedStatistics,
            let homePlayers = findTeamPlayers(for: fixture.homeTeam, in: detail.playersByTeam),
            let awayPlayers = findTeamPlayers(for: fixture.awayTeam, in: detail.playersByTeam, excluding: homePlayers),
            !homePlayers.players.isEmpty || !awayPlayers.players.isEmpty {
@@ -234,6 +239,49 @@ final class BasketballMatchDetailViewModel {
         }
 
         return makeEmptyStatsViewData(from: fixture, phase: phase)
+    }
+
+    private func makeTeamStatisticsStatsViewData(
+        from detail: BasketballMatchDetail,
+        phase: MatchFixturePhase
+    ) -> BasketballMatchDetailStatsViewData? {
+        let fixture = detail.fixture
+        guard let homeStatistics = findTeamStatistics(
+            for: fixture.homeTeam,
+            in: detail.teamStatisticsByTeam
+        ),
+              let awayStatistics = findTeamStatistics(
+                for: fixture.awayTeam,
+                in: detail.teamStatisticsByTeam,
+                excluding: homeStatistics
+              ) else {
+            return nil
+        }
+
+        let homeTotals = makeTotals(from: homeStatistics, score: fixture.score.home)
+        let awayTotals = makeTotals(from: awayStatistics, score: fixture.score.away)
+        let comparisonRows = makeComparisonRows(home: homeTotals, away: awayTotals)
+
+        guard !comparisonRows.isEmpty else {
+            return nil
+        }
+
+        return finalizeStatsViewData(
+            fixture: fixture,
+            phase: phase,
+            viewData: appendQuarterPeriods(
+                to: BasketballMatchDetailStatsViewData(
+                    homeTeamName: fixture.homeTeam.name,
+                    awayTeamName: fixture.awayTeam.name,
+                    displayState: .content,
+                    showsFilter: true,
+                    comparisonRows: comparisonRows,
+                    homeRows: makeValueRows(from: homeTotals),
+                    awayRows: makeValueRows(from: awayTotals)
+                ),
+                score: fixture.score
+            )
+        )
     }
 
     private func makeGameScoreStatsViewData(
@@ -458,6 +506,20 @@ final class BasketballMatchDetailViewModel {
         return candidates.first
     }
 
+    private func findTeamStatistics(
+        for team: BasketballMatchTeam,
+        in statisticsByTeam: [BasketballMatchTeamStatistics],
+        excluding excluded: BasketballMatchTeamStatistics? = nil
+    ) -> BasketballMatchTeamStatistics? {
+        let candidates = statisticsByTeam.filter { $0.teamID != excluded?.teamID }
+
+        if let byID = candidates.first(where: { $0.teamID != nil && $0.teamID == team.teamID }) {
+            return byID
+        }
+
+        return candidates.first
+    }
+
     private func aggregate(players: [BasketballMatchPlayer]) -> BasketballTeamTotals {
         var totals = BasketballTeamTotals()
 
@@ -481,6 +543,32 @@ final class BasketballMatchDetailViewModel {
         return totals
     }
 
+    private func makeTotals(
+        from statistics: BasketballMatchTeamStatistics,
+        score: BasketballMatchTeamScore
+    ) -> BasketballTeamTotals {
+        BasketballTeamTotals(
+            points: Double(score.total ?? 0),
+            fieldGoalsMade: statistics.fieldGoalsMade ?? 0,
+            fieldGoalsAttempted: statistics.fieldGoalsAttempted ?? 0,
+            fieldGoalPercentageOverride: statistics.fieldGoalPercentage,
+            threePointsMade: statistics.threePointsMade ?? 0,
+            threePointsAttempted: statistics.threePointsAttempted ?? 0,
+            threePointPercentageOverride: statistics.threePointPercentage,
+            freeThrowsMade: statistics.freeThrowsMade ?? 0,
+            freeThrowsAttempted: statistics.freeThrowsAttempted ?? 0,
+            freeThrowPercentageOverride: statistics.freeThrowPercentage,
+            rebounds: statistics.rebounds ?? 0,
+            offensiveRebounds: statistics.offensiveRebounds ?? 0,
+            defensiveRebounds: statistics.defensiveRebounds ?? 0,
+            assists: statistics.assists ?? 0,
+            steals: statistics.steals ?? 0,
+            blocks: statistics.blocks ?? 0,
+            turnovers: statistics.turnovers ?? 0,
+            personalFouls: statistics.personalFouls ?? 0
+        )
+    }
+
     private func makeComparisonRows(
         home: BasketballTeamTotals,
         away: BasketballTeamTotals
@@ -489,11 +577,15 @@ final class BasketballMatchDetailViewModel {
             ("Points", home.points, away.points, Self.formatCount),
             ("FG%", home.fieldGoalPercentage, away.fieldGoalPercentage, Self.formatPercentage),
             ("3PT%", home.threePointPercentage, away.threePointPercentage, Self.formatPercentage),
+            ("FT%", home.freeThrowPercentage, away.freeThrowPercentage, Self.formatPercentage),
             ("Rebounds", home.rebounds, away.rebounds, Self.formatCount),
+            ("Off Reb", home.offensiveRebounds, away.offensiveRebounds, Self.formatCount),
+            ("Def Reb", home.defensiveRebounds, away.defensiveRebounds, Self.formatCount),
             ("Assists", home.assists, away.assists, Self.formatCount),
             ("Steals", home.steals, away.steals, Self.formatCount),
             ("Blocks", home.blocks, away.blocks, Self.formatCount),
-            ("Turnovers", home.turnovers, away.turnovers, Self.formatCount)
+            ("Turnovers", home.turnovers, away.turnovers, Self.formatCount),
+            ("Fouls", home.personalFouls, away.personalFouls, Self.formatCount)
         ]
 
         return definitions.compactMap { definition in
@@ -520,11 +612,15 @@ final class BasketballMatchDetailViewModel {
             BasketballMatchStatsValueRowViewData(title: "Points", value: Self.formatCount(totals.points)),
             BasketballMatchStatsValueRowViewData(title: "FG%", value: Self.formatPercentage(totals.fieldGoalPercentage)),
             BasketballMatchStatsValueRowViewData(title: "3PT%", value: Self.formatPercentage(totals.threePointPercentage)),
+            BasketballMatchStatsValueRowViewData(title: "FT%", value: Self.formatPercentage(totals.freeThrowPercentage)),
             BasketballMatchStatsValueRowViewData(title: "Rebounds", value: Self.formatCount(totals.rebounds)),
+            BasketballMatchStatsValueRowViewData(title: "Off Reb", value: Self.formatCount(totals.offensiveRebounds)),
+            BasketballMatchStatsValueRowViewData(title: "Def Reb", value: Self.formatCount(totals.defensiveRebounds)),
             BasketballMatchStatsValueRowViewData(title: "Assists", value: Self.formatCount(totals.assists)),
             BasketballMatchStatsValueRowViewData(title: "Steals", value: Self.formatCount(totals.steals)),
             BasketballMatchStatsValueRowViewData(title: "Blocks", value: Self.formatCount(totals.blocks)),
-            BasketballMatchStatsValueRowViewData(title: "Turnovers", value: Self.formatCount(totals.turnovers))
+            BasketballMatchStatsValueRowViewData(title: "Turnovers", value: Self.formatCount(totals.turnovers)),
+            BasketballMatchStatsValueRowViewData(title: "Fouls", value: Self.formatCount(totals.personalFouls))
         ]
     }
 
@@ -544,25 +640,31 @@ private struct BasketballTeamTotals {
     var points: Double = 0
     var fieldGoalsMade: Double = 0
     var fieldGoalsAttempted: Double = 0
+    var fieldGoalPercentageOverride: Double?
     var threePointsMade: Double = 0
     var threePointsAttempted: Double = 0
+    var threePointPercentageOverride: Double?
     var freeThrowsMade: Double = 0
     var freeThrowsAttempted: Double = 0
+    var freeThrowPercentageOverride: Double?
     var rebounds: Double = 0
+    var offensiveRebounds: Double = 0
+    var defensiveRebounds: Double = 0
     var assists: Double = 0
     var steals: Double = 0
     var blocks: Double = 0
     var turnovers: Double = 0
+    var personalFouls: Double = 0
 
     var fieldGoalPercentage: Double {
-        fieldGoalsAttempted > 0 ? fieldGoalsMade / fieldGoalsAttempted : 0
+        fieldGoalPercentageOverride ?? (fieldGoalsAttempted > 0 ? fieldGoalsMade / fieldGoalsAttempted : 0)
     }
 
     var threePointPercentage: Double {
-        threePointsAttempted > 0 ? threePointsMade / threePointsAttempted : 0
+        threePointPercentageOverride ?? (threePointsAttempted > 0 ? threePointsMade / threePointsAttempted : 0)
     }
 
     var freeThrowPercentage: Double {
-        freeThrowsAttempted > 0 ? freeThrowsMade / freeThrowsAttempted : 0
+        freeThrowPercentageOverride ?? (freeThrowsAttempted > 0 ? freeThrowsMade / freeThrowsAttempted : 0)
     }
 }

@@ -197,6 +197,89 @@ extension MatchBaseViewController {
     }
 }
 
+// MARK: - MatchDetailLeagueNavigationTitleView
+
+@MainActor
+final class MatchDetailLeagueNavigationTitleView: UIView {
+
+    // MARK: - Layout Metrics
+
+    private enum LayoutMetric {
+        static let logoSize: CGFloat = 20
+        static let spacing: CGFloat = 8
+    }
+
+    // MARK: - UI Components
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.tintColor = .primaryLabel
+        return imageView
+    }()
+
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [logoImageView, titleLabel])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = LayoutMetric.spacing
+        return stackView
+    }()
+
+    // MARK: - Initialization
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Configuration
+
+    func configure(title: String, logoURL: URL?) {
+        titleLabel.text = title
+        configureLogo(with: logoURL)
+    }
+
+    private func configureLogo(with logoURL: URL?) {
+        let fallbackImage = UIImage(systemName: "trophy")?.withRenderingMode(.alwaysTemplate)
+
+        if let logoURL {
+            logoImageView.sd_setImage(with: logoURL, placeholderImage: fallbackImage)
+        } else {
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = fallbackImage
+        }
+    }
+
+    // MARK: - Setup
+
+    private func setupView() {
+        addSubview(stackView)
+
+        logoImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(LayoutMetric.logoSize)
+        }
+
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+}
+
 // MARK: - MatchDetailNavigationTitleView
 
 @MainActor

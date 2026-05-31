@@ -431,7 +431,8 @@ private nonisolated struct APISoccerMatchLineupPlayerResponse: Decodable, Sendab
             name: name,
             number: number,
             position: pos,
-            grid: grid
+            grid: grid,
+            photoURL: id.flatMap { APISportsMediaEndpoint.footballPlayer(id: $0).url }
         )
     }
 }

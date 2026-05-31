@@ -8,25 +8,6 @@
 import SnapKit
 import UIKit
 
-// MARK: - BaseballMatchFilterOption
-
-enum BaseballMatchFilterOption: Int, CaseIterable {
-    case total
-    case home
-    case away
-
-    var title: String {
-        switch self {
-        case .total:
-            return "Game Total"
-        case .home:
-            return "Home"
-        case .away:
-            return "Away"
-        }
-    }
-}
-
 // MARK: - BaseballMatchFilterView
 
 final class BaseballMatchFilterView: UICollectionReusableView {
@@ -53,7 +34,9 @@ final class BaseballMatchFilterView: UICollectionReusableView {
     var onFilterChanged: ((BaseballMatchFilterOption) -> Void)?
 
     private let options = BaseballMatchFilterOption.allCases
-    private var selectedOption: BaseballMatchFilterOption = .total
+    private var selectedOption: BaseballMatchFilterOption = .home
+    private var homeTeamName: String?
+    private var awayTeamName: String?
 
     // MARK: - UI Components
 
@@ -106,11 +89,19 @@ final class BaseballMatchFilterView: UICollectionReusableView {
     override func prepareForReuse() {
         super.prepareForReuse()
         onFilterChanged = nil
-        selectedOption = .total
+        selectedOption = .home
+        homeTeamName = nil
+        awayTeamName = nil
     }
 
-    func configure(selectedOption: BaseballMatchFilterOption) {
+    func configure(
+        selectedOption: BaseballMatchFilterOption,
+        homeTeamName: String?,
+        awayTeamName: String?
+    ) {
         self.selectedOption = selectedOption
+        self.homeTeamName = homeTeamName
+        self.awayTeamName = awayTeamName
         collectionView.reloadData()
     }
 
@@ -153,7 +144,7 @@ extension BaseballMatchFilterView: UICollectionViewDataSource {
 
         let option = options[indexPath.item]
         cell.configure(
-            title: option.title,
+            title: option.title(homeTeamName: homeTeamName, awayTeamName: awayTeamName),
             isSelected: option == selectedOption
         )
         return cell
@@ -221,6 +212,8 @@ private final class BaseballMatchFilterOptionCell: UICollectionViewCell {
         label.font = .preferredFont(forTextStyle: .subheadline)
         label.textAlignment = .center
         label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.82
         label.numberOfLines = 1
         return label
     }()

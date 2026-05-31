@@ -8,25 +8,6 @@
 import SnapKit
 import UIKit
 
-// MARK: - SoccerMatchFilterOption
-
-enum SoccerMatchFilterOption: Int, CaseIterable {
-    case total
-    case home
-    case away
-
-    var title: String {
-        switch self {
-        case .total:
-            return "Game Total"
-        case .home:
-            return "Home"
-        case .away:
-            return "Away"
-        }
-    }
-}
-
 // MARK: - SoccerMatchFilterView
 
 final class SoccerMatchFilterView: UICollectionReusableView {

@@ -523,7 +523,10 @@ private extension MatchFixturePhase {
         }
 
         if isBaseballLiveStatus(normalizedStatus) {
-            return .live(elapsedMinute: snapshot.elapsedMinute, periodLabel: "Live")
+            return .live(
+                elapsedMinute: snapshot.elapsedMinute,
+                periodLabel: baseballLivePeriodLabel(from: snapshot)
+            )
         }
 
         switch normalizedStatus {
@@ -629,5 +632,13 @@ private extension MatchFixturePhase {
             || status.contains("top")
             || status.contains("bottom")
             || status.contains("mid")
+    }
+
+    nonisolated static func baseballLivePeriodLabel(from snapshot: MatchFixtureStatusSnapshot) -> String? {
+        let candidates = [snapshot.statusLong, snapshot.statusShort]
+
+        return candidates
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty }
     }
 }

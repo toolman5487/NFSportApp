@@ -25,6 +25,7 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
 
     private let viewModel: BasketballMatchDetailViewModel
     private let navigationTitleView = MatchDetailNavigationTitleView()
+    private let leagueNavigationTitleView = MatchDetailLeagueNavigationTitleView()
     private var screenTitle: String
     private var headerViewData: BasketballMatchDetailHeaderViewData?
     private var sections: [BasketballMatchDetailSectionViewData] = []
@@ -101,42 +102,10 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
             return 0
 
         case .some(.stats(let viewData)):
-            return statsItemCount(for: viewData)
+            return viewData.itemCount(for: selectedStatsFilter)
 
         case .none:
             return 0
-        }
-    }
-
-    private func statsItemCount(for viewData: BasketballMatchDetailStatsViewData) -> Int {
-        switch viewData.displayState {
-        case .empty:
-            return 1
-
-        case .content:
-            let rowCount = statsRowCount(for: viewData)
-            return rowCount > 0 ? rowCount : 1
-        }
-    }
-
-    private func statsHasContent(for viewData: BasketballMatchDetailStatsViewData) -> Bool {
-        switch viewData.displayState {
-        case .empty:
-            return false
-
-        case .content:
-            return statsRowCount(for: viewData) > 0
-        }
-    }
-
-    private func statsRowCount(for viewData: BasketballMatchDetailStatsViewData) -> Int {
-        switch selectedStatsFilter {
-        case .total:
-            return viewData.comparisonRows.count
-        case .home:
-            return viewData.homeRows.count
-        case .away:
-            return viewData.awayRows.count
         }
     }
 
@@ -168,7 +137,7 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
             )
 
         case .some(.stats(let viewData)):
-            let itemHeight: NSCollectionLayoutDimension = statsHasContent(for: viewData)
+            let itemHeight: NSCollectionLayoutDimension = viewData.hasContent(for: selectedStatsFilter)
                 ? .estimated(LayoutMetric.estimatedStatsRowHeight)
                 : .estimated(LayoutMetric.estimatedStatsEmptyHeight)
             let section = makeListSectionLayout(itemHeight: itemHeight)
@@ -219,7 +188,7 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
         for viewData: BasketballMatchDetailStatsViewData,
         at indexPath: IndexPath
     ) -> UICollectionViewCell {
-        guard statsHasContent(for: viewData) else {
+        guard viewData.hasContent(for: selectedStatsFilter) else {
             return makeStatsEmptyCell(for: viewData, at: indexPath)
         }
 
@@ -230,24 +199,15 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
         }
 
-        switch selectedStatsFilter {
-        case .total:
-            guard viewData.comparisonRows.indices.contains(indexPath.item) else {
-                return cell
-            }
-            cell.configure(with: viewData.comparisonRows[indexPath.item])
+        switch viewData.rowContent(at: indexPath.item, filter: selectedStatsFilter) {
+        case .some(.comparison(let row)):
+            cell.configure(with: row)
 
-        case .home:
-            guard viewData.homeRows.indices.contains(indexPath.item) else {
-                return cell
-            }
-            cell.configure(with: viewData.homeRows[indexPath.item])
+        case .some(.value(let row)):
+            cell.configure(with: row)
 
-        case .away:
-            guard viewData.awayRows.indices.contains(indexPath.item) else {
-                return cell
-            }
-            cell.configure(with: viewData.awayRows[indexPath.item])
+        case .none:
+            break
         }
 
         return cell
@@ -264,16 +224,8 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
         }
 
-        switch viewData.displayState {
-        case .empty(let title, let subtitle):
-            cell.configure(title: title, subtitle: subtitle)
-
-        case .content:
-            cell.configure(
-                title: "No Stats Available",
-                subtitle: "Player statistics are not available for this game."
-            )
-        }
+        let emptyCellText = viewData.emptyCellText
+        cell.configure(title: emptyCellText.title, subtitle: emptyCellText.subtitle)
 
         return cell
     }
@@ -363,13 +315,7 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
         case .loaded(let presentation):
             screenTitle = presentation.title
             title = presentation.title
-            headerViewData = presentation.sections.compactMap { section -> BasketballMatchDetailHeaderViewData? in
-                guard case .header(let viewData) = section else {
-                    return nil
-                }
-
-                return viewData
-            }.first
+            headerViewData = presentation.headerViewData
             sections = presentation.sections
             collectionView.reloadData()
             updateNavigationTitle()
@@ -387,10 +333,19 @@ final class BasketballMatchDetailViewController: MatchBaseViewController {
     // MARK: - Navigation Title
 
     private func updateNavigationTitle() {
-        guard isScrolledAwayFromTop,
-              let headerViewData else {
+        guard let headerViewData else {
             navigationItem.titleView = nil
             navigationItem.title = screenTitle
+            return
+        }
+
+        guard isScrolledAwayFromTop else {
+            leagueNavigationTitleView.configure(
+                title: screenTitle,
+                logoURL: headerViewData.leagueLogoURL
+            )
+            navigationItem.title = nil
+            navigationItem.titleView = leagueNavigationTitleView
             return
         }
 

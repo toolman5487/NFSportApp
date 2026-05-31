@@ -12,12 +12,15 @@ import Foundation
 nonisolated enum BasketballMatchDetailEndpoint: Equatable, Sendable {
 
     case game(id: Int)
+    case teamStatistics(gameID: Int)
     case players(gameID: Int)
 
     var path: String {
         switch self {
         case .game:
             return "games"
+        case .teamStatistics:
+            return "games/statistics/teams"
         case .players:
             return "players"
         }
@@ -28,6 +31,10 @@ nonisolated enum BasketballMatchDetailEndpoint: Equatable, Sendable {
         case .game(let id):
             return [
                 NetworkQueryItem(name: "id", value: "\(id)")
+            ]
+        case .teamStatistics(let gameID):
+            return [
+                NetworkQueryItem(name: "id", value: "\(gameID)")
             ]
         case .players(let gameID):
             return [

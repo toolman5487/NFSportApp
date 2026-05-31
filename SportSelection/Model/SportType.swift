@@ -13,15 +13,15 @@ nonisolated struct SportType: Codable, Equatable, Hashable, Sendable {
     let title: String
     let subtitle: String
     let systemImageName: String
-    let apiHost: String
+    let apiBaseURL: APISportsBaseURL
 }
 
 // MARK: - API
 
 extension SportType {
 
-    nonisolated var apiBaseURL: URL? {
-        URL(string: "https://\(apiHost)")
+    nonisolated var apiURL: URL? {
+        apiBaseURL.url
     }
 }
 
@@ -35,56 +35,56 @@ extension SportType {
             title: "Football",
             subtitle: "Games, schedules, and standings",
             systemImageName: "football.fill",
-            apiHost: "v1.american-football.api-sports.io"
+            apiBaseURL: .americanFootball
         ),
         SportType(
             id: "soccer",
             title: "Soccer",
             subtitle: "Fixtures, scores, and leagues",
             systemImageName: "soccerball.inverse",
-            apiHost: "v3.football.api-sports.io"
+            apiBaseURL: .soccer
         ),
         SportType(
             id: "basketball",
             title: "Basketball",
             subtitle: "Games, schedules, and standings",
             systemImageName: "basketball.fill",
-            apiHost: "v1.basketball.api-sports.io"
+            apiBaseURL: .basketball
         ),
         SportType(
             id: "baseball",
             title: "Baseball",
             subtitle: "Games, schedules, and standings",
             systemImageName: "baseball.fill",
-            apiHost: "v1.baseball.api-sports.io"
+            apiBaseURL: .baseball
         ),
         SportType(
             id: "hockey",
             title: "Hockey",
             subtitle: "Games, schedules, and standings",
             systemImageName: "hockey.puck.fill",
-            apiHost: "v1.hockey.api-sports.io"
+            apiBaseURL: .hockey
         ),
         SportType(
             id: "volleyball",
             title: "Volleyball",
             subtitle: "Games, schedules, and standings",
             systemImageName: "volleyball.fill",
-            apiHost: "v1.volleyball.api-sports.io"
+            apiBaseURL: .volleyball
         ),
         SportType(
             id: "handball",
             title: "Handball",
             subtitle: "Games, schedules, and standings",
             systemImageName: "figure.handball",
-            apiHost: "v1.handball.api-sports.io"
+            apiBaseURL: .handball
         ),
         SportType(
             id: "rugby",
             title: "Rugby",
             subtitle: "Games, schedules, and standings",
             systemImageName: "rugbyball.fill",
-            apiHost: "v1.rugby.api-sports.io"
+            apiBaseURL: .rugby
         )
     ]
 }

@@ -10,14 +10,14 @@ import Foundation
 nonisolated enum SportSessionError: Error, Equatable, LocalizedError, Sendable {
 
     case missingSelectedSport
-    case invalidBaseURL(host: String)
+    case invalidBaseURL(APISportsBaseURL)
 
     var errorDescription: String? {
         switch self {
         case .missingSelectedSport:
             return "No sport is currently selected."
-        case .invalidBaseURL(let host):
-            return "Sport API host is invalid: \(host)"
+        case .invalidBaseURL(let baseURL):
+            return "Sport API host is invalid: \(baseURL.host)"
         }
     }
 }
@@ -55,11 +55,10 @@ actor SportSessionStore: SportSessionStoring {
             throw SportSessionError.missingSelectedSport
         }
 
-        guard let baseURL = currentSport.apiBaseURL else {
-            throw SportSessionError.invalidBaseURL(host: currentSport.apiHost)
+        guard let baseURL = currentSport.apiURL else {
+            throw SportSessionError.invalidBaseURL(currentSport.apiBaseURL)
         }
 
         return baseURL
     }
 }
-

@@ -5,6 +5,7 @@
 //  Created by Willy Hsu on 2026/5/29.
 //
 
+import SDWebImage
 import SnapKit
 import UIKit
 
@@ -19,63 +20,62 @@ final class SoccerMatchLineupTeamCell: UICollectionViewCell {
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
-        static let horizontalInset: CGFloat = 16
-        static let verticalInset: CGFloat = 12
+        static let horizontalInset: CGFloat = 12
+        static let verticalInset: CGFloat = 10
+        static let columnSpacing: CGFloat = 8
         static let rowSpacing: CGFloat = 8
+        static let photoSize: CGFloat = 36
+        static let centerWidth: CGFloat = 82
     }
 
     // MARK: - UI Components
 
-    private let teamNameLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .semibold)
-        label.textColor = .primaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 0
-        return label
+    private let homeTeamLabel = makeTeamLabel(alignment: .left)
+    private let awayTeamLabel = makeTeamLabel(alignment: .right)
+    private let homeMetaLabel = makeMetaLabel(alignment: .left)
+    private let awayMetaLabel = makeMetaLabel(alignment: .right)
+    private let positionLabel = makePositionLabel()
+
+    private let homePlayerView = SoccerMatchLineupPlayerColumnView(alignment: .left)
+    private let awayPlayerView = SoccerMatchLineupPlayerColumnView(alignment: .right)
+
+    private lazy var homeHeaderStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [homeTeamLabel, homeMetaLabel])
+        stackView.axis = .vertical
+        stackView.spacing = 2
+        return stackView
     }()
 
-    private let metaLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .footnote)
-        label.textColor = .secondaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 0
-        return label
+    private lazy var awayHeaderStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [awayTeamLabel, awayMetaLabel])
+        stackView.axis = .vertical
+        stackView.spacing = 2
+        return stackView
     }()
 
-    private let startersTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 15, weight: .semibold)
-        label.textColor = .primaryLabel
-        label.text = "Starters"
-        return label
+    private lazy var headerStackView: UIStackView = {
+        let spacerView = UIView()
+        let stackView = UIStackView(arrangedSubviews: [homeHeaderStackView, spacerView, awayHeaderStackView])
+        stackView.axis = .horizontal
+        stackView.alignment = .top
+        stackView.spacing = LayoutMetric.columnSpacing
+        return stackView
     }()
 
-    private let startersLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .primaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 0
-        return label
+    private lazy var rowStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [homePlayerView, positionLabel, awayPlayerView])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = LayoutMetric.columnSpacing
+        return stackView
     }()
 
-    private let substitutesTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 15, weight: .semibold)
-        label.textColor = .primaryLabel
-        label.text = "Substitutes"
-        return label
-    }()
-
-    private let substitutesLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .primaryLabel
-        label.adjustsFontForContentSizeCategory = true
-        label.numberOfLines = 0
-        return label
+    private lazy var contentStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [headerStackView, rowStackView])
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.spacing = LayoutMetric.rowSpacing
+        return stackView
     }()
 
     // MARK: - Initialization
@@ -93,50 +93,49 @@ final class SoccerMatchLineupTeamCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        teamNameLabel.text = nil
-        metaLabel.text = nil
-        metaLabel.isHidden = true
-        startersLabel.text = nil
-        substitutesTitleLabel.isHidden = true
-        substitutesLabel.text = nil
-        substitutesLabel.isHidden = true
+        homeTeamLabel.text = nil
+        awayTeamLabel.text = nil
+        homeMetaLabel.text = nil
+        awayMetaLabel.text = nil
+        positionLabel.text = nil
+        headerStackView.isHidden = false
+        homeMetaLabel.isHidden = true
+        awayMetaLabel.isHidden = true
+        homePlayerView.prepareForReuse()
+        awayPlayerView.prepareForReuse()
     }
 
     // MARK: - Configuration
 
-    func configure(with viewData: SoccerMatchDetailLineupViewData) {
-        teamNameLabel.text = viewData.teamName
+    func configure(
+        with viewData: SoccerMatchLineupComparisonRowViewData,
+        showsTeamHeader: Bool,
+        homeTeamName: String,
+        awayTeamName: String,
+        homeMetaText: String?,
+        awayMetaText: String?
+    ) {
+        headerStackView.isHidden = !showsTeamHeader
+        homeTeamLabel.text = homeTeamName
+        awayTeamLabel.text = awayTeamName
+        configureMetaLabel(homeMetaLabel, text: homeMetaText)
+        configureMetaLabel(awayMetaLabel, text: awayMetaText)
 
-        var metaParts: [String] = []
-        if let formation = viewData.formationText, !formation.isEmpty {
-            metaParts.append("Formation: \(formation)")
-        }
-        if let coach = viewData.coachName, !coach.isEmpty {
-            metaParts.append("Coach: \(coach)")
-        }
+        positionLabel.text = viewData.positionTitle
+        positionLabel.isHidden = viewData.positionTitle == nil
 
-        if metaParts.isEmpty {
-            metaLabel.isHidden = true
+        homePlayerView.configure(with: viewData.homePlayer)
+        awayPlayerView.configure(with: viewData.awayPlayer)
+    }
+
+    private func configureMetaLabel(_ label: UILabel, text: String?) {
+        if let text, !text.isEmpty {
+            label.text = text
+            label.isHidden = false
         } else {
-            metaLabel.text = metaParts.joined(separator: " · ")
-            metaLabel.isHidden = false
+            label.text = nil
+            label.isHidden = true
         }
-
-        startersLabel.text = formatPlayers(viewData.starters)
-
-        switch viewData.layoutState {
-        case .startersOnly:
-            substitutesTitleLabel.isHidden = true
-            substitutesLabel.isHidden = true
-            substitutesLabel.text = nil
-
-        case .withSubstitutes:
-            substitutesTitleLabel.isHidden = false
-            substitutesLabel.isHidden = false
-            substitutesLabel.text = formatPlayers(viewData.substitutes)
-        }
-
-        updateLineupConstraints(for: viewData.layoutState)
     }
 
     // MARK: - Setup
@@ -145,74 +144,183 @@ final class SoccerMatchLineupTeamCell: UICollectionViewCell {
         contentView.backgroundColor = .secondaryBackgroundColor
         contentView.layer.cornerRadius = 12
 
-        contentView.addSubview(teamNameLabel)
-        contentView.addSubview(metaLabel)
-        contentView.addSubview(startersTitleLabel)
-        contentView.addSubview(startersLabel)
-        contentView.addSubview(substitutesTitleLabel)
-        contentView.addSubview(substitutesLabel)
+        contentView.addSubview(contentStackView)
 
-        teamNameLabel.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview().inset(LayoutMetric.horizontalInset)
+        headerStackView.arrangedSubviews[1].snp.makeConstraints { make in
+            make.width.equalTo(LayoutMetric.centerWidth)
         }
 
-        metaLabel.snp.makeConstraints { make in
-            make.top.equalTo(teamNameLabel.snp.bottom).offset(4)
-            make.leading.trailing.equalTo(teamNameLabel)
+        positionLabel.snp.makeConstraints { make in
+            make.width.equalTo(LayoutMetric.centerWidth)
         }
 
-    }
-
-    private func updateLineupConstraints(for layoutState: SoccerMatchLineupLayoutState) {
-        let startersTopAnchor = metaLabel.isHidden
-            ? teamNameLabel.snp.bottom
-            : metaLabel.snp.bottom
-
-        startersTitleLabel.snp.remakeConstraints { make in
-            make.top.equalTo(startersTopAnchor).offset(LayoutMetric.rowSpacing)
-            make.leading.trailing.equalTo(teamNameLabel)
+        homePlayerView.snp.makeConstraints { make in
+            make.width.equalTo(awayPlayerView)
         }
 
-        switch layoutState {
-        case .startersOnly:
-            startersLabel.snp.remakeConstraints { make in
-                make.top.equalTo(startersTitleLabel.snp.bottom).offset(4)
-                make.leading.trailing.equalTo(teamNameLabel)
-                make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
-            }
-
-            substitutesTitleLabel.snp.remakeConstraints { make in
-                make.leading.trailing.equalTo(teamNameLabel)
-            }
-
-            substitutesLabel.snp.remakeConstraints { make in
-                make.leading.trailing.equalTo(teamNameLabel)
-            }
-
-        case .withSubstitutes:
-            startersLabel.snp.remakeConstraints { make in
-                make.top.equalTo(startersTitleLabel.snp.bottom).offset(4)
-                make.leading.trailing.equalTo(teamNameLabel)
-            }
-
-            substitutesTitleLabel.snp.remakeConstraints { make in
-                make.top.equalTo(startersLabel.snp.bottom).offset(LayoutMetric.rowSpacing)
-                make.leading.trailing.equalTo(teamNameLabel)
-            }
-
-            substitutesLabel.snp.remakeConstraints { make in
-                make.top.equalTo(substitutesTitleLabel.snp.bottom).offset(4)
-                make.leading.trailing.equalTo(teamNameLabel)
-                make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
-            }
+        contentStackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(
+                UIEdgeInsets(
+                    top: LayoutMetric.verticalInset,
+                    left: LayoutMetric.horizontalInset,
+                    bottom: LayoutMetric.verticalInset,
+                    right: LayoutMetric.horizontalInset
+                )
+            )
         }
     }
 
-    private func formatPlayers(_ players: [String]) -> String {
-        guard !players.isEmpty else {
-            return "-"
+    // MARK: - Factories
+
+    private static func makeTeamLabel(alignment: NSTextAlignment) -> UILabel {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .subheadline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 2
+        label.textAlignment = alignment
+        return label
+    }
+
+    private static func makeMetaLabel(alignment: NSTextAlignment) -> UILabel {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 2
+        label.textAlignment = alignment
+        return label
+    }
+
+    private static func makePositionLabel() -> UILabel {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.textAlignment = .center
+        label.numberOfLines = 2
+        return label
+    }
+}
+
+// MARK: - SoccerMatchLineupPlayerColumnView
+
+private final class SoccerMatchLineupPlayerColumnView: UIView {
+
+    // MARK: - UI Components
+
+    private let photoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.tintColor = .secondaryLabel
+        imageView.layer.cornerRadius = LayoutMetric.photoSize / 2
+        imageView.backgroundColor = .tertiarySystemFill
+        return imageView
+    }()
+
+    private let numberLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        return label
+    }()
+
+    private let nameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .subheadline)
+        label.textColor = .primaryLabel
+        label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.84
+        label.numberOfLines = 2
+        return label
+    }()
+
+    private lazy var textStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [numberLabel, nameLabel])
+        stackView.axis = .vertical
+        stackView.spacing = 2
+        return stackView
+    }()
+
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [photoImageView, textStackView])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = 8
+        return stackView
+    }()
+
+    private let alignment: NSTextAlignment
+
+    // MARK: - Initialization
+
+    init(alignment: NSTextAlignment) {
+        self.alignment = alignment
+        super.init(frame: .zero)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Configuration
+
+    func prepareForReuse() {
+        photoImageView.sd_cancelCurrentImageLoad()
+        photoImageView.image = nil
+        numberLabel.text = nil
+        nameLabel.text = nil
+        isHidden = false
+    }
+
+    func configure(with viewData: SoccerMatchLineupPlayerViewData?) {
+        guard let viewData else {
+            prepareForReuse()
+            isHidden = true
+            return
         }
 
-        return players.joined(separator: "\n")
+        numberLabel.text = viewData.numberText
+        numberLabel.isHidden = viewData.numberText == nil
+        nameLabel.text = viewData.displayName
+
+        let placeholderImage = UIImage(systemName: "person.crop.circle.fill")?.withRenderingMode(.alwaysTemplate)
+        if let photoURL = viewData.photoURL {
+            photoImageView.sd_setImage(with: photoURL, placeholderImage: placeholderImage)
+        } else {
+            photoImageView.sd_cancelCurrentImageLoad()
+            photoImageView.image = placeholderImage
+        }
+    }
+
+    // MARK: - Setup
+
+    private func setupView() {
+        numberLabel.textAlignment = alignment
+        nameLabel.textAlignment = alignment
+
+        if alignment == .right {
+            stackView.removeArrangedSubview(photoImageView)
+            stackView.insertArrangedSubview(photoImageView, at: 1)
+        }
+
+        addSubview(stackView)
+
+        photoImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(LayoutMetric.photoSize)
+        }
+
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    private enum LayoutMetric {
+        static let photoSize: CGFloat = 36
     }
 }
