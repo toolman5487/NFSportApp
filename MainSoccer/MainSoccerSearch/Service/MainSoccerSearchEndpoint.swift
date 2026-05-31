@@ -16,7 +16,7 @@ nonisolated enum MainSoccerSearchEndpoint: Equatable, Sendable {
     var path: String {
         switch self {
         case .teams:
-            return "teams"
+            return APISportsAPIResource.teams.path
         }
     }
 

@@ -7,18 +7,14 @@
 
 import Foundation
 
-// MARK: - APISportsMediaSport
+// MARK: - APISportsMediaResource
 
-nonisolated enum APISportsMediaSport: String, Codable, Equatable, Hashable, Sendable {
+nonisolated enum APISportsMediaResource: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
 
-    case americanFootball = "american-football"
-    case soccer = "football"
-    case basketball
-    case baseball
-    case hockey
-    case volleyball
-    case handball
-    case rugby
+    case players
+    case teams
+    case leagues
+    case countries
 
     var pathComponent: String {
         rawValue
@@ -29,7 +25,8 @@ nonisolated enum APISportsMediaSport: String, Codable, Equatable, Hashable, Send
 
 nonisolated enum APISportsMediaEndpoint: Equatable, Sendable {
 
-    case player(sport: APISportsMediaSport, id: Int)
+    case image(product: APISportsProduct, resource: APISportsMediaResource, id: Int)
+    case player(product: APISportsProduct, id: Int)
     case footballPlayer(id: Int)
 
     var url: URL? {
@@ -38,30 +35,35 @@ nonisolated enum APISportsMediaEndpoint: Equatable, Sendable {
         }
 
         switch self {
-        case .player(let sport, let id):
+        case .image(let product, let resource, let id):
             return makeImageURL(
                 baseURL: baseURL,
-                sport: sport,
-                collection: "players",
+                product: product,
+                resource: resource,
                 id: id
             )
 
+        case .player(let product, let id):
+            return APISportsMediaEndpoint
+                .image(product: product, resource: .players, id: id)
+                .url
+
         case .footballPlayer(let id):
             return APISportsMediaEndpoint
-                .player(sport: .soccer, id: id)
+                .player(product: .soccer, id: id)
                 .url
         }
     }
 
     private func makeImageURL(
         baseURL: URL,
-        sport: APISportsMediaSport,
-        collection: String,
+        product: APISportsProduct,
+        resource: APISportsMediaResource,
         id: Int
     ) -> URL {
         baseURL
-            .appending(path: sport.pathComponent)
-            .appending(path: collection)
+            .appending(path: product.apiHostComponent)
+            .appending(path: resource.pathComponent)
             .appending(path: "\(id).png")
     }
 }

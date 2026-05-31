@@ -16,7 +16,7 @@ nonisolated enum MainMatchesEndpoint: Equatable, Sendable {
     var path: String {
         switch self {
         case .games:
-            return "games"
+            return APISportsMatchAPI.games.path
         }
     }
 

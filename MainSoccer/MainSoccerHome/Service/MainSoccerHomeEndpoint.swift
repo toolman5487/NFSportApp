@@ -17,7 +17,7 @@ nonisolated enum MainSoccerHomeEndpoint: Equatable, Sendable {
     var path: String {
         switch self {
         case .liveFixtures, .fixtures:
-            return "fixtures"
+            return APISportsProduct.soccer.matchAPI.path
         }
     }
 

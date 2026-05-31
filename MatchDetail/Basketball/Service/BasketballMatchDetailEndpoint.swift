@@ -18,11 +18,11 @@ nonisolated enum BasketballMatchDetailEndpoint: Equatable, Sendable {
     var path: String {
         switch self {
         case .game:
-            return "games"
+            return APISportsProduct.basketball.matchAPI.path
         case .teamStatistics:
-            return "games/statistics/teams"
+            return APISportsAPIResource.gameTeamStatistics.path
         case .players:
-            return "players"
+            return APISportsAPIResource.players.path
         }
     }
 
@@ -30,15 +30,24 @@ nonisolated enum BasketballMatchDetailEndpoint: Equatable, Sendable {
         switch self {
         case .game(let id):
             return [
-                NetworkQueryItem(name: "id", value: "\(id)")
+                NetworkQueryItem(
+                    name: APISportsProduct.basketball.matchAPI.detailIDQueryName,
+                    value: "\(id)"
+                )
             ]
         case .teamStatistics(let gameID):
             return [
-                NetworkQueryItem(name: "id", value: "\(gameID)")
+                NetworkQueryItem(
+                    name: APISportsProduct.basketball.matchAPI.detailIDQueryName,
+                    value: "\(gameID)"
+                )
             ]
         case .players(let gameID):
             return [
-                NetworkQueryItem(name: "game", value: "\(gameID)")
+                NetworkQueryItem(
+                    name: APISportsProduct.basketball.matchAPI.relatedDetailQueryName,
+                    value: "\(gameID)"
+                )
             ]
         }
     }

@@ -19,16 +19,16 @@ nonisolated enum SoccerMatchDetailEndpoint: Equatable, Sendable {
     var path: String {
         switch self {
         case .fixture:
-            return "fixtures"
+            return APISportsProduct.soccer.matchAPI.path
 
         case .statistics:
-            return "fixtures/statistics"
+            return APISportsAPIResource.fixtureStatistics.path
 
         case .events:
-            return "fixtures/events"
+            return APISportsAPIResource.fixtureEvents.path
 
         case .lineups:
-            return "fixtures/lineups"
+            return APISportsAPIResource.fixtureLineups.path
         }
     }
 
@@ -36,14 +36,20 @@ nonisolated enum SoccerMatchDetailEndpoint: Equatable, Sendable {
         switch self {
         case .fixture(let id):
             return [
-                NetworkQueryItem(name: "id", value: "\(id)")
+                NetworkQueryItem(
+                    name: APISportsProduct.soccer.matchAPI.detailIDQueryName,
+                    value: "\(id)"
+                )
             ]
 
         case .statistics(let fixtureID),
              .events(let fixtureID),
              .lineups(let fixtureID):
             return [
-                NetworkQueryItem(name: "fixture", value: "\(fixtureID)")
+                NetworkQueryItem(
+                    name: APISportsProduct.soccer.matchAPI.relatedDetailQueryName,
+                    value: "\(fixtureID)"
+                )
             ]
         }
     }
