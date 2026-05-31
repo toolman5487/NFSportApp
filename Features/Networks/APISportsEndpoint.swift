@@ -1,5 +1,5 @@
 //
-//  APISportsAPIResource.swift
+//  APISportsEndpoint.swift
 //  NFSportApp
 //
 //  Created by Codex on 2026/5/31.
@@ -60,6 +60,25 @@ nonisolated enum APISportsAPIResource: String, Equatable, Hashable, Sendable {
     }
 }
 
+// MARK: - APISportsQueryParameter
+
+nonisolated enum APISportsQueryParameter: String, Equatable, Hashable, Sendable {
+
+    case id
+    case game
+    case fixture
+    case date
+    case timezone
+    case live
+    case league
+    case season
+    case search
+
+    var name: String {
+        rawValue
+    }
+}
+
 // MARK: - APISportsMatchAPI
 
 nonisolated enum APISportsMatchAPI: Equatable, Hashable, Sendable {
@@ -77,23 +96,67 @@ nonisolated enum APISportsMatchAPI: Equatable, Hashable, Sendable {
     }
 
     var detailIDQueryName: String {
+        detailIDQueryParameter.name
+    }
+
+    var detailIDQueryParameter: APISportsQueryParameter {
         switch self {
         case .games,
              .fixtures:
-            return "id"
+            return .id
         }
     }
 
     var relatedDetailQueryName: String {
+        relatedDetailQueryParameter.name
+    }
+
+    var relatedDetailQueryParameter: APISportsQueryParameter {
         switch self {
         case .games:
-            return "game"
+            return .game
         case .fixtures:
-            return "fixture"
+            return .fixture
         }
     }
 
     var path: String {
         resource.path
+    }
+}
+
+// MARK: - APISportsEndpoint
+
+nonisolated struct APISportsEndpoint: Equatable, Sendable {
+
+    let resource: APISportsAPIResource
+    let queryItems: [NetworkQueryItem]
+
+    init(
+        resource: APISportsAPIResource,
+        queryItems: [NetworkQueryItem] = []
+    ) {
+        self.resource = resource
+        self.queryItems = queryItems
+    }
+
+    init(
+        matchAPI: APISportsMatchAPI,
+        queryItems: [NetworkQueryItem] = []
+    ) {
+        self.init(resource: matchAPI.resource, queryItems: queryItems)
+    }
+
+    var path: String {
+        resource.path
+    }
+}
+
+// MARK: - NetworkQueryItem
+
+extension NetworkQueryItem {
+
+    nonisolated init(parameter: APISportsQueryParameter, value: String?) {
+        self.init(name: parameter.name, value: value)
     }
 }

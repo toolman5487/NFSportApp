@@ -14,18 +14,22 @@ nonisolated enum MainSoccerSearchEndpoint: Equatable, Sendable {
     case teams(searchText: String)
 
     var path: String {
-        switch self {
-        case .teams:
-            return APISportsAPIResource.teams.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .teams(let searchText):
-            return [
-                NetworkQueryItem(name: "search", value: searchText)
-            ]
+            return APISportsEndpoint(
+                resource: .teams,
+                queryItems: [
+                    NetworkQueryItem(parameter: .search, value: searchText)
+                ]
+            )
         }
     }
 }

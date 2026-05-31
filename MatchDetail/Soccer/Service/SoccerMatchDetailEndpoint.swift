@@ -17,40 +17,58 @@ nonisolated enum SoccerMatchDetailEndpoint: Equatable, Sendable {
     case lineups(fixtureID: Int)
 
     var path: String {
-        switch self {
-        case .fixture:
-            return APISportsProduct.soccer.matchAPI.path
-
-        case .statistics:
-            return APISportsAPIResource.fixtureStatistics.path
-
-        case .events:
-            return APISportsAPIResource.fixtureEvents.path
-
-        case .lineups:
-            return APISportsAPIResource.fixtureLineups.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .fixture(let id):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.soccer.matchAPI.detailIDQueryName,
-                    value: "\(id)"
-                )
-            ]
+            return APISportsEndpoint(
+                matchAPI: APISportsProduct.soccer.matchAPI,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.soccer.matchAPI.detailIDQueryParameter,
+                        value: "\(id)"
+                    )
+                ]
+            )
 
-        case .statistics(let fixtureID),
-             .events(let fixtureID),
-             .lineups(let fixtureID):
-            return [
+        case .statistics(let fixtureID):
+            return makeRelatedDetailEndpoint(
+                resource: .fixtureStatistics,
+                fixtureID: fixtureID
+            )
+
+        case .events(let fixtureID):
+            return makeRelatedDetailEndpoint(
+                resource: .fixtureEvents,
+                fixtureID: fixtureID
+            )
+
+        case .lineups(let fixtureID):
+            return makeRelatedDetailEndpoint(
+                resource: .fixtureLineups,
+                fixtureID: fixtureID
+            )
+        }
+    }
+
+    private func makeRelatedDetailEndpoint(
+        resource: APISportsAPIResource,
+        fixtureID: Int
+    ) -> APISportsEndpoint {
+        APISportsEndpoint(
+            resource: resource,
+            queryItems: [
                 NetworkQueryItem(
-                    name: APISportsProduct.soccer.matchAPI.relatedDetailQueryName,
+                    parameter: APISportsProduct.soccer.matchAPI.relatedDetailQueryParameter,
                     value: "\(fixtureID)"
                 )
             ]
-        }
+        )
     }
 }

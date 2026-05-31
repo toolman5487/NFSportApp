@@ -16,39 +16,48 @@ nonisolated enum BasketballMatchDetailEndpoint: Equatable, Sendable {
     case players(gameID: Int)
 
     var path: String {
-        switch self {
-        case .game:
-            return APISportsProduct.basketball.matchAPI.path
-        case .teamStatistics:
-            return APISportsAPIResource.gameTeamStatistics.path
-        case .players:
-            return APISportsAPIResource.players.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .game(let id):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.basketball.matchAPI.detailIDQueryName,
-                    value: "\(id)"
-                )
-            ]
+            return APISportsEndpoint(
+                matchAPI: APISportsProduct.basketball.matchAPI,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.basketball.matchAPI.detailIDQueryParameter,
+                        value: "\(id)"
+                    )
+                ]
+            )
+
         case .teamStatistics(let gameID):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.basketball.matchAPI.detailIDQueryName,
-                    value: "\(gameID)"
-                )
-            ]
+            return APISportsEndpoint(
+                resource: .gameTeamStatistics,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.basketball.matchAPI.detailIDQueryParameter,
+                        value: "\(gameID)"
+                    )
+                ]
+            )
+
         case .players(let gameID):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.basketball.matchAPI.relatedDetailQueryName,
-                    value: "\(gameID)"
-                )
-            ]
+            return APISportsEndpoint(
+                resource: .players,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.basketball.matchAPI.relatedDetailQueryParameter,
+                        value: "\(gameID)"
+                    )
+                ]
+            )
         }
     }
+
 }

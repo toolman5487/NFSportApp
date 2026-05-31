@@ -14,21 +14,25 @@ nonisolated enum HockeyMatchDetailEndpoint: Equatable, Sendable {
     case game(id: Int)
 
     var path: String {
-        switch self {
-        case .game:
-            return APISportsProduct.hockey.matchAPI.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .game(let id):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.hockey.matchAPI.detailIDQueryName,
-                    value: "\(id)"
-                )
-            ]
+            return APISportsEndpoint(
+                matchAPI: APISportsProduct.hockey.matchAPI,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.hockey.matchAPI.detailIDQueryParameter,
+                        value: "\(id)"
+                    )
+                ]
+            )
         }
     }
 }

@@ -14,19 +14,23 @@ nonisolated enum MainSoccerMatchesEndpoint: Equatable, Sendable {
     case fixtures(date: String, timezone: String)
 
     var path: String {
-        switch self {
-        case .fixtures:
-            return APISportsProduct.soccer.matchAPI.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .fixtures(let date, let timezone):
-            return [
-                NetworkQueryItem(name: "date", value: date),
-                NetworkQueryItem(name: "timezone", value: timezone)
-            ]
+            return APISportsEndpoint(
+                matchAPI: APISportsProduct.soccer.matchAPI,
+                queryItems: [
+                    NetworkQueryItem(parameter: .date, value: date),
+                    NetworkQueryItem(parameter: .timezone, value: timezone)
+                ]
+            )
         }
     }
 }

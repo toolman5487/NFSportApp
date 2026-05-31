@@ -15,30 +15,36 @@ nonisolated enum BaseballMatchDetailEndpoint: Equatable, Sendable {
     case players(gameID: Int)
 
     var path: String {
-        switch self {
-        case .game:
-            return APISportsProduct.baseball.matchAPI.path
-        case .players:
-            return APISportsAPIResource.players.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .game(let id):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.baseball.matchAPI.detailIDQueryName,
-                    value: "\(id)"
-                )
-            ]
+            return APISportsEndpoint(
+                matchAPI: APISportsProduct.baseball.matchAPI,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.baseball.matchAPI.detailIDQueryParameter,
+                        value: "\(id)"
+                    )
+                ]
+            )
+
         case .players(let gameID):
-            return [
-                NetworkQueryItem(
-                    name: APISportsProduct.baseball.matchAPI.relatedDetailQueryName,
-                    value: "\(gameID)"
-                )
-            ]
+            return APISportsEndpoint(
+                resource: .players,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsProduct.baseball.matchAPI.relatedDetailQueryParameter,
+                        value: "\(gameID)"
+                    )
+                ]
+            )
         }
     }
 }

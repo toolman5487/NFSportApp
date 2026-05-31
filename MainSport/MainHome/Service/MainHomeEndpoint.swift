@@ -19,42 +19,52 @@ nonisolated enum MainHomeEndpoint: Sendable, Equatable {
     // MARK: - Properties
 
     var path: String {
-        switch self {
-        case .games, .liveGames, .gameDetail:
-            return APISportsMatchAPI.games.path
-
-        case .standings:
-            return APISportsAPIResource.standings.path
-        }
+        apiEndpoint.path
     }
 
     var queryItems: [NetworkQueryItem] {
+        apiEndpoint.queryItems
+    }
+
+    private var apiEndpoint: APISportsEndpoint {
         switch self {
         case .games(let date, let timezone):
-            return [
-                NetworkQueryItem(name: "date", value: date),
-                NetworkQueryItem(name: "timezone", value: timezone)
-            ]
+            return APISportsEndpoint(
+                matchAPI: .games,
+                queryItems: [
+                    NetworkQueryItem(parameter: .date, value: date),
+                    NetworkQueryItem(parameter: .timezone, value: timezone)
+                ]
+            )
 
         case .liveGames(let timezone):
-            return [
-                NetworkQueryItem(name: "live", value: "all"),
-                NetworkQueryItem(name: "timezone", value: timezone)
-            ]
+            return APISportsEndpoint(
+                matchAPI: .games,
+                queryItems: [
+                    NetworkQueryItem(parameter: .live, value: "all"),
+                    NetworkQueryItem(parameter: .timezone, value: timezone)
+                ]
+            )
 
         case .gameDetail(let id):
-            return [
-                NetworkQueryItem(
-                    name: APISportsMatchAPI.games.detailIDQueryName,
-                    value: "\(id)"
-                )
-            ]
+            return APISportsEndpoint(
+                matchAPI: .games,
+                queryItems: [
+                    NetworkQueryItem(
+                        parameter: APISportsMatchAPI.games.detailIDQueryParameter,
+                        value: "\(id)"
+                    )
+                ]
+            )
 
         case .standings(let leagueID, let season):
-            return [
-                NetworkQueryItem(name: "league", value: "\(leagueID)"),
-                NetworkQueryItem(name: "season", value: "\(season)")
-            ]
+            return APISportsEndpoint(
+                resource: .standings,
+                queryItems: [
+                    NetworkQueryItem(parameter: .league, value: "\(leagueID)"),
+                    NetworkQueryItem(parameter: .season, value: "\(season)")
+                ]
+            )
         }
     }
 }

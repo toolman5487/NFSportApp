@@ -22,7 +22,7 @@
 		15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B092FC03D43008C60D9 /* NetworkClient.swift */; };
 		15182B0C2FC04000008C60D9 /* APISportsMediaEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B0D2FC04000008C60D9 /* APISportsMediaEndpoint.swift */; };
 		15182B0E2FC04000008C60D9 /* APISportsBaseURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B0F2FC04000008C60D9 /* APISportsBaseURL.swift */; };
-		15182B102FC04000008C60D9 /* APISportsAPIResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B112FC04000008C60D9 /* APISportsAPIResource.swift */; };
+		15182B122FC04000008C60D9 /* APISportsEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B132FC04000008C60D9 /* APISportsEndpoint.swift */; };
 		15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15182B0A2FC04000008C60D9 /* AppLogger.swift */; };
 		152000012FC01000008C60D9 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000112FC01000008C60D9 /* AppTab.swift */; };
 		152000022FC01000008C60D9 /* TabBarItemViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152000122FC01000008C60D9 /* TabBarItemViewData.swift */; };
@@ -156,7 +156,7 @@
 		15182B0A2FC04000008C60D9 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		15182B0D2FC04000008C60D9 /* APISportsMediaEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISportsMediaEndpoint.swift; sourceTree = "<group>"; };
 		15182B0F2FC04000008C60D9 /* APISportsBaseURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISportsBaseURL.swift; sourceTree = "<group>"; };
-		15182B112FC04000008C60D9 /* APISportsAPIResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISportsAPIResource.swift; sourceTree = "<group>"; };
+		15182B132FC04000008C60D9 /* APISportsEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISportsEndpoint.swift; sourceTree = "<group>"; };
 		15186B9D2FBF1393008C60D9 /* NFSportApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NFSportApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		152000112FC01000008C60D9 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		152000122FC01000008C60D9 /* TabBarItemViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItemViewData.swift; sourceTree = "<group>"; };
@@ -412,7 +412,7 @@
 				15182B082FC03D43008C60D9 /* NetworkError.swift */,
 				15182B092FC03D43008C60D9 /* NetworkClient.swift */,
 				15182B0F2FC04000008C60D9 /* APISportsBaseURL.swift */,
-				15182B112FC04000008C60D9 /* APISportsAPIResource.swift */,
+				15182B132FC04000008C60D9 /* APISportsEndpoint.swift */,
 				15182B0D2FC04000008C60D9 /* APISportsMediaEndpoint.swift */,
 			);
 			path = Networks;
@@ -1470,7 +1470,7 @@
 				15182B032FC03D43008C60D9 /* NetworkError.swift in Sources */,
 				15182B042FC03D43008C60D9 /* NetworkClient.swift in Sources */,
 				15182B0E2FC04000008C60D9 /* APISportsBaseURL.swift in Sources */,
-				15182B102FC04000008C60D9 /* APISportsAPIResource.swift in Sources */,
+				15182B122FC04000008C60D9 /* APISportsEndpoint.swift in Sources */,
 				15182B0C2FC04000008C60D9 /* APISportsMediaEndpoint.swift in Sources */,
 				15182B0B2FC04000008C60D9 /* AppLogger.swift in Sources */,
 				153000022FC10000008C60D9 /* SportSelectionViewData.swift in Sources */,
