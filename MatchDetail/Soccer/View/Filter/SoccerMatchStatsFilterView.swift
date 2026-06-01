@@ -1,5 +1,5 @@
 //
-//  SoccerMatchFilterView.swift
+//  SoccerMatchStatsFilterView.swift
 //  NFSportApp
 //
 //  Created by Willy Hsu on 2026/5/29.
@@ -8,13 +8,13 @@
 import SnapKit
 import UIKit
 
-// MARK: - SoccerMatchFilterView
+// MARK: - SoccerMatchStatsFilterView
 
-final class SoccerMatchFilterView: UICollectionReusableView {
+final class SoccerMatchStatsFilterView: UICollectionReusableView {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "SoccerMatchFilterView"
+    static let reuseIdentifier = "SoccerMatchStatsFilterView"
 
     // MARK: - Layout Metrics
 
@@ -58,8 +58,8 @@ final class SoccerMatchFilterView: UICollectionReusableView {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(
-            SoccerMatchFilterOptionCell.self,
-            forCellWithReuseIdentifier: SoccerMatchFilterOptionCell.reuseIdentifier
+            SoccerMatchStatsFilterOptionCell.self,
+            forCellWithReuseIdentifier: SoccerMatchStatsFilterOptionCell.reuseIdentifier
         )
         return collectionView
     }()
@@ -112,7 +112,7 @@ final class SoccerMatchFilterView: UICollectionReusableView {
 
 // MARK: - UICollectionViewDataSource
 
-extension SoccerMatchFilterView: UICollectionViewDataSource {
+extension SoccerMatchStatsFilterView: UICollectionViewDataSource {
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -126,9 +126,9 @@ extension SoccerMatchFilterView: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SoccerMatchFilterOptionCell.reuseIdentifier,
+            withReuseIdentifier: SoccerMatchStatsFilterOptionCell.reuseIdentifier,
             for: indexPath
-        ) as? SoccerMatchFilterOptionCell else {
+        ) as? SoccerMatchStatsFilterOptionCell else {
             return UICollectionViewCell()
         }
 
@@ -143,7 +143,7 @@ extension SoccerMatchFilterView: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDelegate
 
-extension SoccerMatchFilterView: UICollectionViewDelegate {
+extension SoccerMatchStatsFilterView: UICollectionViewDelegate {
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -162,7 +162,7 @@ extension SoccerMatchFilterView: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension SoccerMatchFilterView: UICollectionViewDelegateFlowLayout {
+extension SoccerMatchStatsFilterView: UICollectionViewDelegateFlowLayout {
 
     func collectionView(
         _ collectionView: UICollectionView,
@@ -180,13 +180,13 @@ extension SoccerMatchFilterView: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - SoccerMatchFilterOptionCell
+// MARK: - SoccerMatchStatsFilterOptionCell
 
-private final class SoccerMatchFilterOptionCell: UICollectionViewCell {
+private final class SoccerMatchStatsFilterOptionCell: UICollectionViewCell {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "SoccerMatchFilterOptionCell"
+    static let reuseIdentifier = "SoccerMatchStatsFilterOptionCell"
 
     // MARK: - Layout Metrics
 

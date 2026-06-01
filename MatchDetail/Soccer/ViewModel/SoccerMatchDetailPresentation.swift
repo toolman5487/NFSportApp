@@ -124,10 +124,10 @@ nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
         }
     }
 
-    func rowContent(
+    func resultContent(
         at index: Int,
         filter: SoccerMatchFilterOption
-    ) -> SoccerMatchStatsRowContent? {
+    ) -> SoccerMatchStatsResultContent? {
         switch filter {
         case .total:
             guard comparisonRows.indices.contains(index) else {
@@ -149,6 +149,19 @@ nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
             }
 
             return .value(awayRows[index])
+        }
+    }
+
+    func resultContents(for filter: SoccerMatchFilterOption) -> [SoccerMatchStatsResultContent] {
+        switch filter {
+        case .total:
+            return comparisonRows.map(SoccerMatchStatsResultContent.comparison)
+
+        case .home:
+            return homeRows.map(SoccerMatchStatsResultContent.value)
+
+        case .away:
+            return awayRows.map(SoccerMatchStatsResultContent.value)
         }
     }
 
@@ -177,7 +190,7 @@ nonisolated struct SoccerMatchDetailStatsViewData: Equatable, Sendable {
     }
 }
 
-nonisolated enum SoccerMatchStatsRowContent: Equatable, Sendable {
+nonisolated enum SoccerMatchStatsResultContent: Equatable, Sendable {
 
     case comparison(SoccerMatchStatsComparisonRowViewData)
     case value(SoccerMatchStatsValueRowViewData)

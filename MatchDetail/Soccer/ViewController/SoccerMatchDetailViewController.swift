@@ -16,9 +16,9 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
     private enum LayoutMetric {
         static let estimatedHeaderHeight: CGFloat = 360
         static let estimatedVenueHeight: CGFloat = 96
-        static let estimatedFilterHeaderHeight: CGFloat = SoccerMatchFilterView.preferredHeight
+        static let estimatedFilterHeaderHeight: CGFloat = SoccerMatchStatsFilterView.preferredHeight
         static let estimatedSectionHeaderHeight: CGFloat = SoccerMatchDetailSectionHeaderView.preferredHeight
-        static let estimatedStatsRowHeight: CGFloat = 56
+        static let estimatedStatsResultHeight: CGFloat = 56
         static let estimatedStatsEmptyHeight: CGFloat = 200
         static let estimatedEventRowHeight: CGFloat = 72
         static let estimatedLineupRowHeight: CGFloat = 112
@@ -65,9 +65,9 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             withReuseIdentifier: SoccerMatchScoreHeaderView.reuseIdentifier
         )
         collectionView.register(
-            SoccerMatchFilterView.self,
+            SoccerMatchStatsFilterView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: SoccerMatchFilterView.reuseIdentifier
+            withReuseIdentifier: SoccerMatchStatsFilterView.reuseIdentifier
         )
         collectionView.register(
             SoccerMatchDetailSectionHeaderView.self,
@@ -75,8 +75,8 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             withReuseIdentifier: SoccerMatchDetailSectionHeaderView.reuseIdentifier
         )
         collectionView.register(
-            SoccerMatchStatsRowCell.self,
-            forCellWithReuseIdentifier: SoccerMatchStatsRowCell.reuseIdentifier
+            SoccerMatchStatsResultCollectionCell.self,
+            forCellWithReuseIdentifier: SoccerMatchStatsResultCollectionCell.reuseIdentifier
         )
         collectionView.register(
             SoccerMatchStatsEmptyCell.self,
@@ -117,8 +117,8 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.header):
             return 0
 
-        case .some(.stats(let viewData)):
-            return viewData.itemCount(for: selectedStatsFilter)
+        case .some(.stats):
+            return 1
 
         case .some(.events(let viewData)):
             return viewData.items.count
@@ -162,7 +162,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
         case .some(.stats(let viewData)):
             let itemHeight: NSCollectionLayoutDimension = viewData.hasContent(for: selectedStatsFilter)
-                ? .estimated(LayoutMetric.estimatedStatsRowHeight)
+                ? .estimated(LayoutMetric.estimatedStatsResultHeight)
                 : .estimated(LayoutMetric.estimatedStatsEmptyHeight)
             let section = makeListSectionLayout(itemHeight: itemHeight)
             if viewData.showsFilter {
@@ -176,7 +176,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
                     alignment: .top
                 )
                 filterHeader.pinToVisibleBounds = true
-                filterHeader.zIndex = 2
+                filterHeader.zIndex = 10
                 section.boundarySupplementaryItems = [filterHeader]
             }
             return appendVenueFooterIfNeeded(
@@ -219,11 +219,13 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             widthDimension: .fractionalWidth(1),
             heightDimension: .estimated(LayoutMetric.estimatedSectionHeaderHeight)
         )
-        return NSCollectionLayoutBoundarySupplementaryItem(
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: headerSize,
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .top
         )
+        header.zIndex = 1
+        return header
     }
 
     override func collectionView(
@@ -235,7 +237,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
 
         case .some(.stats(let viewData)):
-            return makeStatsCell(for: viewData, at: indexPath)
+            return makeStatsResultCell(for: viewData, at: indexPath)
 
         case .some(.events(let viewData)):
             return makeEventCell(for: viewData, at: indexPath)
@@ -248,7 +250,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         }
     }
 
-    private func makeStatsCell(
+    private func makeStatsResultCell(
         for viewData: SoccerMatchDetailStatsViewData,
         at indexPath: IndexPath
     ) -> UICollectionViewCell {
@@ -257,23 +259,13 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         }
 
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SoccerMatchStatsRowCell.reuseIdentifier,
+            withReuseIdentifier: SoccerMatchStatsResultCollectionCell.reuseIdentifier,
             for: indexPath
-        ) as? SoccerMatchStatsRowCell else {
+        ) as? SoccerMatchStatsResultCollectionCell else {
             return UICollectionViewCell()
         }
 
-        switch viewData.rowContent(at: indexPath.item, filter: selectedStatsFilter) {
-        case .some(.comparison(let row)):
-            cell.configure(with: row)
-
-        case .some(.value(let row)):
-            cell.configure(with: row)
-
-        case .none:
-            break
-        }
-
+        cell.configure(contents: viewData.resultContents(for: selectedStatsFilter))
         return cell
     }
 
@@ -363,25 +355,11 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
         switch sectionViewData(at: indexPath.section) {
         case .some(.stats(let viewData)):
-            guard viewData.showsFilter,
-                  let filterView = collectionView.dequeueReusableSupplementaryView(
-                    ofKind: kind,
-                    withReuseIdentifier: SoccerMatchFilterView.reuseIdentifier,
-                    for: indexPath
-                  ) as? SoccerMatchFilterView else {
-                return UICollectionReusableView()
-            }
-
-            filterView.configure(selectedOption: selectedStatsFilter)
-            filterView.onFilterChanged = { [weak self] option in
-                guard let self, self.selectedStatsFilter != option else {
-                    return
-                }
-
-                self.selectedStatsFilter = option
-                self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
-            }
-            return filterView
+            return makeStatsFilterView(
+                for: viewData,
+                kind: kind,
+                at: indexPath
+            )
 
         case .some(.events(let viewData)):
             return dequeueSectionTitleHeader(
@@ -413,6 +391,42 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
 
         case .none:
             return UICollectionReusableView()
+        }
+    }
+
+    private func makeStatsFilterView(
+        for viewData: SoccerMatchDetailStatsViewData,
+        kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard viewData.showsFilter,
+              let filterView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: SoccerMatchStatsFilterView.reuseIdentifier,
+                for: indexPath
+              ) as? SoccerMatchStatsFilterView else {
+            return UICollectionReusableView()
+        }
+
+        filterView.configure(selectedOption: selectedStatsFilter)
+        filterView.onFilterChanged = { [weak self] option in
+            self?.applyStatsFilter(option, section: indexPath.section)
+        }
+        return filterView
+    }
+
+    private func applyStatsFilter(
+        _ option: SoccerMatchFilterOption,
+        section: Int
+    ) {
+        guard selectedStatsFilter != option else {
+            return
+        }
+
+        selectedStatsFilter = option
+        collectionView.collectionViewLayout.invalidateLayout()
+        collectionView.performBatchUpdates {
+            collectionView.reloadSections(IndexSet(integer: section))
         }
     }
 

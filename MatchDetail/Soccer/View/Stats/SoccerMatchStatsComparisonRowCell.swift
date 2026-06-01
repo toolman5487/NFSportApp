@@ -1,5 +1,5 @@
 //
-//  SoccerMatchStatsRowCell.swift
+//  SoccerMatchStatsComparisonRowCell.swift
 //  NFSportApp
 //
 //  Created by Willy Hsu on 2026/5/29.
@@ -8,13 +8,13 @@
 import SnapKit
 import UIKit
 
-// MARK: - SoccerMatchStatsRowCell
+// MARK: - SoccerMatchStatsComparisonRowCell
 
-final class SoccerMatchStatsRowCell: UICollectionViewCell {
+final class SoccerMatchStatsComparisonRowCell: UICollectionViewCell {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "SoccerMatchStatsRowCell"
+    static let reuseIdentifier = "SoccerMatchStatsComparisonRowCell"
 
     // MARK: - Layout Metrics
 
@@ -27,8 +27,7 @@ final class SoccerMatchStatsRowCell: UICollectionViewCell {
         static let barSpacing: CGFloat = 4
         static let titleBottomSpacing: CGFloat = 8
         static let minBarRatio: CGFloat = 0.02
-    }
-
+}
     // MARK: - UI Components
 
     private let homeValueLabel: UILabel = {
@@ -101,10 +100,6 @@ final class SoccerMatchStatsRowCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with viewData: SoccerMatchStatsComparisonRowViewData) {
-        homeValueLabel.isHidden = false
-        barContainerView.isHidden = false
-        barHeightConstraint?.update(offset: LayoutMetric.barHeight)
-
         homeValueLabel.text = viewData.homeValue
         awayValueLabel.text = viewData.awayValue
         titleLabel.text = viewData.title
@@ -121,15 +116,6 @@ final class SoccerMatchStatsRowCell: UICollectionViewCell {
             make.trailing.top.bottom.equalToSuperview()
             make.leading.equalTo(homeBarView.snp.trailing).offset(LayoutMetric.barSpacing)
         }
-    }
-
-    func configure(with viewData: SoccerMatchStatsValueRowViewData) {
-        homeValueLabel.isHidden = true
-        barContainerView.isHidden = true
-        barHeightConstraint?.update(offset: 0)
-
-        titleLabel.text = viewData.title
-        awayValueLabel.text = viewData.value
     }
 
     // MARK: - Setup
@@ -178,4 +164,5 @@ final class SoccerMatchStatsRowCell: UICollectionViewCell {
             make.leading.equalTo(homeBarView.snp.trailing).offset(LayoutMetric.barSpacing)
         }
     }
+
 }

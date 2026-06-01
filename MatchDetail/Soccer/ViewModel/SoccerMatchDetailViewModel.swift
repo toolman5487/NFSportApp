@@ -106,13 +106,13 @@ final class SoccerMatchDetailViewModel {
             .header(makeHeaderViewData(from: detail.fixture, phase: phase))
         ]
 
+        if displayPolicy.showsStatsSection {
+            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
+        }
+
         if displayPolicy.showsEventsSection,
            let eventsSection = makeEventsSection(from: detail.events, fixture: detail.fixture) {
             sections.append(.events(eventsSection))
-        }
-
-        if displayPolicy.showsStatsSection {
-            sections.append(.stats(makeStatsViewData(from: detail, phase: phase)))
         }
 
         if displayPolicy.showsLineupsSection,
