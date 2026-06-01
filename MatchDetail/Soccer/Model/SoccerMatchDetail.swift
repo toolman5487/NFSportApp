@@ -86,6 +86,39 @@ nonisolated struct SoccerMatchStatistic: Equatable, Identifiable, Sendable {
     let value: String?
 }
 
+nonisolated extension SoccerMatchStatistic {
+
+    static let preferredDisplayOrder: [String] = [
+        "Ball Possession",
+        "Shots on Goal",
+        "Shots off Goal",
+        "Total Shots",
+        "Blocked Shots",
+        "Shots insidebox",
+        "Shots outsidebox",
+        "Corner Kicks",
+        "Offsides",
+        "Fouls",
+        "Yellow Cards",
+        "Red Cards",
+        "Goalkeeper Saves",
+        "Total passes",
+        "Passes accurate",
+        "Passes %"
+    ]
+
+    static func compareDisplayOrder(lhs: String, rhs: String) -> Bool {
+        let lhsIndex = preferredDisplayOrder.firstIndex(of: lhs) ?? Int.max
+        let rhsIndex = preferredDisplayOrder.firstIndex(of: rhs) ?? Int.max
+
+        if lhsIndex != rhsIndex {
+            return lhsIndex < rhsIndex
+        }
+
+        return lhs.localizedStandardCompare(rhs) == .orderedAscending
+    }
+}
+
 // MARK: - Events
 
 nonisolated struct SoccerMatchEvent: Equatable, Identifiable, Sendable {

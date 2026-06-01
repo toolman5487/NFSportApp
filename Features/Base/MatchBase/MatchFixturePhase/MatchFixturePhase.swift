@@ -55,7 +55,7 @@ extension MatchFixturePhase {
         let statsEmptySubtitle: String
     }
 
-    func displayPolicy(for sport: MatchFixtureSport) -> DisplayPolicy {
+    nonisolated func displayPolicy(for sport: MatchFixtureSport) -> DisplayPolicy {
         switch sport {
         case .soccer:
             return soccerDisplayPolicy
@@ -71,7 +71,7 @@ extension MatchFixturePhase {
         case finished
     }
 
-    var scoreBreakdownStyle: ScoreBreakdownStyle {
+    nonisolated var scoreBreakdownStyle: ScoreBreakdownStyle {
         switch self {
         case .scheduled, .postponed, .cancelled:
             return .none
@@ -84,7 +84,7 @@ extension MatchFixturePhase {
         }
     }
 
-    var navigationStatusStyle: MatchDetailNavigationStatusStyle {
+    nonisolated var navigationStatusStyle: MatchDetailNavigationStatusStyle {
         switch self {
         case .scheduled:
             return .upcoming
@@ -106,7 +106,7 @@ extension MatchFixturePhase {
         }
     }
 
-    func statusText(
+    nonisolated func statusText(
         fallbackStatusLong: String? = nil,
         fallbackStatusShort: String? = nil
     ) -> String {
@@ -180,7 +180,7 @@ extension MatchFixturePhase {
         }
     }
 
-    func statsViewMetadata(hasRows: Bool, sport: MatchFixtureSport) -> (displayState: MatchDetailStatsDisplayState, showsFilter: Bool) {
+    nonisolated func statsViewMetadata(hasRows: Bool, sport: MatchFixtureSport) -> (displayState: MatchDetailStatsDisplayState, showsFilter: Bool) {
         let policy = displayPolicy(for: sport)
 
         guard hasRows else {
@@ -201,7 +201,7 @@ extension MatchFixturePhase {
 
 private extension MatchFixturePhase {
 
-    var soccerDisplayPolicy: DisplayPolicy {
+    nonisolated var soccerDisplayPolicy: DisplayPolicy {
         switch self {
         case .scheduled:
             return DisplayPolicy(
@@ -301,7 +301,7 @@ private extension MatchFixturePhase {
 
 private extension MatchFixturePhase {
 
-    var teamSportsDisplayPolicy: DisplayPolicy {
+    nonisolated var teamSportsDisplayPolicy: DisplayPolicy {
         switch self {
         case .scheduled:
             return DisplayPolicy(

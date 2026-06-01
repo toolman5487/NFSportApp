@@ -66,6 +66,7 @@
 		159090742FC6B00000C7D0D6 /* SoccerMatchDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907D2FC6B00000C7D0D6 /* SoccerMatchDetailService.swift */; };
 		159090752FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */; };
 		159090762FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */; };
+		159090A22FC6B00000C7D0D6 /* SoccerMatchDetailPresentationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090A12FC6B00000C7D0D6 /* SoccerMatchDetailPresentationBuilder.swift */; };
 		159090782FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090812FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift */; };
 		159090792FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift */; };
 		15A100012FC5600000BEEF00 /* ContentStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A100112FC5600000BEEF00 /* ContentStateView.swift */; };
@@ -202,6 +203,7 @@
 		1590907D2FC6B00000C7D0D6 /* SoccerMatchDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailService.swift; sourceTree = "<group>"; };
 		1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailPresentation.swift; sourceTree = "<group>"; };
 		1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailViewModel.swift; sourceTree = "<group>"; };
+		159090A12FC6B00000C7D0D6 /* SoccerMatchDetailPresentationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailPresentationBuilder.swift; sourceTree = "<group>"; };
 		159090812FC6B4A100C7D0D6 /* SoccerMatchScoreHeaderTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchScoreHeaderTeamView.swift; sourceTree = "<group>"; };
 		159090822FC6B4A100C7D0D6 /* SoccerMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
 		15A100112FC5600000BEEF00 /* ContentStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStateView.swift; sourceTree = "<group>"; };
@@ -747,6 +749,7 @@
 			isa = PBXGroup;
 			children = (
 				1590907E2FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift */,
+				159090A12FC6B00000C7D0D6 /* SoccerMatchDetailPresentationBuilder.swift */,
 				1590907F2FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift */,
 			);
 			path = ViewModel;
@@ -1456,6 +1459,7 @@
 				159090732FC6B00000C7D0D6 /* SoccerMatchDetailEndpoint.swift in Sources */,
 				159090742FC6B00000C7D0D6 /* SoccerMatchDetailService.swift in Sources */,
 				159090752FC6B00000C7D0D6 /* SoccerMatchDetailPresentation.swift in Sources */,
+				159090A22FC6B00000C7D0D6 /* SoccerMatchDetailPresentationBuilder.swift in Sources */,
 				159090762FC6B00000C7D0D6 /* SoccerMatchDetailViewModel.swift in Sources */,
 				15EBBC7D2FC82C2700F3083A /* HockeyMatchDetailViewController.swift in Sources */,
 				15EBBC8B2FC8300100F3083A /* HockeyMatchDetail.swift in Sources */,

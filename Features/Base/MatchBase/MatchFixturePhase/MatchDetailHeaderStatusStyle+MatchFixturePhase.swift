@@ -11,7 +11,7 @@ import Foundation
 
 extension SoccerMatchDetailHeaderStatusStyle {
 
-    init(matchNavigationStyle: MatchDetailNavigationStatusStyle) {
+    nonisolated init(matchNavigationStyle: MatchDetailNavigationStatusStyle) {
         switch matchNavigationStyle {
         case .live:
             self = .live
@@ -38,7 +38,7 @@ extension SoccerMatchDetailHeaderStatusStyle {
 
 extension BasketballMatchDetailHeaderStatusStyle {
 
-    init(matchNavigationStyle: MatchDetailNavigationStatusStyle) {
+    nonisolated init(matchNavigationStyle: MatchDetailNavigationStatusStyle) {
         switch matchNavigationStyle {
         case .live:
             self = .live
@@ -65,7 +65,7 @@ extension BasketballMatchDetailHeaderStatusStyle {
 
 extension BaseballMatchDetailHeaderStatusStyle {
 
-    init(matchNavigationStyle: MatchDetailNavigationStatusStyle) {
+    nonisolated init(matchNavigationStyle: MatchDetailNavigationStatusStyle) {
         switch matchNavigationStyle {
         case .live:
             self = .live
