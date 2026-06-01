@@ -79,8 +79,10 @@
 		15A1EE5C2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE5D2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift */; };
 		15A1EE5E2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift */; };
 		15BBDF022FC86B1000F3083A /* BasketballMatchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BBDF012FC86B1000F3083A /* BasketballMatchFilterView.swift */; };
-		15BBDF042FC86B2000F3083A /* BasketballMatchStatsRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BBDF032FC86B2000F3083A /* BasketballMatchStatsRowCell.swift */; };
 		15BBDF062FC86B3000F3083A /* BasketballMatchStatsEmptyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BBDF052FC86B3000F3083A /* BasketballMatchStatsEmptyCell.swift */; };
+		15BBE0022FC9100000F3083A /* BasketballMatchStatsComparisonRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BBE0012FC9100000F3083A /* BasketballMatchStatsComparisonRowCell.swift */; };
+		15BBE0042FC9100000F3083A /* BasketballMatchStatsValueRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BBE0032FC9100000F3083A /* BasketballMatchStatsValueRowCell.swift */; };
+		15BBE0062FC9100000F3083A /* BasketballMatchStatsResultCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BBE0052FC9100000F3083A /* BasketballMatchStatsResultCollectionCell.swift */; };
 		15C927DE2FC43D7B000820EE /* MainSoccerHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */; };
 		15C928312FC46000000820EE /* MainSoccerHomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */; };
 		15C928332FC46000000820EE /* MainSoccerHomeEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */; };
@@ -118,8 +120,10 @@
 		15EBBC922FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift */; };
 		15EBBC932FC8480100F3083A /* MatchBaseVenueFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC922FC8480100F3083A /* MatchBaseVenueFooterView.swift */; };
 		15EBBC962FC84EE600F3083A /* BaseballMatchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBC952FC84EE600F3083A /* BaseballMatchFilterView.swift */; };
-		15EBBCA02FC85F0000F3083A /* BaseballMatchStatsRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBCA12FC85F0000F3083A /* BaseballMatchStatsRowCell.swift */; };
 		15EBBCA32FC85F1000F3083A /* BaseballMatchStatsEmptyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBCA42FC85F1000F3083A /* BaseballMatchStatsEmptyCell.swift */; };
+		15EBBD022FC9200000F3083A /* BaseballMatchStatsComparisonRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBD012FC9200000F3083A /* BaseballMatchStatsComparisonRowCell.swift */; };
+		15EBBD042FC9200000F3083A /* BaseballMatchStatsValueRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBD032FC9200000F3083A /* BaseballMatchStatsValueRowCell.swift */; };
+		15EBBD062FC9200000F3083A /* BaseballMatchStatsResultCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBBD052FC9200000F3083A /* BaseballMatchStatsResultCollectionCell.swift */; };
 		15EBDF1C2FC7EFDD00F3083A /* SoccerMatchScoreHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBDF1B2FC7EFDD00F3083A /* SoccerMatchScoreHeaderView.swift */; };
 		15EBDF312FC7F13A00F3083A /* BasketballMatchScoreHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EBDF302FC7F13A00F3083A /* BasketballMatchScoreHeaderView.swift */; };
 		15EF4F9C2FC0A62A0016E43C /* MainBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */; };
@@ -216,8 +220,10 @@
 		15A1EE5D2FC6DA30001F9FBC /* BasketballMatchScoreHeaderTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchScoreHeaderTeamView.swift; sourceTree = "<group>"; };
 		15A1EE5F2FC6DA40001F9FBC /* BasketballMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
 		15BBDF012FC86B1000F3083A /* BasketballMatchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchFilterView.swift; sourceTree = "<group>"; };
-		15BBDF032FC86B2000F3083A /* BasketballMatchStatsRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchStatsRowCell.swift; sourceTree = "<group>"; };
 		15BBDF052FC86B3000F3083A /* BasketballMatchStatsEmptyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchStatsEmptyCell.swift; sourceTree = "<group>"; };
+		15BBE0012FC9100000F3083A /* BasketballMatchStatsComparisonRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchStatsComparisonRowCell.swift; sourceTree = "<group>"; };
+		15BBE0032FC9100000F3083A /* BasketballMatchStatsValueRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchStatsValueRowCell.swift; sourceTree = "<group>"; };
+		15BBE0052FC9100000F3083A /* BasketballMatchStatsResultCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchStatsResultCollectionCell.swift; sourceTree = "<group>"; };
 		15C927DD2FC43D7B000820EE /* MainSoccerHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeViewController.swift; sourceTree = "<group>"; };
 		15C928302FC46000000820EE /* MainSoccerHomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeDashboard.swift; sourceTree = "<group>"; };
 		15C928322FC46000000820EE /* MainSoccerHomeEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSoccerHomeEndpoint.swift; sourceTree = "<group>"; };
@@ -255,8 +261,10 @@
 		15EBBC882FC8300100F3083A /* HockeyMatchDetailVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyMatchDetailVenueFooterView.swift; sourceTree = "<group>"; };
 		15EBBC922FC8480100F3083A /* MatchBaseVenueFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchBaseVenueFooterView.swift; sourceTree = "<group>"; };
 		15EBBC952FC84EE600F3083A /* BaseballMatchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchFilterView.swift; sourceTree = "<group>"; };
-		15EBBCA12FC85F0000F3083A /* BaseballMatchStatsRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchStatsRowCell.swift; sourceTree = "<group>"; };
 		15EBBCA42FC85F1000F3083A /* BaseballMatchStatsEmptyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchStatsEmptyCell.swift; sourceTree = "<group>"; };
+		15EBBD012FC9200000F3083A /* BaseballMatchStatsComparisonRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchStatsComparisonRowCell.swift; sourceTree = "<group>"; };
+		15EBBD032FC9200000F3083A /* BaseballMatchStatsValueRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchStatsValueRowCell.swift; sourceTree = "<group>"; };
+		15EBBD052FC9200000F3083A /* BaseballMatchStatsResultCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseballMatchStatsResultCollectionCell.swift; sourceTree = "<group>"; };
 		15EBDF1B2FC7EFDD00F3083A /* SoccerMatchScoreHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoccerMatchScoreHeaderView.swift; sourceTree = "<group>"; };
 		15EBDF302FC7F13A00F3083A /* BasketballMatchScoreHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketballMatchScoreHeaderView.swift; sourceTree = "<group>"; };
 		15EF4F9B2FC0A62A0016E43C /* MainBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainBaseViewController.swift; sourceTree = "<group>"; };
@@ -862,7 +870,9 @@
 			isa = PBXGroup;
 			children = (
 				15BBDF052FC86B3000F3083A /* BasketballMatchStatsEmptyCell.swift */,
-				15BBDF032FC86B2000F3083A /* BasketballMatchStatsRowCell.swift */,
+				15BBE0012FC9100000F3083A /* BasketballMatchStatsComparisonRowCell.swift */,
+				15BBE0052FC9100000F3083A /* BasketballMatchStatsResultCollectionCell.swift */,
+				15BBE0032FC9100000F3083A /* BasketballMatchStatsValueRowCell.swift */,
 			);
 			path = Stats;
 			sourceTree = "<group>";
@@ -1201,7 +1211,9 @@
 			isa = PBXGroup;
 			children = (
 				15EBBCA42FC85F1000F3083A /* BaseballMatchStatsEmptyCell.swift */,
-				15EBBCA12FC85F0000F3083A /* BaseballMatchStatsRowCell.swift */,
+				15EBBD012FC9200000F3083A /* BaseballMatchStatsComparisonRowCell.swift */,
+				15EBBD052FC9200000F3083A /* BaseballMatchStatsResultCollectionCell.swift */,
+				15EBBD032FC9200000F3083A /* BaseballMatchStatsValueRowCell.swift */,
 			);
 			path = Stats;
 			sourceTree = "<group>";
@@ -1446,8 +1458,10 @@
 				15A1EE582FC6DA20001F9FBC /* BasketballMatchDetailEndpoint.swift in Sources */,
 				15A1EE5A2FC6DA20001F9FBC /* BasketballMatchDetailService.swift in Sources */,
 				15BBDF022FC86B1000F3083A /* BasketballMatchFilterView.swift in Sources */,
-				15BBDF042FC86B2000F3083A /* BasketballMatchStatsRowCell.swift in Sources */,
 				15BBDF062FC86B3000F3083A /* BasketballMatchStatsEmptyCell.swift in Sources */,
+				15BBE0022FC9100000F3083A /* BasketballMatchStatsComparisonRowCell.swift in Sources */,
+				15BBE0042FC9100000F3083A /* BasketballMatchStatsValueRowCell.swift in Sources */,
+				15BBE0062FC9100000F3083A /* BasketballMatchStatsResultCollectionCell.swift in Sources */,
 				154000022FC20000008C60D9 /* MainHomeEndpoint.swift in Sources */,
 				1590906C2FC5A60B00C7D0D6 /* MatchBaseViewController.swift in Sources */,
 				159090722FC6B00000C7D0D6 /* SoccerMatchDetail.swift in Sources */,
@@ -1509,8 +1523,10 @@
 				15EBBC3C2FC80DEB00F3083A /* BaseballMatchDetailViewController.swift in Sources */,
 				15EBBC412FC8200000F3083A /* BaseballMatchDetail.swift in Sources */,
 				15EBBC962FC84EE600F3083A /* BaseballMatchFilterView.swift in Sources */,
-				15EBBCA02FC85F0000F3083A /* BaseballMatchStatsRowCell.swift in Sources */,
 				15EBBCA32FC85F1000F3083A /* BaseballMatchStatsEmptyCell.swift in Sources */,
+				15EBBD022FC9200000F3083A /* BaseballMatchStatsComparisonRowCell.swift in Sources */,
+				15EBBD042FC9200000F3083A /* BaseballMatchStatsValueRowCell.swift in Sources */,
+				15EBBD062FC9200000F3083A /* BaseballMatchStatsResultCollectionCell.swift in Sources */,
 				15EBBC422FC8200000F3083A /* BaseballMatchDetailPresentation.swift in Sources */,
 				15EBBC432FC8200000F3083A /* BaseballMatchDetailViewModel.swift in Sources */,
 				15EBBC492FC8210000F3083A /* BaseballMatchScoreHeaderTeamView.swift in Sources */,

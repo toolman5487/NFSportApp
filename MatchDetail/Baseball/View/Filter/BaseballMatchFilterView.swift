@@ -34,7 +34,7 @@ final class BaseballMatchFilterView: UICollectionReusableView {
     var onFilterChanged: ((BaseballMatchFilterOption) -> Void)?
 
     private let options = BaseballMatchFilterOption.allCases
-    private var selectedOption: BaseballMatchFilterOption = .home
+    private var selectedOption: BaseballMatchFilterOption = .total
     private var homeTeamName: String?
     private var awayTeamName: String?
 
@@ -89,7 +89,7 @@ final class BaseballMatchFilterView: UICollectionReusableView {
     override func prepareForReuse() {
         super.prepareForReuse()
         onFilterChanged = nil
-        selectedOption = .home
+        selectedOption = .total
         homeTeamName = nil
         awayTeamName = nil
     }

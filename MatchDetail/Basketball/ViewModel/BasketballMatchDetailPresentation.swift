@@ -101,17 +101,6 @@ nonisolated struct BasketballMatchDetailStatsViewData: Equatable, Sendable {
     let homeRows: [BasketballMatchStatsValueRowViewData]
     let awayRows: [BasketballMatchStatsValueRowViewData]
 
-    func itemCount(for filter: BasketballMatchFilterOption) -> Int {
-        switch displayState {
-        case .empty:
-            return 1
-
-        case .content:
-            let rowCount = rowCount(for: filter)
-            return rowCount > 0 ? rowCount : 1
-        }
-    }
-
     func hasContent(for filter: BasketballMatchFilterOption) -> Bool {
         switch displayState {
         case .empty:
@@ -122,31 +111,16 @@ nonisolated struct BasketballMatchDetailStatsViewData: Equatable, Sendable {
         }
     }
 
-    func rowContent(
-        at index: Int,
-        filter: BasketballMatchFilterOption
-    ) -> BasketballMatchStatsRowContent? {
+    func resultContents(for filter: BasketballMatchFilterOption) -> [BasketballMatchStatsResultContent] {
         switch filter {
         case .total:
-            guard comparisonRows.indices.contains(index) else {
-                return nil
-            }
-
-            return .comparison(comparisonRows[index])
+            return comparisonRows.map(BasketballMatchStatsResultContent.comparison)
 
         case .home:
-            guard homeRows.indices.contains(index) else {
-                return nil
-            }
-
-            return .value(homeRows[index])
+            return homeRows.map(BasketballMatchStatsResultContent.value)
 
         case .away:
-            guard awayRows.indices.contains(index) else {
-                return nil
-            }
-
-            return .value(awayRows[index])
+            return awayRows.map(BasketballMatchStatsResultContent.value)
         }
     }
 
@@ -175,7 +149,7 @@ nonisolated struct BasketballMatchDetailStatsViewData: Equatable, Sendable {
     }
 }
 
-nonisolated enum BasketballMatchStatsRowContent: Equatable, Sendable {
+nonisolated enum BasketballMatchStatsResultContent: Equatable, Sendable {
 
     case comparison(BasketballMatchStatsComparisonRowViewData)
     case value(BasketballMatchStatsValueRowViewData)

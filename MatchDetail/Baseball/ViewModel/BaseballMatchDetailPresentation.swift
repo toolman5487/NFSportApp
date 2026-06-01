@@ -73,11 +73,14 @@ nonisolated struct BaseballMatchDetailVenueViewData: Equatable, Sendable {
 
 nonisolated enum BaseballMatchFilterOption: Int, CaseIterable, Equatable, Sendable {
 
+    case total
     case home
     case away
 
     func title(homeTeamName: String?, awayTeamName: String?) -> String {
         switch self {
+        case .total:
+            return "Game Total"
         case .home:
             return homeTeamName ?? "Home"
         case .away:
@@ -96,17 +99,6 @@ nonisolated struct BaseballMatchDetailStatsViewData: Equatable, Sendable {
     let homeRows: [BaseballMatchStatsValueRowViewData]
     let awayRows: [BaseballMatchStatsValueRowViewData]
 
-    func itemCount(for filter: BaseballMatchFilterOption) -> Int {
-        switch displayState {
-        case .empty:
-            return 1
-
-        case .content:
-            let rowCount = rowCount(for: filter)
-            return rowCount > 0 ? rowCount : 1
-        }
-    }
-
     func hasContent(for filter: BaseballMatchFilterOption) -> Bool {
         switch displayState {
         case .empty:
@@ -117,24 +109,17 @@ nonisolated struct BaseballMatchDetailStatsViewData: Equatable, Sendable {
         }
     }
 
-    func rowContent(
-        at index: Int,
-        filter: BaseballMatchFilterOption
-    ) -> BaseballMatchStatsValueRowViewData? {
-        let rows: [BaseballMatchStatsValueRowViewData]
-
+    func resultContents(for filter: BaseballMatchFilterOption) -> [BaseballMatchStatsResultContent] {
         switch filter {
+        case .total:
+            return comparisonRows.map(BaseballMatchStatsResultContent.comparison)
+
         case .home:
-            rows = homeRows
+            return homeRows.map(BaseballMatchStatsResultContent.value)
+
         case .away:
-            rows = awayRows
+            return awayRows.map(BaseballMatchStatsResultContent.value)
         }
-
-        guard rows.indices.contains(index) else {
-            return nil
-        }
-
-        return rows[index]
     }
 
     var emptyCellText: (title: String, subtitle: String?) {
@@ -152,12 +137,20 @@ nonisolated struct BaseballMatchDetailStatsViewData: Equatable, Sendable {
 
     private func rowCount(for filter: BaseballMatchFilterOption) -> Int {
         switch filter {
+        case .total:
+            return comparisonRows.count
         case .home:
             return homeRows.count
         case .away:
             return awayRows.count
         }
     }
+}
+
+nonisolated enum BaseballMatchStatsResultContent: Equatable, Sendable {
+
+    case comparison(BaseballMatchStatsComparisonRowViewData)
+    case value(BaseballMatchStatsValueRowViewData)
 }
 
 nonisolated struct BaseballMatchStatsComparisonRowViewData: Equatable, Identifiable, Sendable {

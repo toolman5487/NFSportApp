@@ -1,20 +1,20 @@
 //
-//  BaseballMatchStatsRowCell.swift
+//  BaseballMatchStatsComparisonRowCell.swift
 //  NFSportApp
 //
-//  Created by Willy Hsu on 2026/5/29.
+//  Created by Codex on 2026/6/1.
 //
 
 import SnapKit
 import UIKit
 
-// MARK: - BaseballMatchStatsRowCell
+// MARK: - BaseballMatchStatsComparisonRowCell
 
-final class BaseballMatchStatsRowCell: UICollectionViewCell {
+final class BaseballMatchStatsComparisonRowCell: UICollectionViewCell {
 
     // MARK: - Constants
 
-    static let reuseIdentifier = "BaseballMatchStatsRowCell"
+    static let reuseIdentifier = "BaseballMatchStatsComparisonRowCell"
 
     // MARK: - Layout Metrics
 
@@ -76,8 +76,6 @@ final class BaseballMatchStatsRowCell: UICollectionViewCell {
 
     private let barContainerView = UIView()
 
-    private var barHeightConstraint: Constraint?
-
     // MARK: - Initialization
 
     override init(frame: CGRect) {
@@ -101,10 +99,6 @@ final class BaseballMatchStatsRowCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with viewData: BaseballMatchStatsComparisonRowViewData) {
-        homeValueLabel.isHidden = false
-        barContainerView.isHidden = false
-        barHeightConstraint?.update(offset: LayoutMetric.barHeight)
-
         homeValueLabel.text = viewData.homeValue
         awayValueLabel.text = viewData.awayValue
         titleLabel.text = viewData.title
@@ -121,15 +115,6 @@ final class BaseballMatchStatsRowCell: UICollectionViewCell {
             make.trailing.top.bottom.equalToSuperview()
             make.leading.equalTo(homeBarView.snp.trailing).offset(LayoutMetric.barSpacing)
         }
-    }
-
-    func configure(with viewData: BaseballMatchStatsValueRowViewData) {
-        homeValueLabel.isHidden = true
-        barContainerView.isHidden = true
-        barHeightConstraint?.update(offset: 0)
-
-        titleLabel.text = viewData.title
-        awayValueLabel.text = viewData.value
     }
 
     // MARK: - Setup
@@ -164,7 +149,7 @@ final class BaseballMatchStatsRowCell: UICollectionViewCell {
         barContainerView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(LayoutMetric.titleBottomSpacing)
             make.leading.trailing.equalToSuperview().inset(LayoutMetric.horizontalInset)
-            barHeightConstraint = make.height.equalTo(LayoutMetric.barHeight).constraint
+            make.height.equalTo(LayoutMetric.barHeight)
             make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset)
         }
 

@@ -17,7 +17,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         static let estimatedHeaderHeight: CGFloat = 360
         static let estimatedVenueHeight: CGFloat = 96
         static let estimatedFilterHeaderHeight: CGFloat = BaseballMatchFilterView.preferredHeight
-        static let estimatedStatsRowHeight: CGFloat = 56
+        static let estimatedStatsResultHeight: CGFloat = 56
         static let estimatedStatsEmptyHeight: CGFloat = 200
     }
 
@@ -29,7 +29,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
     private var screenTitle: String
     private var headerViewData: BaseballMatchDetailHeaderViewData?
     private var sections: [BaseballMatchDetailSectionViewData] = []
-    private var selectedStatsFilter: BaseballMatchFilterOption = .home
+    private var selectedStatsFilter: BaseballMatchFilterOption = .total
 
     // MARK: - Initialization
 
@@ -67,8 +67,8 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             withReuseIdentifier: BaseballMatchFilterView.reuseIdentifier
         )
         collectionView.register(
-            BaseballMatchStatsRowCell.self,
-            forCellWithReuseIdentifier: BaseballMatchStatsRowCell.reuseIdentifier
+            BaseballMatchStatsResultCollectionCell.self,
+            forCellWithReuseIdentifier: BaseballMatchStatsResultCollectionCell.reuseIdentifier
         )
         collectionView.register(
             BaseballMatchStatsEmptyCell.self,
@@ -98,11 +98,11 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch sectionViewData(at: section) {
-        case .some(.header(_)):
+        case .some(.header):
             return 0
 
-        case .some(.stats(let viewData)):
-            return viewData.itemCount(for: selectedStatsFilter)
+        case .some(.stats):
+            return 1
 
         case .none:
             return 0
@@ -138,7 +138,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
 
         case .some(.stats(let viewData)):
             let itemHeight: NSCollectionLayoutDimension = viewData.hasContent(for: selectedStatsFilter)
-                ? .estimated(LayoutMetric.estimatedStatsRowHeight)
+                ? .estimated(LayoutMetric.estimatedStatsResultHeight)
                 : .estimated(LayoutMetric.estimatedStatsEmptyHeight)
             let section = makeListSectionLayout(itemHeight: itemHeight)
             if viewData.showsFilter {
@@ -152,7 +152,7 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
                     alignment: .top
                 )
                 filterHeader.pinToVisibleBounds = true
-                filterHeader.zIndex = 2
+                filterHeader.zIndex = 10
                 section.boundarySupplementaryItems = [filterHeader]
             }
             return appendVenueFooterIfNeeded(
@@ -173,18 +173,18 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         switch sectionViewData(at: indexPath.section) {
-        case .some(.header(_)):
+        case .some(.header):
             return UICollectionViewCell()
 
         case .some(.stats(let viewData)):
-            return makeStatsCell(for: viewData, at: indexPath)
+            return makeStatsResultCell(for: viewData, at: indexPath)
 
         case .none:
             return UICollectionViewCell()
         }
     }
 
-    private func makeStatsCell(
+    private func makeStatsResultCell(
         for viewData: BaseballMatchDetailStatsViewData,
         at indexPath: IndexPath
     ) -> UICollectionViewCell {
@@ -193,16 +193,13 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
         }
 
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: BaseballMatchStatsRowCell.reuseIdentifier,
+            withReuseIdentifier: BaseballMatchStatsResultCollectionCell.reuseIdentifier,
             for: indexPath
-        ) as? BaseballMatchStatsRowCell else {
+        ) as? BaseballMatchStatsResultCollectionCell else {
             return UICollectionViewCell()
         }
 
-        if let row = viewData.rowContent(at: indexPath.item, filter: selectedStatsFilter) {
-            cell.configure(with: row)
-        }
-
+        cell.configure(contents: viewData.resultContents(for: selectedStatsFilter))
         return cell
     }
 
@@ -235,48 +232,29 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
             return UICollectionReusableView()
         }
 
+        if kind == UICollectionView.elementKindSectionFooter,
+           shouldShowVenueFooter(
+               at: indexPath.section,
+               numberOfSections: sections.count,
+               hasVenue: headerViewData?.venue != nil
+           ),
+           let venue = headerViewData?.venue,
+           let footerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: BaseballMatchDetailVenueFooterView.reuseIdentifier,
+            for: indexPath
+           ) as? BaseballMatchDetailVenueFooterView {
+            footerView.configure(with: venue)
+            return footerView
+        }
+
         switch sectionViewData(at: indexPath.section) {
         case .some(.stats(let viewData)):
-            if kind == UICollectionView.elementKindSectionFooter,
-               shouldShowVenueFooter(
-                   at: indexPath.section,
-                   numberOfSections: sections.count,
-                   hasVenue: headerViewData?.venue != nil
-               ),
-               let venue = headerViewData?.venue,
-               let footerView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: BaseballMatchDetailVenueFooterView.reuseIdentifier,
-                for: indexPath
-               ) as? BaseballMatchDetailVenueFooterView {
-                footerView.configure(with: venue)
-                return footerView
-            }
-
-            guard viewData.showsFilter,
-                  kind == UICollectionView.elementKindSectionHeader,
-                  let filterView = collectionView.dequeueReusableSupplementaryView(
-                    ofKind: kind,
-                    withReuseIdentifier: BaseballMatchFilterView.reuseIdentifier,
-                    for: indexPath
-                  ) as? BaseballMatchFilterView else {
-                return UICollectionReusableView()
-            }
-
-            filterView.configure(
-                selectedOption: selectedStatsFilter,
-                homeTeamName: viewData.homeTeamName,
-                awayTeamName: viewData.awayTeamName
+            return makeStatsFilterView(
+                for: viewData,
+                kind: kind,
+                at: indexPath
             )
-            filterView.onFilterChanged = { [weak self] option in
-                guard let self, self.selectedStatsFilter != option else {
-                    return
-                }
-
-                self.selectedStatsFilter = option
-                self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
-            }
-            return filterView
 
         case .some(.header(let viewData)):
             guard kind == UICollectionView.elementKindSectionHeader,
@@ -293,6 +271,47 @@ final class BaseballMatchDetailViewController: MatchBaseViewController {
 
         case .none:
             return UICollectionReusableView()
+        }
+    }
+
+    private func makeStatsFilterView(
+        for viewData: BaseballMatchDetailStatsViewData,
+        kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard viewData.showsFilter,
+              kind == UICollectionView.elementKindSectionHeader,
+              let filterView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: BaseballMatchFilterView.reuseIdentifier,
+                for: indexPath
+              ) as? BaseballMatchFilterView else {
+            return UICollectionReusableView()
+        }
+
+        filterView.configure(
+            selectedOption: selectedStatsFilter,
+            homeTeamName: viewData.homeTeamName,
+            awayTeamName: viewData.awayTeamName
+        )
+        filterView.onFilterChanged = { [weak self] option in
+            self?.applyStatsFilter(option, section: indexPath.section)
+        }
+        return filterView
+    }
+
+    private func applyStatsFilter(
+        _ option: BaseballMatchFilterOption,
+        section: Int
+    ) {
+        guard selectedStatsFilter != option else {
+            return
+        }
+
+        selectedStatsFilter = option
+        collectionView.collectionViewLayout.invalidateLayout()
+        collectionView.performBatchUpdates {
+            collectionView.reloadSections(IndexSet(integer: section))
         }
     }
 
