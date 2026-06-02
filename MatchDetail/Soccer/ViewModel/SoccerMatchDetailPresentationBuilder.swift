@@ -261,67 +261,72 @@ nonisolated struct SoccerMatchDetailPresentationBuilder {
         let homeLineup = detail.lineups.first { matchesTeam($0.team, detail.fixture.homeTeam) }
         let awayLineup = detail.lineups.first { matchesTeam($0.team, detail.fixture.awayTeam) }
 
-        let rows = makeLineupComparisonRows(
-            homePlayers: homeLineup?.startXI ?? [],
-            awayPlayers: awayLineup?.startXI ?? []
+        let homeTeam = makeLineupTeamViewData(
+            teamName: detail.fixture.homeTeam.name,
+            lineup: homeLineup
+        )
+        let awayTeam = makeLineupTeamViewData(
+            teamName: detail.fixture.awayTeam.name,
+            lineup: awayLineup
         )
 
-        guard !rows.isEmpty else {
+        guard !homeTeam.formationRows.isEmpty || !awayTeam.formationRows.isEmpty else {
             return nil
         }
 
         return SoccerMatchDetailLineupsSectionViewData(
             title: "Lineups",
-            homeTeamName: detail.fixture.homeTeam.name,
-            awayTeamName: detail.fixture.awayTeam.name,
-            homeMetaText: makeLineupMetaText(from: homeLineup),
-            awayMetaText: makeLineupMetaText(from: awayLineup),
-            rows: rows
+            homeTeam: homeTeam,
+            awayTeam: awayTeam
         )
     }
 
-    private func makeLineupMetaText(from lineup: SoccerMatchLineup?) -> String? {
-        guard let lineup else {
+    private func makeLineupTeamViewData(
+        teamName: String,
+        lineup: SoccerMatchLineup?
+    ) -> SoccerMatchLineupTeamViewData {
+        SoccerMatchLineupTeamViewData(
+            name: teamName,
+            formationText: makeLineupFormationText(from: lineup),
+            coachText: makeLineupCoachText(from: lineup),
+            formationRows: makeLineupFormationRows(from: lineup?.startXI ?? []),
+            substitutes: sortedSubstitutePlayers(lineup?.substitutes ?? []).map(makeLineupPlayerViewData)
+        )
+    }
+
+    private func makeLineupFormationText(from lineup: SoccerMatchLineup?) -> String? {
+        guard let formation = lineup?.formation?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !formation.isEmpty else {
             return nil
         }
 
-        var parts: [String] = []
-        if let formation = lineup.formation?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !formation.isEmpty {
-            parts.append(formation)
-        }
-        if let coachName = lineup.coachName?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !coachName.isEmpty {
-            parts.append("Coach: \(coachName)")
-        }
-
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+        return formation
     }
 
-    private func makeLineupComparisonRows(
-        homePlayers: [SoccerMatchLineupPlayer],
-        awayPlayers: [SoccerMatchLineupPlayer]
-    ) -> [SoccerMatchLineupComparisonRowViewData] {
-        SoccerMatchLineupPositionGroup.allCases.flatMap { group in
-            let homeGroupPlayers = sortedLineupPlayers(
-                homePlayers.filter { makePositionGroup(from: $0) == group }
-            )
-            let awayGroupPlayers = sortedLineupPlayers(
-                awayPlayers.filter { makePositionGroup(from: $0) == group }
-            )
-            let rowCount = max(homeGroupPlayers.count, awayGroupPlayers.count)
+    private func makeLineupCoachText(from lineup: SoccerMatchLineup?) -> String? {
+        guard let coachName = lineup?.coachName?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !coachName.isEmpty else {
+            return nil
+        }
 
-            return (0..<rowCount).map { index in
-                SoccerMatchLineupComparisonRowViewData(
-                    positionTitle: index == 0 ? group.rawValue : nil,
-                    homePlayer: homeGroupPlayers.indices.contains(index)
-                        ? makeLineupPlayerViewData(from: homeGroupPlayers[index])
-                        : nil,
-                    awayPlayer: awayGroupPlayers.indices.contains(index)
-                        ? makeLineupPlayerViewData(from: awayGroupPlayers[index])
-                        : nil
-                )
+        return "Coach: \(coachName)"
+    }
+
+    private func makeLineupFormationRows(
+        from players: [SoccerMatchLineupPlayer]
+    ) -> [SoccerMatchLineupFormationRowViewData] {
+        let groupedPlayers = Dictionary(grouping: players, by: lineupFormationRowOrder)
+
+        return groupedPlayers.keys.sorted().compactMap { order in
+            let players = sortedFormationRowPlayers(groupedPlayers[order] ?? [])
+            guard !players.isEmpty else {
+                return nil
             }
+
+            return SoccerMatchLineupFormationRowViewData(
+                title: makeFormationRowTitle(from: players),
+                players: players.map(makeLineupPlayerViewData)
+            )
         }
     }
 
@@ -329,9 +334,50 @@ nonisolated struct SoccerMatchDetailPresentationBuilder {
         SoccerMatchLineupPlayerViewData(
             id: player.id,
             displayName: player.name,
+            shortDisplayName: makeShortLineupDisplayName(from: player.name),
             numberText: player.number.map { "#\($0)" },
-            photoURL: player.photoURL
+            positionText: makeLineupPositionText(from: player.position)
         )
+    }
+
+    private func makeShortLineupDisplayName(from name: String) -> String {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let nameParts = trimmedName.split(separator: " ")
+        guard let lastName = nameParts.last, nameParts.count > 1 else {
+            return trimmedName
+        }
+
+        return String(lastName)
+    }
+
+    private func makeLineupPositionText(from position: String?) -> String? {
+        guard let position = position?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !position.isEmpty else {
+            return nil
+        }
+
+        switch position.uppercased() {
+        case "G":
+            return "GK"
+        case "D":
+            return "DEF"
+        case "M":
+            return "MID"
+        case "F":
+            return "FWD"
+        default:
+            return position.uppercased()
+        }
+    }
+
+    private func makeFormationRowTitle(from players: [SoccerMatchLineupPlayer]) -> String {
+        let positionGroups = players.map(makePositionGroup)
+        guard let firstGroup = positionGroups.first,
+              positionGroups.allSatisfy({ $0 == firstGroup }) else {
+            return "Line"
+        }
+
+        return firstGroup.rawValue
     }
 
     private func makePositionGroup(from player: SoccerMatchLineupPlayer) -> SoccerMatchLineupPositionGroup {
@@ -349,11 +395,11 @@ nonisolated struct SoccerMatchDetailPresentationBuilder {
         }
     }
 
-    private func sortedLineupPlayers(_ players: [SoccerMatchLineupPlayer]) -> [SoccerMatchLineupPlayer] {
+    private func sortedFormationRowPlayers(_ players: [SoccerMatchLineupPlayer]) -> [SoccerMatchLineupPlayer] {
         players.sorted { lhs, rhs in
-            switch (lineupGridOrder(lhs.grid), lineupGridOrder(rhs.grid)) {
-            case (.some(let lhsOrder), .some(let rhsOrder)):
-                return lhsOrder < rhsOrder
+            switch (lineupGridColumn(lhs.grid), lineupGridColumn(rhs.grid)) {
+            case (.some(let lhsColumn), .some(let rhsColumn)):
+                return lhsColumn < rhsColumn
             case (.some, .none):
                 return true
             case (.none, .some):
@@ -364,7 +410,55 @@ nonisolated struct SoccerMatchDetailPresentationBuilder {
         }
     }
 
-    private func lineupGridOrder(_ grid: String?) -> Int? {
+    private func sortedSubstitutePlayers(_ players: [SoccerMatchLineupPlayer]) -> [SoccerMatchLineupPlayer] {
+        players.sorted { lhs, rhs in
+            let lhsGroupOrder = positionGroupOrder(makePositionGroup(from: lhs))
+            let rhsGroupOrder = positionGroupOrder(makePositionGroup(from: rhs))
+            guard lhsGroupOrder == rhsGroupOrder else {
+                return lhsGroupOrder < rhsGroupOrder
+            }
+
+            switch (lhs.number, rhs.number) {
+            case (.some(let lhsNumber), .some(let rhsNumber)):
+                return lhsNumber < rhsNumber
+            case (.some, .none):
+                return true
+            case (.none, .some):
+                return false
+            case (.none, .none):
+                return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+            }
+        }
+    }
+
+    private func lineupFormationRowOrder(for player: SoccerMatchLineupPlayer) -> Int {
+        if let line = lineupGridComponents(player.grid)?.line {
+            return line
+        }
+
+        return 100 + positionGroupOrder(makePositionGroup(from: player))
+    }
+
+    private func positionGroupOrder(_ group: SoccerMatchLineupPositionGroup) -> Int {
+        switch group {
+        case .goalkeeper:
+            return 1
+        case .defender:
+            return 2
+        case .midfielder:
+            return 3
+        case .forward:
+            return 4
+        case .other:
+            return 5
+        }
+    }
+
+    private func lineupGridColumn(_ grid: String?) -> Int? {
+        lineupGridComponents(grid)?.column
+    }
+
+    private func lineupGridComponents(_ grid: String?) -> (line: Int, column: Int)? {
         guard let grid else {
             return nil
         }
@@ -374,7 +468,7 @@ nonisolated struct SoccerMatchDetailPresentationBuilder {
             return nil
         }
 
-        return parts[0] * 100 + parts[1]
+        return (line: parts[0], column: parts[1])
     }
 
     // MARK: - Stats Aggregation

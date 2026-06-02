@@ -21,7 +21,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         static let estimatedStatsResultHeight: CGFloat = 56
         static let estimatedStatsEmptyHeight: CGFloat = 200
         static let estimatedEventRowHeight: CGFloat = 72
-        static let estimatedLineupRowHeight: CGFloat = 112
+        static let estimatedLineupsHeight: CGFloat = 880
     }
 
     // MARK: - Properties
@@ -123,8 +123,8 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         case .some(.events(let viewData)):
             return viewData.items.count
 
-        case .some(.lineups(let viewData)):
-            return viewData.rows.count
+        case .some(.lineups):
+            return 1
 
         case .none:
             return 0
@@ -199,7 +199,7 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             )
 
         case .some(.lineups):
-            let section = makeListSectionLayout(itemHeight: .estimated(LayoutMetric.estimatedLineupRowHeight))
+            let section = makeListSectionLayout(itemHeight: .estimated(LayoutMetric.estimatedLineupsHeight))
             section.boundarySupplementaryItems = [makeSectionTitleHeaderItem()]
             return appendVenueFooterIfNeeded(
                 to: section,
@@ -311,19 +311,11 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SoccerMatchLineupTeamCell.reuseIdentifier,
             for: indexPath
-        ) as? SoccerMatchLineupTeamCell,
-              viewData.rows.indices.contains(indexPath.item) else {
+        ) as? SoccerMatchLineupTeamCell else {
             return UICollectionViewCell()
         }
 
-        cell.configure(
-            with: viewData.rows[indexPath.item],
-            showsTeamHeader: indexPath.item == 0,
-            homeTeamName: viewData.homeTeamName,
-            awayTeamName: viewData.awayTeamName,
-            homeMetaText: viewData.homeMetaText,
-            awayMetaText: viewData.awayMetaText
-        )
+        cell.configure(with: viewData)
         return cell
     }
 

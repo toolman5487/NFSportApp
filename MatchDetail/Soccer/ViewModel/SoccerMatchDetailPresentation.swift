@@ -247,34 +247,43 @@ nonisolated enum SoccerMatchDetailEventSide: Equatable, Sendable {
 nonisolated struct SoccerMatchDetailLineupsSectionViewData: Equatable, Sendable {
 
     let title: String
-    let homeTeamName: String
-    let awayTeamName: String
-    let homeMetaText: String?
-    let awayMetaText: String?
-    let rows: [SoccerMatchLineupComparisonRowViewData]
+    let homeTeam: SoccerMatchLineupTeamViewData
+    let awayTeam: SoccerMatchLineupTeamViewData
+
+    var hasSubstitutes: Bool {
+        !homeTeam.substitutes.isEmpty || !awayTeam.substitutes.isEmpty
+    }
 }
 
-nonisolated struct SoccerMatchLineupComparisonRowViewData: Equatable, Identifiable, Sendable {
+nonisolated struct SoccerMatchLineupTeamViewData: Equatable, Sendable {
+
+    let name: String
+    let formationText: String?
+    let coachText: String?
+    let formationRows: [SoccerMatchLineupFormationRowViewData]
+    let substitutes: [SoccerMatchLineupPlayerViewData]
+}
+
+nonisolated struct SoccerMatchLineupFormationRowViewData: Equatable, Identifiable, Sendable {
 
     var id: String {
         [
-            positionTitle ?? "",
-            homePlayer?.id ?? "empty-home",
-            awayPlayer?.id ?? "empty-away"
+            title,
+            players.map(\.id).joined(separator: "-")
         ].joined(separator: "|")
     }
 
-    let positionTitle: String?
-    let homePlayer: SoccerMatchLineupPlayerViewData?
-    let awayPlayer: SoccerMatchLineupPlayerViewData?
+    let title: String
+    let players: [SoccerMatchLineupPlayerViewData]
 }
 
 nonisolated struct SoccerMatchLineupPlayerViewData: Equatable, Identifiable, Sendable {
 
     let id: String
     let displayName: String
+    let shortDisplayName: String
     let numberText: String?
-    let photoURL: URL?
+    let positionText: String?
 }
 
 nonisolated enum SoccerMatchLineupPositionGroup: String, CaseIterable, Sendable {
