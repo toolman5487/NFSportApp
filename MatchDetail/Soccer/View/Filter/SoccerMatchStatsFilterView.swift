@@ -5,6 +5,7 @@
 //  Created by Willy Hsu on 2026/5/29.
 //
 
+import SDWebImage
 import SnapKit
 import UIKit
 
@@ -35,6 +36,10 @@ final class SoccerMatchStatsFilterView: UICollectionReusableView {
 
     private let options = SoccerMatchFilterOption.allCases
     private var selectedOption: SoccerMatchFilterOption = .total
+    private var homeTeamName: String?
+    private var homeTeamLogoURL: URL?
+    private var awayTeamName: String?
+    private var awayTeamLogoURL: URL?
 
     // MARK: - UI Components
 
@@ -88,10 +93,24 @@ final class SoccerMatchStatsFilterView: UICollectionReusableView {
         super.prepareForReuse()
         onFilterChanged = nil
         selectedOption = .total
+        homeTeamName = nil
+        homeTeamLogoURL = nil
+        awayTeamName = nil
+        awayTeamLogoURL = nil
     }
 
-    func configure(selectedOption: SoccerMatchFilterOption) {
+    func configure(
+        selectedOption: SoccerMatchFilterOption,
+        homeTeamName: String?,
+        homeTeamLogoURL: URL?,
+        awayTeamName: String?,
+        awayTeamLogoURL: URL?
+    ) {
         self.selectedOption = selectedOption
+        self.homeTeamName = homeTeamName
+        self.homeTeamLogoURL = homeTeamLogoURL
+        self.awayTeamName = awayTeamName
+        self.awayTeamLogoURL = awayTeamLogoURL
         collectionView.reloadData()
     }
 
@@ -133,10 +152,22 @@ extension SoccerMatchStatsFilterView: UICollectionViewDataSource {
         }
 
         let option = options[indexPath.item]
-        cell.configure(
-            title: option.title,
-            isSelected: option == selectedOption
-        )
+        let title: String
+        let logoURL: URL?
+
+        switch option {
+        case .total:
+            title = option.title
+            logoURL = nil
+        case .home:
+            title = homeTeamName ?? option.title
+            logoURL = homeTeamLogoURL
+        case .away:
+            title = awayTeamName ?? option.title
+            logoURL = awayTeamLogoURL
+        }
+
+        cell.configure(title: title, logoURL: logoURL, isSelected: option == selectedOption)
         return cell
     }
 }
@@ -191,11 +222,19 @@ private final class SoccerMatchStatsFilterOptionCell: UICollectionViewCell {
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
+        static let logoSize: CGFloat = 24
         static let horizontalInset: CGFloat = 8
         static let borderWidth: CGFloat = 1
     }
 
     // MARK: - UI Components
+
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.isHidden = true
+        return imageView
+    }()
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -221,7 +260,11 @@ private final class SoccerMatchStatsFilterOptionCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        logoImageView.sd_cancelCurrentImageLoad()
+        logoImageView.image = nil
+        logoImageView.isHidden = true
         titleLabel.text = nil
+        titleLabel.isHidden = false
         accessibilityTraits.remove(.selected)
     }
 
@@ -234,8 +277,19 @@ private final class SoccerMatchStatsFilterOptionCell: UICollectionViewCell {
 
     // MARK: - Configuration
 
-    func configure(title: String, isSelected: Bool) {
-        titleLabel.text = title
+    func configure(title: String, logoURL: URL?, isSelected: Bool) {
+        if let logoURL {
+            logoImageView.sd_setImage(with: logoURL)
+            logoImageView.isHidden = false
+            titleLabel.isHidden = true
+        } else {
+            logoImageView.sd_cancelCurrentImageLoad()
+            logoImageView.image = nil
+            logoImageView.isHidden = true
+            titleLabel.text = title
+            titleLabel.isHidden = false
+        }
+
         accessibilityLabel = title
         applySelectionState(isSelected)
     }
@@ -248,7 +302,13 @@ private final class SoccerMatchStatsFilterOptionCell: UICollectionViewCell {
 
         contentView.layer.masksToBounds = true
         contentView.layer.borderWidth = LayoutMetric.borderWidth
+        contentView.addSubview(logoImageView)
         contentView.addSubview(titleLabel)
+
+        logoImageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(LayoutMetric.logoSize)
+        }
 
         titleLabel.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(LayoutMetric.horizontalInset)
@@ -264,12 +324,18 @@ private final class SoccerMatchStatsFilterOptionCell: UICollectionViewCell {
             contentView.backgroundColor = .primaryLabel
             contentView.layer.borderColor = UIColor.primaryLabel.cgColor
             titleLabel.textColor = .backgroundColor
+            contentView.layer.shadowOpacity = 0
             accessibilityTraits.insert(.selected)
 
         case false:
             contentView.backgroundColor = .secondaryBackgroundColor
             contentView.layer.borderColor = UIColor.separator.withAlphaComponent(0.24).cgColor
             titleLabel.textColor = .primaryLabel
+            contentView.layer.shadowOpacity = 0
         }
+
+        logoImageView.layer.cornerRadius = LayoutMetric.logoSize / 2
+        logoImageView.layer.masksToBounds = false
+        logoImageView.backgroundColor = .clear
     }
 }

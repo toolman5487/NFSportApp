@@ -265,8 +265,27 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             return UICollectionViewCell()
         }
 
-        cell.configure(contents: viewData.resultContents(for: selectedStatsFilter))
+        let teamNames = statsResultTeamNames(for: viewData)
+        cell.configure(
+            contents: viewData.resultContents(for: selectedStatsFilter),
+            leadingTeamName: teamNames.leading,
+            centerTeamName: teamNames.center,
+            trailingTeamName: teamNames.trailing
+        )
         return cell
+    }
+
+    private func statsResultTeamNames(
+        for viewData: SoccerMatchDetailStatsViewData
+    ) -> (leading: String?, center: String?, trailing: String?) {
+        switch selectedStatsFilter {
+        case .home:
+            return (nil, viewData.homeTeamName, nil)
+        case .total:
+            return (viewData.homeTeamName, nil, viewData.awayTeamName)
+        case .away:
+            return (nil, viewData.awayTeamName, nil)
+        }
     }
 
     private func makeEventCell(
@@ -408,7 +427,13 @@ final class SoccerMatchDetailViewController: MatchBaseViewController {
             return UICollectionReusableView()
         }
 
-        filterView.configure(selectedOption: selectedStatsFilter)
+        filterView.configure(
+            selectedOption: selectedStatsFilter,
+            homeTeamName: viewData.homeTeamName,
+            homeTeamLogoURL: viewData.homeTeamLogoURL,
+            awayTeamName: viewData.awayTeamName,
+            awayTeamLogoURL: viewData.awayTeamLogoURL
+        )
         filterView.onFilterChanged = { [weak self] option in
             self?.applyStatsFilter(option, section: indexPath.section)
         }

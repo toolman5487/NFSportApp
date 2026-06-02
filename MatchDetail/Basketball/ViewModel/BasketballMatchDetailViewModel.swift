@@ -221,7 +221,9 @@ final class BasketballMatchDetailViewModel {
                     viewData: appendQuarterPeriods(
                         to: BasketballMatchDetailStatsViewData(
                             homeTeamName: fixture.homeTeam.name,
+                            homeTeamLogoURL: fixture.homeTeam.logoURL,
                             awayTeamName: fixture.awayTeam.name,
+                            awayTeamLogoURL: fixture.awayTeam.logoURL,
                             displayState: .content,
                             showsFilter: true,
                             comparisonRows: comparisonRows,
@@ -272,7 +274,9 @@ final class BasketballMatchDetailViewModel {
             viewData: appendQuarterPeriods(
                 to: BasketballMatchDetailStatsViewData(
                     homeTeamName: fixture.homeTeam.name,
+                    homeTeamLogoURL: fixture.homeTeam.logoURL,
                     awayTeamName: fixture.awayTeam.name,
+                    awayTeamLogoURL: fixture.awayTeam.logoURL,
                     displayState: .content,
                     showsFilter: true,
                     comparisonRows: comparisonRows,
@@ -319,7 +323,9 @@ final class BasketballMatchDetailViewModel {
             phase: phase,
             viewData: BasketballMatchDetailStatsViewData(
                 homeTeamName: fixture.homeTeam.name,
+                homeTeamLogoURL: fixture.homeTeam.logoURL,
                 awayTeamName: fixture.awayTeam.name,
+                awayTeamLogoURL: fixture.awayTeam.logoURL,
                 displayState: .content,
                 showsFilter: true,
                 comparisonRows: comparisonRows,
@@ -417,7 +423,9 @@ final class BasketballMatchDetailViewModel {
 
         return BasketballMatchDetailStatsViewData(
             homeTeamName: viewData.homeTeamName,
+            homeTeamLogoURL: viewData.homeTeamLogoURL,
             awayTeamName: viewData.awayTeamName,
+            awayTeamLogoURL: viewData.awayTeamLogoURL,
             displayState: viewData.displayState,
             showsFilter: viewData.showsFilter,
             comparisonRows: viewData.comparisonRows + quarterComparisonRows,
@@ -438,7 +446,9 @@ final class BasketballMatchDetailViewModel {
 
         return BasketballMatchDetailStatsViewData(
             homeTeamName: fixture.homeTeam.name,
+            homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
+            awayTeamLogoURL: fixture.awayTeam.logoURL,
             displayState: metadata.displayState,
             showsFilter: metadata.showsFilter,
             comparisonRows: viewData.comparisonRows,
@@ -475,7 +485,9 @@ final class BasketballMatchDetailViewModel {
             phase: phase,
             viewData: BasketballMatchDetailStatsViewData(
                 homeTeamName: fixture.homeTeam.name,
+                homeTeamLogoURL: fixture.homeTeam.logoURL,
                 awayTeamName: fixture.awayTeam.name,
+                awayTeamLogoURL: fixture.awayTeam.logoURL,
                 displayState: .content,
                 showsFilter: false,
                 comparisonRows: [],

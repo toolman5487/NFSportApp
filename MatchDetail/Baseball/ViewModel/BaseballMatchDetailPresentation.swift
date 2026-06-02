@@ -73,16 +73,16 @@ nonisolated struct BaseballMatchDetailVenueViewData: Equatable, Sendable {
 
 nonisolated enum BaseballMatchFilterOption: Int, CaseIterable, Equatable, Sendable {
 
-    case total
     case home
+    case total
     case away
 
     func title(homeTeamName: String?, awayTeamName: String?) -> String {
         switch self {
-        case .total:
-            return "Game Total"
         case .home:
             return homeTeamName ?? "Home"
+        case .total:
+            return "Total Game"
         case .away:
             return awayTeamName ?? "Away"
         }
@@ -92,7 +92,9 @@ nonisolated enum BaseballMatchFilterOption: Int, CaseIterable, Equatable, Sendab
 nonisolated struct BaseballMatchDetailStatsViewData: Equatable, Sendable {
 
     let homeTeamName: String
+    let homeTeamLogoURL: URL?
     let awayTeamName: String
+    let awayTeamLogoURL: URL?
     let displayState: MatchDetailStatsDisplayState
     let showsFilter: Bool
     let comparisonRows: [BaseballMatchStatsComparisonRowViewData]

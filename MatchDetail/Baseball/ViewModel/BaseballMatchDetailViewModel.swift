@@ -213,7 +213,9 @@ final class BaseballMatchDetailViewModel {
                     viewData: appendInningPeriods(
                         to: BaseballMatchDetailStatsViewData(
                             homeTeamName: fixture.homeTeam.name,
+                            homeTeamLogoURL: fixture.homeTeam.logoURL,
                             awayTeamName: fixture.awayTeam.name,
+                            awayTeamLogoURL: fixture.awayTeam.logoURL,
                             displayState: .content,
                             showsFilter: true,
                             comparisonRows: comparisonRows,
@@ -247,7 +249,9 @@ final class BaseballMatchDetailViewModel {
             phase: phase,
             viewData: BaseballMatchDetailStatsViewData(
                 homeTeamName: fixture.homeTeam.name,
+                homeTeamLogoURL: fixture.homeTeam.logoURL,
                 awayTeamName: fixture.awayTeam.name,
+                awayTeamLogoURL: fixture.awayTeam.logoURL,
                 displayState: .content,
                 showsFilter: true,
                 comparisonRows: comparisonRows,
@@ -333,7 +337,9 @@ final class BaseballMatchDetailViewModel {
 
         return BaseballMatchDetailStatsViewData(
             homeTeamName: viewData.homeTeamName,
+            homeTeamLogoURL: viewData.homeTeamLogoURL,
             awayTeamName: viewData.awayTeamName,
+            awayTeamLogoURL: viewData.awayTeamLogoURL,
             displayState: viewData.displayState,
             showsFilter: viewData.showsFilter,
             comparisonRows: viewData.comparisonRows + inningComparisonRows,
@@ -354,7 +360,9 @@ final class BaseballMatchDetailViewModel {
 
         return BaseballMatchDetailStatsViewData(
             homeTeamName: fixture.homeTeam.name,
+            homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
+            awayTeamLogoURL: fixture.awayTeam.logoURL,
             displayState: metadata.displayState,
             showsFilter: metadata.showsFilter,
             comparisonRows: viewData.comparisonRows,
@@ -445,7 +453,9 @@ final class BaseballMatchDetailViewModel {
             phase: phase,
             viewData: BaseballMatchDetailStatsViewData(
                 homeTeamName: fixture.homeTeam.name,
+                homeTeamLogoURL: fixture.homeTeam.logoURL,
                 awayTeamName: fixture.awayTeam.name,
+                awayTeamLogoURL: fixture.awayTeam.logoURL,
                 displayState: .content,
                 showsFilter: false,
                 comparisonRows: [],

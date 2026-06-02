@@ -464,7 +464,9 @@ nonisolated struct SoccerMatchDetailPresentationBuilder {
 
         return SoccerMatchDetailStatsViewData(
             homeTeamName: fixture.homeTeam.name,
+            homeTeamLogoURL: fixture.homeTeam.logoURL,
             awayTeamName: fixture.awayTeam.name,
+            awayTeamLogoURL: fixture.awayTeam.logoURL,
             displayState: metadata.displayState,
             showsFilter: metadata.showsFilter,
             comparisonRows: comparisonRows,

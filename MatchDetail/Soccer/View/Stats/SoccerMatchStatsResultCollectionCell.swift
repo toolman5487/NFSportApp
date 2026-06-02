@@ -19,6 +19,8 @@ final class SoccerMatchStatsResultCollectionCell: UICollectionViewCell {
     // MARK: - Layout Metrics
 
     private enum LayoutMetric {
+        static let headerHeight: CGFloat = 24
+        static let headerBottomSpacing: CGFloat = 8
         static let interItemSpacing: CGFloat = 8
         static let estimatedItemHeight: CGFloat = 56
     }
@@ -29,6 +31,22 @@ final class SoccerMatchStatsResultCollectionCell: UICollectionViewCell {
     private var currentCollectionViewHeight: CGFloat = 0
 
     // MARK: - UI Components
+
+    private let leadingTeamLabel = SoccerMatchStatsResultCollectionCell.makeTeamLabel(alignment: .left)
+    private let centerTeamLabel = SoccerMatchStatsResultCollectionCell.makeTeamLabel(alignment: .center)
+    private let trailingTeamLabel = SoccerMatchStatsResultCollectionCell.makeTeamLabel(alignment: .right)
+
+    private lazy var teamNameStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [
+            leadingTeamLabel,
+            centerTeamLabel,
+            trailingTeamLabel
+        ])
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.distribution = .fillEqually
+        return stackView
+    }()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -66,13 +84,24 @@ final class SoccerMatchStatsResultCollectionCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         contents = []
+        configureTeamNames(leading: nil, center: nil, trailing: nil)
         collectionView.reloadData()
     }
 
     // MARK: - Configuration
 
-    func configure(contents: [SoccerMatchStatsResultContent]) {
+    func configure(
+        contents: [SoccerMatchStatsResultContent],
+        leadingTeamName: String?,
+        centerTeamName: String?,
+        trailingTeamName: String?
+    ) {
         self.contents = contents
+        configureTeamNames(
+            leading: leadingTeamName,
+            center: centerTeamName,
+            trailing: trailingTeamName
+        )
         collectionView.reloadData()
         updateCollectionViewHeightIfNeeded(for: collectionView.bounds.width)
     }
@@ -96,11 +125,40 @@ final class SoccerMatchStatsResultCollectionCell: UICollectionViewCell {
 
     private func setupView() {
         contentView.backgroundColor = .clear
+        contentView.addSubview(teamNameStackView)
         contentView.addSubview(collectionView)
 
-        collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        teamNameStackView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(LayoutMetric.headerHeight)
         }
+
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(teamNameStackView.snp.bottom).offset(LayoutMetric.headerBottomSpacing)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+
+    private func configureTeamNames(
+        leading: String?,
+        center: String?,
+        trailing: String?
+    ) {
+        leadingTeamLabel.text = leading
+        centerTeamLabel.text = center
+        trailingTeamLabel.text = trailing
+    }
+
+    private static func makeTeamLabel(alignment: NSTextAlignment) -> UILabel {
+        let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .footnote)
+        label.textColor = .secondaryLabel
+        label.textAlignment = alignment
+        label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.82
+        return label
     }
 
     private func makeCollectionViewLayout() -> UICollectionViewLayout {
@@ -126,6 +184,8 @@ final class SoccerMatchStatsResultCollectionCell: UICollectionViewCell {
         collectionView.layoutIfNeeded()
 
         let fittingHeight = collectionView.collectionViewLayout.collectionViewContentSize.height
+            + LayoutMetric.headerHeight
+            + LayoutMetric.headerBottomSpacing
         guard currentCollectionViewHeight != fittingHeight else {
             return currentCollectionViewHeight
         }
