@@ -157,14 +157,9 @@ final class SoccerMatchLineupTeamCell: UICollectionViewCell {
         substitutesContainerView.addSubview(substitutesStackView)
 
         contentStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(
-                UIEdgeInsets(
-                    top: LayoutMetric.verticalInset,
-                    left: LayoutMetric.horizontalInset,
-                    bottom: LayoutMetric.verticalInset,
-                    right: LayoutMetric.horizontalInset
-                )
-            )
+            make.top.equalToSuperview().inset(LayoutMetric.verticalInset)
+            make.leading.trailing.equalToSuperview().inset(LayoutMetric.horizontalInset)
+            make.bottom.equalToSuperview().inset(LayoutMetric.verticalInset).priority(999)
         }
 
         substitutesStackView.snp.makeConstraints { make in
@@ -439,14 +434,14 @@ private final class SoccerMatchLineupPitchView: UIView {
             make.top.equalToSuperview()
             make.centerX.equalToSuperview()
             make.width.equalTo(LayoutMetric.penaltyBoxWidth)
-            make.height.equalTo(LayoutMetric.penaltyBoxHeight)
+            make.height.equalTo(LayoutMetric.penaltyBoxHeight).priority(.high)
         }
 
         bottomPenaltyBoxView.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
             make.centerX.equalToSuperview()
             make.width.equalTo(LayoutMetric.penaltyBoxWidth)
-            make.height.equalTo(LayoutMetric.penaltyBoxHeight)
+            make.height.equalTo(LayoutMetric.penaltyBoxHeight).priority(.high)
         }
 
         fieldStackView.snp.makeConstraints { make in
@@ -461,7 +456,7 @@ private final class SoccerMatchLineupPitchView: UIView {
         }
 
         centerDividerView.snp.makeConstraints { make in
-            make.height.equalTo(LayoutMetric.centerDividerHeight)
+            make.height.equalTo(LayoutMetric.centerDividerHeight).priority(.high)
         }
 
         centerLineView.snp.makeConstraints { make in
@@ -663,7 +658,10 @@ private final class SoccerMatchLineupPlayerChipView: UIView {
 
         stackView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(LayoutMetric.contentInset)
-            make.height.greaterThanOrEqualTo(LayoutMetric.minimumHeight)
+        }
+
+        snp.makeConstraints { make in
+            make.height.greaterThanOrEqualTo(LayoutMetric.minimumHeight).priority(.high)
         }
 
         numberLabel.snp.makeConstraints { make in
@@ -873,7 +871,10 @@ private final class SoccerMatchLineupSubstituteRowView: UIView {
                     right: LayoutMetric.horizontalInset
                 )
             )
-            make.height.greaterThanOrEqualTo(LayoutMetric.minimumHeight)
+        }
+
+        snp.makeConstraints { make in
+            make.height.greaterThanOrEqualTo(LayoutMetric.minimumHeight).priority(.high)
         }
     }
 }

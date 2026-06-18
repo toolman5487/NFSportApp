@@ -11,6 +11,7 @@ nonisolated enum NetworkError: Error, Equatable, LocalizedError, Sendable {
     case invalidBaseURL
     case invalidURL
     case invalidResponse
+    case rateLimited(retryAfterSeconds: Int?)
     case unacceptableStatusCode(Int)
     case encodingFailed(String)
     case decodingFailed(String)
@@ -24,6 +25,12 @@ nonisolated enum NetworkError: Error, Equatable, LocalizedError, Sendable {
             return "Request URL is invalid."
         case .invalidResponse:
             return "Server response is invalid."
+        case .rateLimited(let retryAfterSeconds):
+            if let retryAfterSeconds {
+                return "API rate limit reached. Try again in \(retryAfterSeconds) seconds."
+            }
+
+            return "API rate limit reached. Please try again later."
         case .unacceptableStatusCode(let statusCode):
             return "Server returned status code \(statusCode)."
         case .encodingFailed(let message):
@@ -33,5 +40,13 @@ nonisolated enum NetworkError: Error, Equatable, LocalizedError, Sendable {
         case .requestFailed(let message):
             return "Request failed: \(message)"
         }
+    }
+
+    var isRateLimited: Bool {
+        guard case .rateLimited = self else {
+            return false
+        }
+
+        return true
     }
 }

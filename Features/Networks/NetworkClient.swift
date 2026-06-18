@@ -97,6 +97,10 @@ actor NetworkClient: NetworkServicing {
             AppLogger.logNetworkError(error, method: request.method.rawValue, path: request.path)
             throw error
         } catch {
+            if isCancellationError(error) {
+                throw error
+            }
+
             let networkError = NetworkError.requestFailed(error.localizedDescription)
             AppLogger.logNetworkError(networkError, method: request.method.rawValue, path: request.path)
             throw networkError
@@ -285,9 +289,33 @@ actor NetworkClient: NetworkServicing {
         switch HTTPStatusCategory(statusCode: httpResponse.statusCode) {
         case .success:
             return
+        case .clientError where httpResponse.statusCode == 429:
+            throw NetworkError.rateLimited(
+                retryAfterSeconds: retryAfterSeconds(from: httpResponse)
+            )
         case .informational, .redirection, .clientError, .serverError, .unexpected:
             throw NetworkError.unacceptableStatusCode(httpResponse.statusCode)
         }
+    }
+
+    private func retryAfterSeconds(from response: HTTPURLResponse) -> Int? {
+        guard let retryAfter = response.value(forHTTPHeaderField: "Retry-After") else {
+            return nil
+        }
+
+        return Int(retryAfter)
+    }
+
+    private func isCancellationError(_ error: Error) -> Bool {
+        if error is CancellationError {
+            return true
+        }
+
+        guard let urlError = error as? URLError else {
+            return false
+        }
+
+        return urlError.code == .cancelled
     }
 }
 

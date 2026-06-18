@@ -25,25 +25,105 @@ nonisolated struct SoccerMatchDetailService: SoccerMatchDetailServicing {
     }
 
     func fetchMatchDetail(fixtureID: Int) async throws -> SoccerMatchDetail {
-        async let fixturePayload = fetchFixturePayload(from: .fixture(id: fixtureID))
-        async let statistics = fetchStatistics(from: .statistics(fixtureID: fixtureID))
-        async let events = fetchEvents(from: .events(fixtureID: fixtureID))
-        async let lineups = fetchLineups(from: .lineups(fixtureID: fixtureID))
+        let resolvedFixturePayload = try await fetchFixturePayload(from: .fixture(id: fixtureID))
 
-        let resolvedFixturePayload = try await fixturePayload
-        let dedicatedStatistics = (try? await statistics) ?? []
-        let resolvedStatistics = dedicatedStatistics.isEmpty
-            ? resolvedFixturePayload.embeddedStatistics
-            : dedicatedStatistics
-        let resolvedEvents = (try? await events) ?? []
-        let resolvedLineups = (try? await lineups) ?? []
+        let optionalData = await fetchOptionalData(
+            fixtureID: fixtureID,
+            fixturePayload: resolvedFixturePayload
+        )
 
         return SoccerMatchDetail(
             fixture: resolvedFixturePayload.fixture,
-            statistics: resolvedStatistics,
-            events: resolvedEvents,
-            lineups: resolvedLineups
+            statistics: optionalData.statistics,
+            events: optionalData.events,
+            lineups: optionalData.lineups
         )
+    }
+
+    private func fetchOptionalData(
+        fixtureID: Int,
+        fixturePayload: APISoccerFixturePayload
+    ) async -> SoccerMatchDetailOptionalData {
+        var statistics = fixturePayload.embeddedStatistics
+        var events: [SoccerMatchEvent] = []
+        var lineups: [SoccerMatchLineup] = []
+
+        if statistics.isEmpty {
+            switch await fetchOptionalStatistics(fixtureID: fixtureID) {
+            case .fetched(let resolvedStatistics):
+                statistics = resolvedStatistics
+            case .unavailable:
+                break
+            case .rateLimited:
+                return SoccerMatchDetailOptionalData(
+                    statistics: statistics,
+                    events: events,
+                    lineups: lineups
+                )
+            }
+        }
+
+        switch await fetchOptionalEvents(fixtureID: fixtureID) {
+        case .fetched(let resolvedEvents):
+            events = resolvedEvents
+        case .unavailable:
+            break
+        case .rateLimited:
+            return SoccerMatchDetailOptionalData(
+                statistics: statistics,
+                events: events,
+                lineups: lineups
+            )
+        }
+
+        switch await fetchOptionalLineups(fixtureID: fixtureID) {
+        case .fetched(let resolvedLineups):
+            lineups = resolvedLineups
+        case .unavailable, .rateLimited:
+            break
+        }
+
+        return SoccerMatchDetailOptionalData(
+            statistics: statistics,
+            events: events,
+            lineups: lineups
+        )
+    }
+
+    private func fetchOptionalStatistics(
+        fixtureID: Int
+    ) async -> SoccerMatchDetailOptionalFetchResult<[SoccerMatchTeamStatistics]> {
+        await fetchOptionalValue {
+            try await fetchStatistics(from: .statistics(fixtureID: fixtureID))
+        }
+    }
+
+    private func fetchOptionalEvents(
+        fixtureID: Int
+    ) async -> SoccerMatchDetailOptionalFetchResult<[SoccerMatchEvent]> {
+        await fetchOptionalValue {
+            try await fetchEvents(from: .events(fixtureID: fixtureID))
+        }
+    }
+
+    private func fetchOptionalLineups(
+        fixtureID: Int
+    ) async -> SoccerMatchDetailOptionalFetchResult<[SoccerMatchLineup]> {
+        await fetchOptionalValue {
+            try await fetchLineups(from: .lineups(fixtureID: fixtureID))
+        }
+    }
+
+    private func fetchOptionalValue<Value: Sendable>(
+        _ operation: () async throws -> Value
+    ) async -> SoccerMatchDetailOptionalFetchResult<Value> {
+        do {
+            return .fetched(try await operation())
+        } catch let error as NetworkError where error.isRateLimited {
+            return .rateLimited
+        } catch {
+            return .unavailable
+        }
     }
 
     private func fetchFixturePayload(
@@ -110,6 +190,20 @@ private nonisolated struct APISoccerFixturePayload: Sendable {
 
     let fixture: SoccerMatchFixtureDetail
     let embeddedStatistics: [SoccerMatchTeamStatistics]
+}
+
+private nonisolated struct SoccerMatchDetailOptionalData: Sendable {
+
+    let statistics: [SoccerMatchTeamStatistics]
+    let events: [SoccerMatchEvent]
+    let lineups: [SoccerMatchLineup]
+}
+
+private nonisolated enum SoccerMatchDetailOptionalFetchResult<Value: Sendable>: Sendable {
+
+    case fetched(Value)
+    case unavailable
+    case rateLimited
 }
 
 // MARK: - Fixture Response
